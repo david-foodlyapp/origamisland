@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Origami Island | Batumi</title>
+    <meta
+      name="description"
+      content="Discover ultra-luxury branded residences, premium beachfront villas, and elite condominiums in Batumi's most prestigious communities. In collaboration with Cavalli, de Grisogono, and Paramount."
+    />
+    <meta
+      name="keywords"
+      content="Batumi real estate, luxury properties, luxury villas, branded apartments, Cavalli tower, de Grisogono, Batumi Marina, Origami lagoons"
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="icon" type="image/png" sizes="96x96" href="https://origamiholding.ge/favicon-96x96.png" />
+    <link rel="icon" type="image/svg+xml" href="https://origamiholding.ge/favicon.svg" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      {
+        const savedTheme = localStorage.getItem("origami_theme");
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        const theme = savedTheme || (prefersLight ? "light" : "dark");
+        document.documentElement.setAttribute("data-theme", theme);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+  </html>
