@@ -949,7 +949,7 @@ function App() {
 
         const payload: AboutUsResponse = await response.json();
         const aboutItem = payload.data
-          .filter((item) => item.status && item.type === "Origami Island")
+          .filter((item) => item.status && item.type === "origamisland")
           .sort((a, b) => a.rank - b.rank)[0] || null;
 
         setApiAboutData(aboutItem);
