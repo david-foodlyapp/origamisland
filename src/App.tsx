@@ -1,5 +1,6 @@
 import { FormEvent, InvalidEvent, useEffect, useRef, useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import GA4React from "react-ga4";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { translations, type Language, type TranslationKey } from "./i18n";
@@ -393,6 +394,10 @@ function App() {
   };
   const darkThemeLogoSrc = resolveBrandingLogo(branding, language, "dark");
   const lightThemeLogoSrc = resolveBrandingLogo(branding, language, "default");
+
+  useEffect(() => {
+    GA4React.initialize("G-QYSDYT7YGN");
+  }, []);
 
   useEffect(() => {
     const handleRouteChange = () => {
