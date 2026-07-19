@@ -1960,16 +1960,13 @@ function App() {
                 <ChevronIcon direction={openFooterSection === "services" ? "up" : "down"} />
               </button>
               <ul>
-                {serviceLinks.map((service) => (
-                  <li key={service}>
-                    <a
-                      href="#"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        openModal();
-                      }}
-                    >
-                      {service}
+                {(apiCompanyProjectsData?.items.length
+                  ? apiCompanyProjectsData.items.map((item) => ({ label: item.title, link: item.link || "#0" }))
+                  : serviceLinks.map((service) => ({ label: service, link: "#0" }))
+                ).map((service) => (
+                  <li key={service.label}>
+                    <a href={service.link}>
+                      {service.label}
                     </a>
                   </li>
                 ))}
@@ -2001,17 +1998,14 @@ function App() {
           </div>
 
           <div className="footer-bottom">
+            <p>{t("footer_copyright")}</p>
             <p>
-              {t("footer_copyright")} {t("footer_author_label")} :{" "}
+              {t("footer_author_label")} :{" "}
               <a href="https://github.com/david-gakhokia/" target="_blank" rel="noreferrer">
                 {"<D/G>"}
               </a>
               .
             </p>
-            <div className="footer-legal">
-              <a href="#">{t("footer_privacy")}</a>
-              <a href="#">{t("footer_terms")}</a>
-            </div>
           </div>
         </div>
       </footer>
