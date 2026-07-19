@@ -2012,7 +2012,7 @@ function App() {
                 aria-expanded={openFooterSection === "services"}
                 onClick={() => toggleFooterSection("services")}
               >
-                <span className="footer-column-title">{t("footer_col_services")}</span>
+                <span className="footer-column-title">{apiCompanyProjectsData?.title || t("footer_col_services")}</span>
                 <ChevronIcon direction={openFooterSection === "services" ? "up" : "down"} />
               </button>
               <ul>
