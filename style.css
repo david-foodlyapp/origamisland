@@ -533,6 +533,10 @@ header > .container::after {
   transition: var(--transition-smooth);
 }
 
+.mobile-nav-logo {
+  display: none;
+}
+
 /* --- Logo Light/Dark Switch Rules --- */
 .logo-light {
   display: none !important;
