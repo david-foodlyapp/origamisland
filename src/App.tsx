@@ -1,4 +1,5 @@
 import { FormEvent, InvalidEvent, useEffect, useRef, useState } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { translations, type Language, type TranslationKey } from "./i18n";
@@ -2211,6 +2212,7 @@ function App() {
         </div>
       </div>
 
+      <Analytics />
     </>
   );
 }
