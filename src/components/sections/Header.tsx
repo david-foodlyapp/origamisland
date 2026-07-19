@@ -70,6 +70,10 @@ export function Header({
         {!isUnitsVariant ? (
           <>
             <nav id="nav-menu" className={mobileMenuOpen ? "active" : ""}>
+              <div className="mobile-nav-logo theme-aware-logo">
+                <img src={darkThemeLogoSrc} alt="ORIGAMI" className="logo-img logo-dark" />
+                <img src={lightThemeLogoSrc} alt="ORIGAMI" className="logo-img logo-light" />
+              </div>
               <button
                 className="mobile-menu-close"
                 type="button"

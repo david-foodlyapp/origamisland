@@ -4056,15 +4056,16 @@ html[data-theme="dark"] .floating-widget-body {
     overflow-y: auto;
   }
 
-  nav::before {
-    content: "";
+  .mobile-nav-logo {
+    display: flex;
+    align-items: center;
     position: absolute;
-    top: 1.15rem;
+    top: 1.3rem;
     left: 1.35rem;
-    right: 5.3rem;
-    height: 1px;
-    background: linear-gradient(90deg, rgba(197, 168, 128, 0.55), rgba(197, 168, 128, 0));
-    opacity: 0.75;
+  }
+
+  .mobile-nav-logo .logo-img {
+    height: 26px;
   }
 
   .mobile-menu-close {
@@ -4725,7 +4726,7 @@ html[data-theme="dark"] .floating-widget-body {
     display: block;
     width: 18px;
     height: 18px;
-    color: rgba(214, 221, 238, 0.72);
+    color: var(--text-gray);
     flex-shrink: 0;
   }
 
@@ -4747,7 +4748,7 @@ html[data-theme="dark"] .floating-widget-body {
 
   .footer-column a {
     font-size: 0.98rem;
-    color: rgba(214, 221, 238, 0.72);
+    color: var(--text-gray);
   }
 
   .footer-column a:hover {
