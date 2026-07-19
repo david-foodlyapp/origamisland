@@ -2036,18 +2036,16 @@ function App() {
                 aria-expanded={openFooterSection === "legal"}
                 onClick={() => toggleFooterSection("legal")}
               >
-                <span className="footer-column-title">{t("footer_col_legal")}</span>
+                <span className="footer-column-title">{t("footer_col_contact")}</span>
                 <ChevronIcon direction={openFooterSection === "legal" ? "up" : "down"} />
               </button>
-              <ul>
+              <ul className="footer-contact-list">
+                <li>{t("footer_contact_address")}</li>
                 <li>
-                  <a href="#">{t("footer_privacy")}</a>
+                  <a href={`mailto:${t("footer_contact_email")}`}>{t("footer_contact_email")}</a>
                 </li>
                 <li>
-                  <a href="#">{t("footer_terms")}</a>
-                </li>
-                <li>
-                  <a href="#">{t("footer_cookies")}</a>
+                  <a href={`tel:${t("footer_contact_phone").replace(/\s+/g, "")}`}>{t("footer_contact_phone")}</a>
                 </li>
               </ul>
             </div>
@@ -2055,6 +2053,11 @@ function App() {
 
           <div className="footer-bottom">
             <p>{t("footer_copyright")}</p>
+            <div className="footer-legal">
+              <a href="#">{t("footer_privacy")}</a>
+              <a href="#">{t("footer_terms")}</a>
+              <a href="#">{t("footer_cookies")}</a>
+            </div>
             <p>
               {t("footer_author_label")} :{" "}
               <a href="https://github.com/david-gakhokia/" target="_blank" rel="noreferrer">
