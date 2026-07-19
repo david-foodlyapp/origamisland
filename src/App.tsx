@@ -46,7 +46,9 @@ import {
   type CompanyProjectsSectionResponse,
   type AboutUsApiItem,
   type AboutUsResponse,
-  type Community
+  type Community,
+  type SocialNetworkItem,
+  type SocialNetworksResponse
 } from "./types";
 import {
   DEFAULT_BUILDING_SLUG,
@@ -251,6 +253,7 @@ function App() {
   const [apiFinanceData, setApiFinanceData] = useState<{ title: string; description: string; items: FinanceApiItem[] } | null>(null);
   const [apiCompanyProjectsData, setApiCompanyProjectsData] = useState<{ title: string; items: CompanyProjectApiItem[] } | null>(null);
   const [apiFooterMenuItems, setApiFooterMenuItems] = useState<FooterMenuApiItem[]>([]);
+  const [apiSocialNetworks, setApiSocialNetworks] = useState<SocialNetworkItem[]>([]);
   const [branding, setBranding] = useState<BrandingSettings | null>(null);
   const [isCompanyProjectsLoading, setIsCompanyProjectsLoading] = useState(true);
   const [apiAboutData, setApiAboutData] = useState<AboutUsApiItem | null>(null);
@@ -660,6 +663,35 @@ function App() {
     loadFooterMenu();
     return () => controller.abort();
   }, [language]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadSocialNetworks = async () => {
+      try {
+        const response = await fetch("https://admin.origamiholding.com/api/social-networks", { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Social networks request failed: ${response.status}`);
+        }
+
+        const payload: SocialNetworksResponse = await response.json();
+        setApiSocialNetworks(
+          payload.data
+            .filter((item) => item.status)
+            .sort((a, b) => a.rank - b.rank)
+        );
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load social networks data:", error);
+        setApiSocialNetworks([]);
+      }
+    };
+
+    loadSocialNetworks();
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1912,15 +1944,33 @@ function App() {
               <p>{t("footer_desc")}</p>
 
               <div className="social-links">
-                <a href="#" aria-label="Facebook Page">
-                  <FacebookIcon />
-                </a>
-                <a href="#" aria-label="Instagram Profile">
-                  <InstagramIcon />
-                </a>
-                <a href="#" aria-label="LinkedIn Company Page">
-                  <LinkedInIcon />
-                </a>
+                {apiSocialNetworks.length > 0 ? (
+                  apiSocialNetworks.map((network) => (
+                    <a key={network.id} href={network.link} target="_blank" rel="noreferrer" aria-label={network.name}>
+                      {network.image_url ? (
+                        <img src={network.image_url} alt={network.name} width={18} height={18} />
+                      ) : network.name.toLowerCase() === "facebook" ? (
+                        <FacebookIcon />
+                      ) : network.name.toLowerCase() === "instagram" ? (
+                        <InstagramIcon />
+                      ) : (
+                        <LinkedInIcon />
+                      )}
+                    </a>
+                  ))
+                ) : (
+                  <>
+                    <a href="#" aria-label="Facebook Page">
+                      <FacebookIcon />
+                    </a>
+                    <a href="#" aria-label="Instagram Profile">
+                      <InstagramIcon />
+                    </a>
+                    <a href="#" aria-label="LinkedIn Company Page">
+                      <LinkedInIcon />
+                    </a>
+                  </>
+                )}
               </div>
             </div>
 

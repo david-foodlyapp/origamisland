@@ -3639,11 +3639,21 @@ footer > .container {
   transition: var(--transition-smooth);
 }
 
+.social-links a:has(img) {
+  background: #ffffff;
+}
+
 .social-links a:hover {
   border-color: var(--primary-gold);
   background: var(--gold-gradient);
   color: var(--bg-dark);
   transform: translateY(-3px);
+}
+
+.social-links a img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
 }
 
 .social-links svg {

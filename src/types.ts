@@ -404,6 +404,21 @@ export type FooterMenuSectionResponse = {
   };
 };
 
+export type SocialNetworkItem = {
+  id: number;
+  name: string;
+  icon: string | null;
+  custom_icon_url: string | null;
+  image_url: string | null;
+  link: string;
+  rank: number;
+  status: boolean;
+};
+
+export type SocialNetworksResponse = {
+  data: SocialNetworkItem[];
+};
+
 export type AboutUsApiItem = {
   id: number;
   type: string;
