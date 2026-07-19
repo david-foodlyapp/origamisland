@@ -38,8 +38,8 @@ import {
   type FinanceApiItem,
   type FinanceSectionResponse,
   type InfrastructureSectionResponse,
-  type MainMenuApiItem,
-  type MainMenuSectionResponse,
+  type FooterMenuApiItem,
+  type FooterMenuSectionResponse,
   type CompanyProjectApiItem,
   type CompanyProjectsSectionResponse,
   type AboutUsApiItem,
@@ -248,7 +248,7 @@ function App() {
   const [apiChooseData, setApiChooseData] = useState<{ title: string; items: ChooseApiItem[] } | null>(null);
   const [apiFinanceData, setApiFinanceData] = useState<{ title: string; description: string; items: FinanceApiItem[] } | null>(null);
   const [apiCompanyProjectsData, setApiCompanyProjectsData] = useState<{ title: string; items: CompanyProjectApiItem[] } | null>(null);
-  const [apiMainMenuItems, setApiMainMenuItems] = useState<MainMenuApiItem[]>([]);
+  const [apiFooterMenuItems, setApiFooterMenuItems] = useState<FooterMenuApiItem[]>([]);
   const [branding, setBranding] = useState<BrandingSettings | null>(null);
   const [isCompanyProjectsLoading, setIsCompanyProjectsLoading] = useState(true);
   const [apiAboutData, setApiAboutData] = useState<AboutUsApiItem | null>(null);
@@ -354,18 +354,22 @@ function App() {
     { title: t("finance_tourism"), icon: <AudienceOutlineIcon /> },
     { title: t("finance_rental_model"), icon: <CalendarIcon /> }
   ];
-  const primaryNavItems = (apiMainMenuItems.length > 0
-    ? apiMainMenuItems
+  const primaryNavItems = (apiFooterMenuItems.length > 0
+    ? apiFooterMenuItems
     : [
       { id: 1, slug: "about-us", title: t("nav_about"), subtitle: "", description: "", image: "", logo: "", link: "about-us", badge: "", rank: 1, status: true },
       { id: 2, slug: "biohacking", title: t("nav_biohacking"), subtitle: "", description: "", image: "", logo: "", link: "biohacking", badge: "", rank: 2, status: true },
       { id: 3, slug: "consultation", title: t("utility_schedule"), subtitle: "", description: "", image: "", logo: "", link: "consultation", badge: "", rank: 3, status: true }
-    ] satisfies MainMenuApiItem[]
-  ).map((item) => ({
-    href: `#${item.link || item.slug}`,
-    label: item.title,
-    isModalAction: (item.link || item.slug) === "consultation"
-  }));
+    ] satisfies FooterMenuApiItem[]
+  ).map((item) => {
+    const rawTarget = item.link || item.slug;
+    const anchor = rawTarget.replace(/^#+/, "");
+    return {
+      href: `#${anchor}`,
+      label: item.title,
+      isModalAction: anchor === "consultation"
+    };
+  });
   const resolvedGalleryItems: GalleryItem[] = apiGalleryItems.map((item, index) => ({
     id: item.id,
     title: item.title?.trim() || "",
@@ -624,16 +628,16 @@ function App() {
   useEffect(() => {
     const controller = new AbortController();
 
-    const loadMainMenu = async () => {
+    const loadFooterMenu = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/main-menu?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`https://admin.origamiholding.com/api/sections/menu?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
-          throw new Error(`Main menu request failed: ${response.status}`);
+          throw new Error(`Footer menu request failed: ${response.status}`);
         }
 
-        const payload: MainMenuSectionResponse = await response.json();
-        setApiMainMenuItems(
+        const payload: FooterMenuSectionResponse = await response.json();
+        setApiFooterMenuItems(
           payload.data.items
             .filter((item) => item.status)
             .sort((a, b) => a.rank - b.rank)
@@ -642,12 +646,12 @@ function App() {
         if (error instanceof DOMException && error.name === "AbortError") {
           return;
         }
-        console.error("Failed to load main menu data:", error);
-        setApiMainMenuItems([]);
+        console.error("Failed to load footer menu data:", error);
+        setApiFooterMenuItems([]);
       }
     };
 
-    loadMainMenu();
+    loadFooterMenu();
     return () => controller.abort();
   }, [language]);
 
@@ -1928,9 +1932,9 @@ function App() {
                 {primaryNavItems.map((item) => (
                   <li key={item.href}>
                     <a
-                      href={item.isModalAction ? "#" : item.href}
+                      href={"isModalAction" in item && item.isModalAction ? "#" : item.href}
                       onClick={(event) => {
-                        if (!item.isModalAction) {
+                        if (!("isModalAction" in item) || !item.isModalAction) {
                           return;
                         }
 

@@ -383,7 +383,7 @@ export type CompanyProjectsSectionResponse = {
   };
 };
 
-export type MainMenuApiItem = {
+export type FooterMenuApiItem = {
   id: number;
   slug: string;
   title: string;
@@ -397,10 +397,10 @@ export type MainMenuApiItem = {
   status: boolean;
 };
 
-export type MainMenuSectionResponse = {
+export type FooterMenuSectionResponse = {
   data: {
     title: string;
-    items: MainMenuApiItem[];
+    items: FooterMenuApiItem[];
   };
 };
 
