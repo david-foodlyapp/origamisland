@@ -910,7 +910,7 @@ function App() {
       setIsCompanyProjectsLoading(true);
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/company-projects?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`https://admin.origamiholding.com/api/sections/projects?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Company projects request failed: ${response.status}`);
         }
