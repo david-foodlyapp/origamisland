@@ -71,8 +71,9 @@ const copy = {
   studio: "სტუდიო",
   condition: "კონდიცია",
   conditionWhite: "თეთრი კარკასი",
-  conditionFull: "საბოლოო რემონტი",
-  conditionTurnkey: "მზა",
+  conditionFull: "რემონტით",
+  typeHotelRoom: "სასტუმროს ნომერი",
+  typeBrandedResidence: "ბრენდული რეზიდენცია",
   bathroomLabel: "სველი წერტილი",
   detailContact: "დაგვიკავშირდით",
   available: "ხელმისაწვდომი",
@@ -108,8 +109,12 @@ function bedroomOptionLabel(count: number) {
 
 const conditionOptions = [
   { value: "white", label: copy.conditionWhite },
-  { value: "full", label: copy.conditionFull },
-  { value: "turnkey", label: copy.conditionTurnkey }
+  { value: "full", label: copy.conditionFull }
+];
+
+const typeOptions = [
+  { value: "hotel_room", label: copy.typeHotelRoom },
+  { value: "apartment", label: copy.typeBrandedResidence }
 ];
 
 export function UnitCatalogPage({
@@ -324,10 +329,10 @@ export function UnitCatalogPage({
     ? (filters?.floors || []).find((item) => item.slug === draftQuery.floors[0])?.title?.trim() || `${copy.floorLabel} ${draftQuery.floors[0]}`
     : "";
   const selectedTypeLabel = draftQuery.types[0]
-    ? (filters?.types || []).find((item) => item.value === draftQuery.types[0])?.label || draftQuery.types[0]
+    ? typeOptions.find((item) => item.value === draftQuery.types[0])?.label || draftQuery.types[0]
     : "";
   const selectedStatusLabel = draftQuery.statuses[0]
-    ? (filters?.statuses || []).find((item) => item.value === draftQuery.statuses[0])?.label || draftQuery.statuses[0]
+    ? mapUnitStatusLabel(draftQuery.statuses[0], language)
     : "";
   const selectedBedroomsLabel = draftQuery.bedrooms[0]
     ? bedroomOptionLabel(Number(draftQuery.bedrooms[0]))
@@ -598,7 +603,7 @@ export function UnitCatalogPage({
                       <FilterSelect
                         label={copy.type}
                         value={draftQuery.types[0] || ""}
-                        options={(filters?.types || []).map((item) => ({ value: item.value, label: item.label }))}
+                        options={typeOptions}
                         allLabel={copy.all}
                         onChange={(value) => updateDraftQuery((current) => ({ ...current, types: value ? [value] : [] }), true)}
                       />
@@ -622,7 +627,7 @@ export function UnitCatalogPage({
                       <FilterSelect
                         label={copy.status}
                         value={draftQuery.statuses[0] || ""}
-                        options={(filters?.statuses || []).map((item) => ({ value: item.value, label: item.label }))}
+                        options={["available", "reserved", "sold"].map((value) => ({ value, label: mapUnitStatusLabel(value, language) }))}
                         allLabel={copy.all}
                         onChange={(value) => updateDraftQuery((current) => ({ ...current, statuses: value ? [value] : [] }), true)}
                       />
