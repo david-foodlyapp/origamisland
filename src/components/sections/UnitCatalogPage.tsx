@@ -610,9 +610,9 @@ export function UnitCatalogPage({
                           className="units-search-button"
                           type="button"
                           onClick={() => applyQuery({ ...draftQuery, page: 1 })}
+                          aria-label={copy.search}
                         >
                           <SearchIcon />
-                          <span>{copy.search}</span>
                         </button>
                         <div className="units-view-toggle units-view-toggle-mobile">
                           <button
@@ -645,7 +645,7 @@ export function UnitCatalogPage({
                     {filteredUnits.length ? filteredUnits.map((item) => (
                       <article key={item.id} className="unit-card" onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}>
                         <div className="unit-card-topline">
-                          <span className="unit-card-badge">{mapUnitStatusLabel(item.status, language)}</span>
+                          <span className={`unit-card-badge unit-card-badge--${item.status}`}>{mapUnitStatusLabel(item.status, language)}</span>
                           <span className="unit-card-floor">{copy.floorLabel} {item.floor?.number ?? "-"}</span>
                         </div>
                         <div className="unit-card-image">
