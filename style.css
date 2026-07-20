@@ -2106,7 +2106,10 @@ html[data-theme="dark"] .direction-card-description {
 .biohacking-section {
   position: relative;
   overflow: hidden;
+  min-height: 90vh;
   padding: 5rem 0;
+  display: flex;
+  align-items: center;
   background:
     linear-gradient(180deg, rgba(250, 248, 244, 0.82) 0%, rgba(250, 248, 244, 0.5) 42%, rgba(250, 248, 244, 0.86) 100%),
     var(--biohacking-bg, url("/assets/3d/7.jpg"));
@@ -2118,6 +2121,7 @@ html[data-theme="dark"] .direction-card-description {
 .biohacking-section .container {
   position: relative;
   z-index: 1;
+  width: 100%;
 }
 
 .biohacking-heading {
