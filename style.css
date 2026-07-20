@@ -2214,11 +2214,24 @@ html[data-theme="dark"] .direction-card-description {
   border: 1px solid rgba(var(--primary-gold-rgb), 0.28);
   background: rgba(255, 248, 239, 0.9);
   color: #c9a56e;
+  transition: var(--transition-smooth);
 }
 
 .biohacking-list-icon svg {
   width: 1.5rem;
   height: 1.5rem;
+  transition: var(--transition-smooth);
+}
+
+.biohacking-pillar-card:hover .biohacking-list-icon {
+  transform: scale(1.12) rotate(-8deg);
+  border-color: rgba(var(--primary-gold-rgb), 0.5);
+  background: rgba(255, 248, 239, 1);
+  box-shadow: 0 6px 18px rgba(var(--primary-gold-rgb), 0.28);
+}
+
+.biohacking-pillar-card:hover .biohacking-list-icon svg {
+  transform: scale(1.08);
 }
 
 html[data-theme="dark"] .biohacking-pillar-card {
@@ -5421,6 +5434,21 @@ html[data-theme="dark"] .modal-content {
   background: rgba(255, 255, 255, 0.03);
 }
 
+.units-table-image-cell {
+  padding: 0.6rem !important;
+  width: 72px;
+}
+
+.units-table-image,
+.units-table-image-placeholder {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  object-fit: cover;
+  display: block;
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .units-pagination {
   display: flex;
   justify-content: center;
@@ -5779,6 +5807,10 @@ html[data-theme="light"] .unit-icon-button {
 html[data-theme="light"] .unit-card-price,
 html[data-theme="light"] .unit-card-badge {
   color: #8e734f;
+}
+
+html[data-theme="light"] .units-table-image-placeholder {
+  background: rgba(184, 153, 118, 0.1);
 }
 
 html[data-theme="light"] .units-filter-control span,

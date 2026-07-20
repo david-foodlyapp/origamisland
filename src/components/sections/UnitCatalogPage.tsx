@@ -75,8 +75,8 @@ const copyKa = {
   bedroomLabel: "საძინებელი",
   studio: "სტუდიო",
   condition: "კონდიცია",
-  conditionWhite: "თეთრი კარკასი",
-  conditionFull: "რემონტით",
+  conditionWhite: "მწვანე",
+  conditionFull: "სრულად აღჭურვილი",
   typeHotelRoom: "სასტუმროს ნომერი",
   typeBrandedResidence: "ბრენდული რეზიდენცია",
   bathroomLabel: "სველი წერტილი",
@@ -86,6 +86,7 @@ const copyKa = {
   totalArea: "საერთო ფართი",
   area: "ფართი",
   number: "ბინა",
+  image: "სურათი",
   image3d: "3D",
   image2d: "2D",
   floorPlan: "Floor Plan",
@@ -129,8 +130,8 @@ const copyEn: typeof copyKa = {
   bedroomLabel: "Bedroom",
   studio: "Studio",
   condition: "Condition",
-  conditionWhite: "White frame",
-  conditionFull: "Renovated",
+  conditionWhite: "Green",
+  conditionFull: "Turn key",
   typeHotelRoom: "Hotel Room",
   typeBrandedResidence: "Branded Residence",
   bathroomLabel: "Bathroom",
@@ -140,6 +141,7 @@ const copyEn: typeof copyKa = {
   totalArea: "Total area",
   area: "Area",
   number: "Unit",
+  image: "Image",
   image3d: "3D",
   image2d: "2D",
   floorPlan: "Floor Plan",
@@ -177,8 +179,8 @@ function bedroomOptionLabel(count: number, copy: typeof copyKa) {
 
 function getConditionOptions(copy: typeof copyKa) {
   return [
-    { value: "white", label: copy.conditionWhite },
-    { value: "full", label: copy.conditionFull }
+    { value: "green", label: copy.conditionWhite },
+    { value: "turnkey", label: copy.conditionFull }
   ];
 }
 
@@ -363,13 +365,15 @@ export function UnitCatalogPage({
     { icon: <KeyIcon />, label: copy.status, value: mapUnitStatusLabel(unit.status, language) }
   ] : [];
   const filteredUnits = useMemo(() => {
+    // TODO: temporary — show only available units, remove when ready to show all statuses again
+    const availableUnits = units.filter((item) => item.status === "available");
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     if (!normalizedSearch) {
-      return units;
+      return availableUnits;
     }
 
-    return units.filter((item) => {
+    return availableUnits.filter((item) => {
       const displayTitle = getUnitDisplayTitle(item, language).toLowerCase();
       const typeLabel = mapUnitTypeLabel(item.type, language).toLowerCase();
       const unitNumber = item.unit_number?.toLowerCase() || "";
@@ -397,7 +401,6 @@ export function UnitCatalogPage({
   const activeFilterCount = [
     draftQuery.floors.length,
     draftQuery.types.length,
-    draftQuery.statuses.length,
     draftQuery.bedrooms.length,
     condition ? 1 : 0,
     searchTerm.trim() ? 1 : 0
@@ -408,9 +411,6 @@ export function UnitCatalogPage({
     : "";
   const selectedTypeLabel = draftQuery.types[0]
     ? typeOptions.find((item) => item.value === draftQuery.types[0])?.label || draftQuery.types[0]
-    : "";
-  const selectedStatusLabel = draftQuery.statuses[0]
-    ? mapUnitStatusLabel(draftQuery.statuses[0], language)
     : "";
   const selectedBedroomsLabel = draftQuery.bedrooms[0]
     ? bedroomOptionLabel(Number(draftQuery.bedrooms[0]), copy)
@@ -424,7 +424,6 @@ export function UnitCatalogPage({
     selectedTypeLabel ? `${copy.type}: ${selectedTypeLabel}` : "",
     selectedConditionLabel ? `${copy.condition}: ${selectedConditionLabel}` : "",
     selectedFloorLabel ? `${copy.floor}: ${selectedFloorLabel}` : "",
-    selectedStatusLabel ? `${copy.status}: ${selectedStatusLabel}` : "",
     searchTerm.trim() ? `${copy.search}: ${searchTerm.trim()}` : ""
   ].filter(Boolean).join(" • ") || copy.all;
 
@@ -435,7 +434,6 @@ export function UnitCatalogPage({
       ...draftQuery,
       floors: [],
       types: [],
-      statuses: [],
       bedrooms: [],
       page: 1
     });
@@ -702,13 +700,6 @@ export function UnitCatalogPage({
                         allLabel={copy.all}
                         onChange={(value) => updateDraftQuery((current) => ({ ...current, floors: value ? [value] : [] }), true)}
                       />
-                      <FilterSelect
-                        label={copy.status}
-                        value={draftQuery.statuses[0] || ""}
-                        options={["available", "reserved", "sold"].map((value) => ({ value, label: mapUnitStatusLabel(value, language) }))}
-                        allLabel={copy.all}
-                        onChange={(value) => updateDraftQuery((current) => ({ ...current, statuses: value ? [value] : [] }), true)}
-                      />
                       <label className="units-filter-control units-filter-search">
                         <span>{copy.search}</span>
                         <div className="units-search-input-wrap">
@@ -799,24 +790,30 @@ export function UnitCatalogPage({
                     <table className="units-table">
                       <thead>
                         <tr>
+                          <th>{copy.image}</th>
                           <th>{copy.number}</th>
                           <th>{copy.type}</th>
                           <th>{copy.totalArea}</th>
                           <th>{copy.bedrooms}</th>
                           <th>{copy.floor}</th>
-                          <th>{copy.status}</th>
                           <th>{copy.fromPrice}</th>
                         </tr>
                       </thead>
                       <tbody>
                         {filteredUnits.map((item) => (
                           <tr key={item.id} onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}>
+                            <td className="units-table-image-cell">
+                              {item.image ? (
+                                <img className="units-table-image" src={item.image} alt={getUnitDisplayTitle(item, language)} />
+                              ) : (
+                                <div className="units-table-image-placeholder" />
+                              )}
+                            </td>
                             <td>{getUnitDisplayTitle(item, language)}</td>
                             <td>{mapUnitTypeLabel(item.type, language)}</td>
                             <td>{formatArea(item.area)}</td>
                             <td>{item.bedrooms_count ?? 0}</td>
                             <td>{item.floor?.number ?? "-"}</td>
-                            <td>{mapUnitStatusLabel(item.status, language)}</td>
                             <td>{getUnitPriceText(item.price, item.currency)}</td>
                           </tr>
                         ))}
