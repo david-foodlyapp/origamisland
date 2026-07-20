@@ -195,6 +195,64 @@ export function formatPrice(value: string | number | null | undefined, currency 
   }).format(numeric);
 }
 
+export type SupportedCurrency = "USD" | "EUR" | "GEL";
+
+export type CurrencyRates = Record<SupportedCurrency, number>;
+
+const NBG_RATES_URL = "https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json";
+
+export async function fetchCurrencyRates(): Promise<CurrencyRates> {
+  const response = await fetch(NBG_RATES_URL);
+
+  if (!response.ok) {
+    throw new Error(`NBG API request failed with status ${response.status}`);
+  }
+
+  const data = await response.json() as Array<{
+    currencies: Array<{ code: string; quantity: number; rate: number }>;
+  }>;
+
+  const currencies = data[0]?.currencies || [];
+  const rates: CurrencyRates = { GEL: 1, USD: 0, EUR: 0 };
+
+  for (const entry of currencies) {
+    if (entry.code === "USD" || entry.code === "EUR") {
+      rates[entry.code] = entry.rate / entry.quantity;
+    }
+  }
+
+  return rates;
+}
+
+export function convertPrice(
+  value: string | number | null | undefined,
+  fromCurrency: string | undefined,
+  toCurrency: SupportedCurrency,
+  rates: CurrencyRates | null
+) {
+  if (value == null || value === "") {
+    return null;
+  }
+
+  const numeric = typeof value === "number" ? value : Number(value);
+  if (Number.isNaN(numeric)) {
+    return null;
+  }
+
+  const from = (fromCurrency || "USD").toUpperCase() as SupportedCurrency;
+
+  if (from === toCurrency || !rates) {
+    return numeric;
+  }
+
+  if (!rates[from] || !rates[toCurrency]) {
+    return numeric;
+  }
+
+  const inGel = numeric * rates[from];
+  return inGel / rates[toCurrency];
+}
+
 export function mapUnitTypeLabel(type: string, language: Language) {
   const kaMap: Record<string, string> = {
     apartment: "აპარტამენტი",

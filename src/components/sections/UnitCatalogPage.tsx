@@ -3,8 +3,11 @@ import type { Language } from "../../i18n";
 import type { Theme } from "../../types";
 import {
   DEFAULT_BUILDING_SLUG,
+  type CurrencyRates,
+  type SupportedCurrency,
   type UnitCatalogQueryState,
   buildUnitCatalogSearch,
+  convertPrice,
   fetchUnit,
   fetchUnitFilters,
   fetchUnits,
@@ -45,6 +48,10 @@ type UnitCatalogPageProps = {
   openModal: () => void;
   propertySlug?: string;
   unitSlug?: string;
+  currency: SupportedCurrency;
+  currencyRates: CurrencyRates | null;
+  isCurrencyModalOpen: boolean;
+  setIsCurrencyModalOpen: (open: boolean) => void;
 };
 
 const copyKa = {
@@ -96,6 +103,7 @@ const copyKa = {
   compare: "შედარება",
   homeAriaLabel: "მთავარ გვერდზე",
   changeLanguage: "ენის შეცვლა",
+  changeCurrency: "ვალუტის შეცვლა",
   switchToDark: "მუქ რეჟიმზე გადართვა",
   switchToLight: "ღია რეჟიმზე გადართვა"
 };
@@ -149,6 +157,7 @@ const copyEn: typeof copyKa = {
   compare: "Compare",
   homeAriaLabel: "Go to homepage",
   changeLanguage: "Change language",
+  changeCurrency: "Change currency",
   switchToDark: "Switch to dark mode",
   switchToLight: "Switch to light mode"
 };
@@ -192,7 +201,11 @@ export function UnitCatalogPage({
   handleThemeToggle,
   openModal,
   propertySlug = DEFAULT_BUILDING_SLUG,
-  unitSlug
+  unitSlug,
+  currency,
+  currencyRates,
+  isCurrencyModalOpen,
+  setIsCurrencyModalOpen
 }: UnitCatalogPageProps) {
   const copy = getCopy(language);
   const conditionOptions = useMemo(() => getConditionOptions(copy), [copy]);
@@ -319,8 +332,9 @@ export function UnitCatalogPage({
   const unitImage2d = unit?.media?.find((item) => item.type === "image" && item.url)?.url || unit?.image || "";
   const unitFloorPlanImage = unit?.media?.find((item) => item.type === "floor_plan" && item.url)?.url || "";
   const unitPdfUrl = unit?.media?.find((item) => item.type === "document" && item.url)?.url || "";
-  const getUnitPriceText = (price?: string | number | null, currency?: string | null) => {
-    const formattedPrice = formatPrice(price, currency || "USD");
+  const getUnitPriceText = (price?: string | number | null, priceCurrency?: string | null) => {
+    const convertedPrice = convertPrice(price, priceCurrency, currency, currencyRates);
+    const formattedPrice = formatPrice(convertedPrice, currency);
     return formattedPrice ? `${copy.fromPrice}: ${formattedPrice}` : `${copy.fromPrice}:`;
   };
 
@@ -382,7 +396,7 @@ export function UnitCatalogPage({
         priceText
       ].some((value) => value.includes(normalizedSearch));
     });
-  }, [language, searchTerm, units]);
+  }, [language, searchTerm, units, currency, currencyRates]);
 
   const activeFilterCount = [
     draftQuery.floors.length,
@@ -559,6 +573,16 @@ export function UnitCatalogPage({
                     >
                       <GlobeOutlineIcon />
                     </button>
+                    <button
+                      className="nav-language-btn header-language-btn units-currency-btn-mobile"
+                      type="button"
+                      aria-label={copy.changeCurrency}
+                      aria-haspopup="dialog"
+                      aria-expanded={isCurrencyModalOpen}
+                      onClick={() => setIsCurrencyModalOpen(true)}
+                    >
+                      <span>{currency}</span>
+                    </button>
 
                     <div className="units-heading-aside">
                       <div className="units-utility-controls">
@@ -571,6 +595,16 @@ export function UnitCatalogPage({
                           onClick={() => setIsLanguageModalOpen(true)}
                         >
                           <GlobeOutlineIcon />
+                        </button>
+                        <button
+                          className="nav-language-btn header-language-btn units-currency-btn"
+                          type="button"
+                          aria-label={copy.changeCurrency}
+                          aria-haspopup="dialog"
+                          aria-expanded={isCurrencyModalOpen}
+                          onClick={() => setIsCurrencyModalOpen(true)}
+                        >
+                          <span>{currency}</span>
                         </button>
                         <div className="controls-pill units-theme-pill">
                           <button

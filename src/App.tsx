@@ -53,8 +53,11 @@ import {
 import {
   DEFAULT_BUILDING_SLUG,
   buildUnitCatalogSearch,
+  fetchCurrencyRates,
   getUnitCatalogRoute,
-  navigateTo
+  navigateTo,
+  type CurrencyRates,
+  type SupportedCurrency
 } from "./unitCatalog";
 import { getExplorerRoute, type ExplorerRoute } from "./propertyExplorer";
 
@@ -102,6 +105,12 @@ const languageOptions: Array<{ code: Language; label: string; shortLabel: string
   { code: "en", label: "English", shortLabel: "EN" },
   // { code: "ru", label: "Русский", shortLabel: "RUS" },
   // { code: "pl", label: "Polski", shortLabel: "POL" }
+];
+
+const currencyOptions: Array<{ code: SupportedCurrency; label: string }> = [
+  { code: "USD", label: "USD — $" },
+  { code: "EUR", label: "EUR — €" },
+  { code: "GEL", label: "GEL — ₾" }
 ];
 
 const brandingLogoFallbacks = {
@@ -243,6 +252,9 @@ function App() {
   const [selectedCondition, setSelectedCondition] = useState<ConditionFilter>("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
+  const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
+  const [currency, setCurrency] = useState<SupportedCurrency>("USD");
+  const [currencyRates, setCurrencyRates] = useState<CurrencyRates | null>(null);
   const [newsItems, setNewsItems] = useState<NewsCard[]>([]);
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
@@ -426,6 +438,24 @@ function App() {
     localStorage.setItem("origami_language", language);
     document.documentElement.lang = language;
   }, [language]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchCurrencyRates()
+      .then((rates) => {
+        if (!cancelled) {
+          setCurrencyRates(rates);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to load currency rates:", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1073,6 +1103,15 @@ function App() {
     setIsLanguageModalOpen(false);
   };
 
+  const closeCurrencyModal = () => {
+    setIsCurrencyModalOpen(false);
+  };
+
+  const handleCurrencySelect = (nextCurrency: SupportedCurrency) => {
+    setCurrency(nextCurrency);
+    setIsCurrencyModalOpen(false);
+  };
+
   const handleSearch = () => {
     setMobileFilterOpen(false);
     navigateTo(
@@ -1206,6 +1245,10 @@ function App() {
           openModal={openModal}
           propertySlug={routeState.propertySlug}
           unitSlug={routeState.name === "unitDetail" ? routeState.unitSlug : undefined}
+          currency={currency}
+          currencyRates={currencyRates}
+          isCurrencyModalOpen={isCurrencyModalOpen}
+          setIsCurrencyModalOpen={setIsCurrencyModalOpen}
         />
 
         <div id="vip-modal" className={`modal ${isModalOpen ? "active" : ""}`}>
@@ -1369,6 +1412,31 @@ function App() {
                 >
                   <span>{option.label}</span>
                   {language === option.code ? <span className="language-option-check">•</span> : null}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className={`modal ${isCurrencyModalOpen ? "active" : ""}`}>
+          <div className="modal-overlay" onClick={closeCurrencyModal}></div>
+
+          <div className="modal-content language-modal-content">
+            <button className="modal-close" aria-label="Close currency modal" type="button" onClick={closeCurrencyModal}>
+              <CloseIcon />
+            </button>
+
+            <h3 className="modal-title language-modal-title">{language === "ka" ? "აირჩიეთ ვალუტა" : "Choose currency"}</h3>
+            <div className="language-options" role="list">
+              {currencyOptions.map((option) => (
+                <button
+                  key={option.code}
+                  type="button"
+                  className={`language-option ${currency === option.code ? "is-active" : ""}`}
+                  onClick={() => handleCurrencySelect(option.code)}
+                >
+                  <span>{option.label}</span>
+                  {currency === option.code ? <span className="language-option-check">•</span> : null}
                 </button>
               ))}
             </div>
