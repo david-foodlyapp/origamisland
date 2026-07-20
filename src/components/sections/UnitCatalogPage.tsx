@@ -333,7 +333,7 @@ export function UnitCatalogPage({
   const unitFloorPlanImage = unit?.media?.find((item) => item.type === "floor_plan" && item.url)?.url || "";
   const unitPdfUrl = unit?.media?.find((item) => item.type === "document" && item.url)?.url || "";
   const getUnitPriceText = (price?: string | number | null, priceCurrency?: string | null) => {
-    const convertedPrice = convertPrice(price, priceCurrency, currency, currencyRates);
+    const convertedPrice = convertPrice(price, priceCurrency || undefined, currency, currencyRates);
     const formattedPrice = formatPrice(convertedPrice, currency);
     return formattedPrice ? `${copy.fromPrice}: ${formattedPrice}/${copy.pricePerSqmSuffix}` : `${copy.fromPrice}:`;
   };
