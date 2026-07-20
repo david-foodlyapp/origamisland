@@ -1250,8 +1250,6 @@ function App() {
           unitSlug={routeState.name === "unitDetail" ? routeState.unitSlug : undefined}
           currency={currency}
           currencyRates={currencyRates}
-          isCurrencyModalOpen={isCurrencyModalOpen}
-          setIsCurrencyModalOpen={setIsCurrencyModalOpen}
         />
 
         <div id="vip-modal" className={`modal ${isModalOpen ? "active" : ""}`}>

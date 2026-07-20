@@ -50,8 +50,6 @@ type UnitCatalogPageProps = {
   unitSlug?: string;
   currency: SupportedCurrency;
   currencyRates: CurrencyRates | null;
-  isCurrencyModalOpen: boolean;
-  setIsCurrencyModalOpen: (open: boolean) => void;
 };
 
 const copyKa = {
@@ -203,9 +201,7 @@ export function UnitCatalogPage({
   propertySlug = DEFAULT_BUILDING_SLUG,
   unitSlug,
   currency,
-  currencyRates,
-  isCurrencyModalOpen,
-  setIsCurrencyModalOpen
+  currencyRates
 }: UnitCatalogPageProps) {
   const copy = getCopy(language);
   const conditionOptions = useMemo(() => getConditionOptions(copy), [copy]);
@@ -573,16 +569,6 @@ export function UnitCatalogPage({
                     >
                       <GlobeOutlineIcon />
                     </button>
-                    <button
-                      className="nav-language-btn header-language-btn units-currency-btn-mobile"
-                      type="button"
-                      aria-label={copy.changeCurrency}
-                      aria-haspopup="dialog"
-                      aria-expanded={isCurrencyModalOpen}
-                      onClick={() => setIsCurrencyModalOpen(true)}
-                    >
-                      <span>{currency}</span>
-                    </button>
 
                     <div className="units-heading-aside">
                       <div className="units-utility-controls">
@@ -595,16 +581,6 @@ export function UnitCatalogPage({
                           onClick={() => setIsLanguageModalOpen(true)}
                         >
                           <GlobeOutlineIcon />
-                        </button>
-                        <button
-                          className="nav-language-btn header-language-btn units-currency-btn"
-                          type="button"
-                          aria-label={copy.changeCurrency}
-                          aria-haspopup="dialog"
-                          aria-expanded={isCurrencyModalOpen}
-                          onClick={() => setIsCurrencyModalOpen(true)}
-                        >
-                          <span>{currency}</span>
                         </button>
                         <div className="controls-pill units-theme-pill">
                           <button
