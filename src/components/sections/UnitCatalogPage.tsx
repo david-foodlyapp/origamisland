@@ -47,7 +47,7 @@ type UnitCatalogPageProps = {
   unitSlug?: string;
 };
 
-const copy = {
+const copyKa = {
   listingTitle: "ბინების არჩევა",
   floor: "სართული",
   type: "ტიპი",
@@ -93,8 +93,69 @@ const copy = {
   priceOnRequest: "ფასი შეთანხმებით",
   pdf: "PDF",
   favorite: "რჩეულებში",
-  compare: "შედარება"
+  compare: "შედარება",
+  homeAriaLabel: "მთავარ გვერდზე",
+  changeLanguage: "ენის შეცვლა",
+  switchToDark: "მუქ რეჟიმზე გადართვა",
+  switchToLight: "ღია რეჟიმზე გადართვა"
 };
+
+const copyEn: typeof copyKa = {
+  listingTitle: "Choose an apartment",
+  floor: "Floor",
+  type: "Type",
+  rooms: "Rooms",
+  bedrooms: "Bedrooms",
+  status: "Status",
+  search: "Search",
+  reset: "Reset",
+  filters: "Filters",
+  filtersClose: "Close filters",
+  activeFilters: "active filters",
+  grid: "Grid",
+  table: "List",
+  all: "All",
+  pageLoading: "Loading...",
+  noResults: "No results found",
+  floorLabel: "Floor",
+  fromPrice: "Price",
+  roomLabel: "Room",
+  bedroomLabel: "Bedroom",
+  studio: "Studio",
+  condition: "Condition",
+  conditionWhite: "White frame",
+  conditionFull: "Renovated",
+  typeHotelRoom: "Hotel Room",
+  typeBrandedResidence: "Branded Residence",
+  bathroomLabel: "Bathroom",
+  detailContact: "Contact us",
+  available: "Available",
+  unitOverview: "Overview",
+  totalArea: "Total area",
+  area: "Area",
+  number: "Unit",
+  image3d: "3D",
+  image2d: "2D",
+  floorPlan: "Floor Plan",
+  detailBack: "All units",
+  details: "Details",
+  updated: "Updated",
+  total: "Total",
+  page: "Page",
+  defaultBuildingTitle: "Origami Island",
+  priceOnRequest: "Price on request",
+  pdf: "PDF",
+  favorite: "Favorites",
+  compare: "Compare",
+  homeAriaLabel: "Go to homepage",
+  changeLanguage: "Change language",
+  switchToDark: "Switch to dark mode",
+  switchToLight: "Switch to light mode"
+};
+
+function getCopy(language: Language) {
+  return language === "ka" ? copyKa : copyEn;
+}
 
 function sanitizeCatalogQueryState(state: UnitCatalogQueryState): UnitCatalogQueryState {
   return {
@@ -103,19 +164,23 @@ function sanitizeCatalogQueryState(state: UnitCatalogQueryState): UnitCatalogQue
   };
 }
 
-function bedroomOptionLabel(count: number) {
+function bedroomOptionLabel(count: number, copy: typeof copyKa) {
   return count === 0 ? copy.studio : `${count} ${copy.bedroomLabel}`;
 }
 
-const conditionOptions = [
-  { value: "white", label: copy.conditionWhite },
-  { value: "full", label: copy.conditionFull }
-];
+function getConditionOptions(copy: typeof copyKa) {
+  return [
+    { value: "white", label: copy.conditionWhite },
+    { value: "full", label: copy.conditionFull }
+  ];
+}
 
-const typeOptions = [
-  { value: "hotel_room", label: copy.typeHotelRoom },
-  { value: "apartment", label: copy.typeBrandedResidence }
-];
+function getTypeOptions(copy: typeof copyKa) {
+  return [
+    { value: "hotel_room", label: copy.typeHotelRoom },
+    { value: "apartment", label: copy.typeBrandedResidence }
+  ];
+}
 
 export function UnitCatalogPage({
   language,
@@ -129,6 +194,9 @@ export function UnitCatalogPage({
   propertySlug = DEFAULT_BUILDING_SLUG,
   unitSlug
 }: UnitCatalogPageProps) {
+  const copy = getCopy(language);
+  const conditionOptions = useMemo(() => getConditionOptions(copy), [copy]);
+  const typeOptions = useMemo(() => getTypeOptions(copy), [copy]);
   const initialQuery = useMemo(() => sanitizeCatalogQueryState(readUnitCatalogQuery()), []);
   const [query, setQuery] = useState<UnitCatalogQueryState>(initialQuery);
   const [draftQuery, setDraftQuery] = useState<UnitCatalogQueryState>(initialQuery);
@@ -335,7 +403,7 @@ export function UnitCatalogPage({
     ? mapUnitStatusLabel(draftQuery.statuses[0], language)
     : "";
   const selectedBedroomsLabel = draftQuery.bedrooms[0]
-    ? bedroomOptionLabel(Number(draftQuery.bedrooms[0]))
+    ? bedroomOptionLabel(Number(draftQuery.bedrooms[0]), copy)
     : "";
   const selectedConditionLabel = condition
     ? conditionOptions.find((item) => item.value === condition)?.label || condition
@@ -463,7 +531,7 @@ export function UnitCatalogPage({
                       <a
                         className="theme-aware-logo units-heading-logo-wrap"
                         href="/"
-                        aria-label="მთავარ გვერდზე"
+                        aria-label={copy.homeAriaLabel}
                         onClick={(event) => {
                           event.preventDefault();
                           navigateTo("/");
@@ -484,7 +552,7 @@ export function UnitCatalogPage({
                     <button
                       className="nav-language-btn header-language-btn units-language-btn-mobile"
                       type="button"
-                      aria-label="Change language"
+                      aria-label={copy.changeLanguage}
                       aria-haspopup="dialog"
                       aria-expanded={isLanguageModalOpen}
                       onClick={() => setIsLanguageModalOpen(true)}
@@ -497,7 +565,7 @@ export function UnitCatalogPage({
                         <button
                           className="nav-language-btn header-language-btn units-language-btn"
                           type="button"
-                          aria-label="Change language"
+                          aria-label={copy.changeLanguage}
                           aria-haspopup="dialog"
                           aria-expanded={isLanguageModalOpen}
                           onClick={() => setIsLanguageModalOpen(true)}
@@ -507,7 +575,7 @@ export function UnitCatalogPage({
                         <div className="controls-pill units-theme-pill">
                           <button
                             className="theme-pill-btn"
-                            aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+                            aria-label={theme === "light" ? copy.switchToDark : copy.switchToLight}
                             aria-pressed={theme === "light"}
                             data-theme-state={theme}
                             type="button"
@@ -596,7 +664,7 @@ export function UnitCatalogPage({
                       <FilterSelect
                         label={copy.area}
                         value={draftQuery.bedrooms[0] || ""}
-                        options={(filters?.bedrooms || []).map((count) => ({ value: String(count), label: bedroomOptionLabel(count) }))}
+                        options={(filters?.bedrooms || []).map((count) => ({ value: String(count), label: bedroomOptionLabel(count, copy) }))}
                         allLabel={copy.all}
                         onChange={(value) => updateDraftQuery((current) => ({ ...current, bedrooms: value ? [value] : [] }), true)}
                       />
