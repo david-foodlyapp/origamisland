@@ -5089,7 +5089,7 @@ html[data-theme="dark"] .modal-content {
 
 .units-filterbar {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 0.78fr)) minmax(250px, 0.9fr);
+  grid-template-columns: repeat(5, minmax(0, 0.78fr)) minmax(140px, 0.62fr) auto;
   gap: 0.7rem;
   align-items: end;
   margin-bottom: 0;

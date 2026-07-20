@@ -68,6 +68,11 @@ const copy = {
   fromPrice: "ფასი",
   roomLabel: "ოთახი",
   bedroomLabel: "საძინებელი",
+  studio: "სტუდიო",
+  condition: "კონდიცია",
+  conditionWhite: "თეთრი კარკასი",
+  conditionFull: "საბოლოო რემონტი",
+  conditionTurnkey: "მზა",
   bathroomLabel: "სველი წერტილი",
   detailContact: "დაგვიკავშირდით",
   available: "ხელმისაწვდომი",
@@ -93,10 +98,19 @@ const copy = {
 function sanitizeCatalogQueryState(state: UnitCatalogQueryState): UnitCatalogQueryState {
   return {
     ...state,
-    rooms: [],
-    bedrooms: []
+    rooms: []
   };
 }
+
+function bedroomOptionLabel(count: number) {
+  return count === 0 ? copy.studio : `${count} ${copy.bedroomLabel}`;
+}
+
+const conditionOptions = [
+  { value: "white", label: copy.conditionWhite },
+  { value: "full", label: copy.conditionFull },
+  { value: "turnkey", label: copy.conditionTurnkey }
+];
 
 export function UnitCatalogPage({
   language,
@@ -122,6 +136,7 @@ export function UnitCatalogPage({
   const [mediaMode, setMediaMode] = useState<"3d" | "2d" | "floorPlan">("3d");
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [condition, setCondition] = useState("");
 
   useEffect(() => {
     const nextQuery = sanitizeCatalogQueryState(readUnitCatalogQuery());
@@ -300,6 +315,8 @@ export function UnitCatalogPage({
     draftQuery.floors.length,
     draftQuery.types.length,
     draftQuery.statuses.length,
+    draftQuery.bedrooms.length,
+    condition ? 1 : 0,
     searchTerm.trim() ? 1 : 0
   ].reduce((sum, value) => sum + value, 0);
 
@@ -312,21 +329,31 @@ export function UnitCatalogPage({
   const selectedStatusLabel = draftQuery.statuses[0]
     ? (filters?.statuses || []).find((item) => item.value === draftQuery.statuses[0])?.label || draftQuery.statuses[0]
     : "";
+  const selectedBedroomsLabel = draftQuery.bedrooms[0]
+    ? bedroomOptionLabel(Number(draftQuery.bedrooms[0]))
+    : "";
+  const selectedConditionLabel = condition
+    ? conditionOptions.find((item) => item.value === condition)?.label || condition
+    : "";
 
   const mobileFilterSummary = [
-    selectedFloorLabel ? `${copy.floor}: ${selectedFloorLabel}` : "",
+    selectedBedroomsLabel ? `${copy.area}: ${selectedBedroomsLabel}` : "",
     selectedTypeLabel ? `${copy.type}: ${selectedTypeLabel}` : "",
+    selectedConditionLabel ? `${copy.condition}: ${selectedConditionLabel}` : "",
+    selectedFloorLabel ? `${copy.floor}: ${selectedFloorLabel}` : "",
     selectedStatusLabel ? `${copy.status}: ${selectedStatusLabel}` : "",
     searchTerm.trim() ? `${copy.search}: ${searchTerm.trim()}` : ""
   ].filter(Boolean).join(" • ") || copy.all;
 
   const resetFilters = () => {
     setSearchTerm("");
+    setCondition("");
     applyQuery({
       ...draftQuery,
       floors: [],
       types: [],
       statuses: [],
+      bedrooms: [],
       page: 1
     });
   };
@@ -562,6 +589,27 @@ export function UnitCatalogPage({
 
                     <div className="units-filterbar">
                       <FilterSelect
+                        label={copy.area}
+                        value={draftQuery.bedrooms[0] || ""}
+                        options={(filters?.bedrooms || []).map((count) => ({ value: String(count), label: bedroomOptionLabel(count) }))}
+                        allLabel={copy.all}
+                        onChange={(value) => updateDraftQuery((current) => ({ ...current, bedrooms: value ? [value] : [] }), true)}
+                      />
+                      <FilterSelect
+                        label={copy.type}
+                        value={draftQuery.types[0] || ""}
+                        options={(filters?.types || []).map((item) => ({ value: item.value, label: item.label }))}
+                        allLabel={copy.all}
+                        onChange={(value) => updateDraftQuery((current) => ({ ...current, types: value ? [value] : [] }), true)}
+                      />
+                      <FilterSelect
+                        label={copy.condition}
+                        value={condition}
+                        options={conditionOptions}
+                        allLabel={copy.all}
+                        onChange={(value) => setCondition(value)}
+                      />
+                      <FilterSelect
                         label={copy.floor}
                         value={draftQuery.floors[0] || ""}
                         options={(filters?.floors || []).map((item) => ({
@@ -570,13 +618,6 @@ export function UnitCatalogPage({
                         }))}
                         allLabel={copy.all}
                         onChange={(value) => updateDraftQuery((current) => ({ ...current, floors: value ? [value] : [] }), true)}
-                      />
-                      <FilterSelect
-                        label={copy.type}
-                        value={draftQuery.types[0] || ""}
-                        options={(filters?.types || []).map((item) => ({ value: item.value, label: item.label }))}
-                        allLabel={copy.all}
-                        onChange={(value) => updateDraftQuery((current) => ({ ...current, types: value ? [value] : [] }), true)}
                       />
                       <FilterSelect
                         label={copy.status}
