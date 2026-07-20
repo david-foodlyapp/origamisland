@@ -71,6 +71,7 @@ const copyKa = {
   noResults: "მონაცემები ვერ მოიძებნა",
   floorLabel: "სართული",
   fromPrice: "ფასი",
+  pricePerSqmSuffix: "კვ.მ დან",
   roomLabel: "ოთახი",
   bedroomLabel: "საძინებელი",
   studio: "სტუდიო",
@@ -126,6 +127,7 @@ const copyEn: typeof copyKa = {
   noResults: "No results found",
   floorLabel: "Floor",
   fromPrice: "Price",
+  pricePerSqmSuffix: "sq.m from",
   roomLabel: "Room",
   bedroomLabel: "Bedroom",
   studio: "Studio",
@@ -333,7 +335,7 @@ export function UnitCatalogPage({
   const getUnitPriceText = (price?: string | number | null, priceCurrency?: string | null) => {
     const convertedPrice = convertPrice(price, priceCurrency, currency, currencyRates);
     const formattedPrice = formatPrice(convertedPrice, currency);
-    return formattedPrice ? `${copy.fromPrice}: ${formattedPrice}` : `${copy.fromPrice}:`;
+    return formattedPrice ? `${copy.fromPrice}: ${formattedPrice}/${copy.pricePerSqmSuffix}` : `${copy.fromPrice}:`;
   };
 
   const applyQuery = (nextQuery: UnitCatalogQueryState) => {
