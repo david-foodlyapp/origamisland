@@ -1353,82 +1353,114 @@ html[data-theme="light"] .concept-render {
 
 /* --- Origami Info Section --- */
 .origami-info-section {
-  margin-top: 0.75rem;
-  padding-top: 0.85rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  margin-top: 2rem;
 }
 
 .origami-info-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
   background: transparent;
 }
 
 .origami-info-card {
-  min-height: 108px;
-  padding: 1rem 1rem 0.9rem;
+  position: relative;
+  min-height: 148px;
+  padding: 1.5rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 0.45rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  gap: 0.6rem;
   text-align: center;
+  border-radius: var(--radius-lg);
+  background: var(--lg-bg);
+  border: 1px solid var(--lg-border);
+  box-shadow: var(--lg-shadow);
+  backdrop-filter: blur(20px) saturate(1.1);
+  -webkit-backdrop-filter: blur(20px) saturate(1.1);
+  overflow: hidden;
+  transition: var(--transition-smooth);
 }
 
-.origami-info-card:nth-child(3n) {
-  border-right: none;
+.origami-info-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(197, 168, 128, 0.14), transparent 65%);
+  opacity: 0;
+  transition: var(--transition-smooth);
+  pointer-events: none;
 }
 
-.origami-info-card:nth-last-child(-n + 3) {
-  border-bottom: none;
+.origami-info-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--lg-border-gold);
+  box-shadow: var(--lg-gold-glow);
+}
+
+.origami-info-card:hover::before {
+  opacity: 1;
 }
 
 .origami-info-value {
+  position: relative;
   font-family: 'FiraGO', var(--font-sans), sans-serif;
-  font-size: clamp(1.2rem, 1.7vw, 1.75rem);
+  font-weight: 600;
+  font-size: clamp(1.3rem, 1.8vw, 1.85rem);
   line-height: 1.05;
-  color: var(--accent-primary);
-  letter-spacing: 0.03em;
+  color: var(--text-white);
+  letter-spacing: 0.02em;
 }
 
 .origami-info-icon {
-  width: 2rem;
-  height: 2rem;
+  position: relative;
+  width: 2.5rem;
+  height: 2.5rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-primary);
-  background: rgba(212, 176, 116, 0.1);
-  border: 1px solid rgba(212, 176, 116, 0.18);
+  color: var(--primary-gold);
+  background: rgba(197, 168, 128, 0.12);
+  border: 1px solid rgba(197, 168, 128, 0.25);
   border-radius: 999px;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.25rem;
+  transition: var(--transition-smooth);
+}
+
+.origami-info-card:hover .origami-info-icon {
+  background: rgba(197, 168, 128, 0.2);
+  border-color: rgba(197, 168, 128, 0.45);
+  transform: scale(1.06);
 }
 
 .origami-info-icon svg {
-  width: 0.95rem;
-  height: 0.95rem;
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .origami-info-label {
-  font-size: 0.76rem;
+  position: relative;
+  font-size: 0.78rem;
   line-height: 1.25;
-  color: rgba(255, 255, 255, 0.74);
-}
-
-html[data-theme="light"] .origami-info-section {
-  border-top: 1px solid rgba(184, 153, 118, 0.14);
+  color: var(--text-gray);
+  letter-spacing: 0.02em;
 }
 
 html[data-theme="light"] .origami-info-card {
-  border-right: 1px solid rgba(184, 153, 118, 0.14);
-  border-bottom: 1px solid rgba(184, 153, 118, 0.14);
+  background: rgba(255, 252, 247, 0.92);
+  border-color: rgba(184, 153, 118, 0.18);
+  box-shadow: 0 10px 24px rgba(125, 103, 75, 0.08);
+}
+
+html[data-theme="light"] .origami-info-card:hover {
+  border-color: rgba(184, 153, 118, 0.4);
+  box-shadow: 0 16px 36px rgba(125, 103, 75, 0.16);
 }
 
 html[data-theme="light"] .origami-info-icon {
-  background: rgba(184, 153, 118, 0.08);
-  border-color: rgba(184, 153, 118, 0.16);
+  background: rgba(184, 153, 118, 0.1);
+  border-color: rgba(184, 153, 118, 0.22);
 }
 
 html[data-theme="light"] .origami-info-label {
@@ -1438,31 +1470,18 @@ html[data-theme="light"] .origami-info-label {
 @media (max-width: 900px) {
   .origami-info-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
   }
 
   .origami-info-card {
-    min-height: 94px;
-    padding: 0.95rem 0.85rem;
+    min-height: 128px;
+    padding: 1.25rem 1rem;
   }
+}
 
-  .origami-info-card:nth-child(2n) {
-    border-right: none;
-  }
-
-  .origami-info-card:nth-last-child(-n + 3) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .origami-info-card:nth-last-child(-n + 2) {
-    border-bottom: none;
-  }
-
-  html[data-theme="light"] .origami-info-card:nth-last-child(-n + 3) {
-    border-bottom: 1px solid rgba(184, 153, 118, 0.14);
-  }
-
-  html[data-theme="light"] .origami-info-card:nth-last-child(-n + 2) {
-    border-bottom: none;
+@media (max-width: 520px) {
+  .origami-info-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
