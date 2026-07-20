@@ -1109,7 +1109,10 @@ function App() {
 
   const handleCurrencySelect = (nextCurrency: SupportedCurrency) => {
     setCurrency(nextCurrency);
-    setIsCurrencyModalOpen(false);
+  };
+
+  const handleUnitsLanguageSelect = (nextLanguage: Language) => {
+    setLanguage(nextLanguage);
   };
 
   const handleSearch = () => {
@@ -1393,11 +1396,16 @@ function App() {
           </div>
         </div>
 
-        <div className={`modal ${isLanguageModalOpen ? "active" : ""}`}>
-          <div className="modal-overlay" onClick={closeLanguageModal}></div>
+        <div className={`modal ${isLanguageModalOpen || isCurrencyModalOpen ? "active" : ""}`}>
+          <div className="modal-overlay" onClick={() => { closeLanguageModal(); closeCurrencyModal(); }}></div>
 
           <div className="modal-content language-modal-content">
-            <button className="modal-close" aria-label="Close language modal" type="button" onClick={closeLanguageModal}>
+            <button
+              className="modal-close"
+              aria-label="Close language and currency modal"
+              type="button"
+              onClick={() => { closeLanguageModal(); closeCurrencyModal(); }}
+            >
               <CloseIcon />
             </button>
 
@@ -1408,25 +1416,15 @@ function App() {
                   key={option.code}
                   type="button"
                   className={`language-option ${language === option.code ? "is-active" : ""}`}
-                  onClick={() => handleLanguageSelect(option.code)}
+                  onClick={() => handleUnitsLanguageSelect(option.code)}
                 >
                   <span>{option.label}</span>
                   {language === option.code ? <span className="language-option-check">•</span> : null}
                 </button>
               ))}
             </div>
-          </div>
-        </div>
 
-        <div className={`modal ${isCurrencyModalOpen ? "active" : ""}`}>
-          <div className="modal-overlay" onClick={closeCurrencyModal}></div>
-
-          <div className="modal-content language-modal-content">
-            <button className="modal-close" aria-label="Close currency modal" type="button" onClick={closeCurrencyModal}>
-              <CloseIcon />
-            </button>
-
-            <h3 className="modal-title language-modal-title">{language === "ka" ? "აირჩიეთ ვალუტა" : "Choose currency"}</h3>
+            <h3 className="modal-title language-modal-title currency-modal-title">{language === "ka" ? "აირჩიეთ ვალუტა" : "Choose currency"}</h3>
             <div className="language-options" role="list">
               {currencyOptions.map((option) => (
                 <button
