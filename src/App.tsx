@@ -1796,14 +1796,23 @@ function App() {
                 {apiOrigamiHoldingData && apiOrigamiHoldingData.items.length > 0 ? (
                   [...apiOrigamiHoldingData.items]
                     .sort((a, b) => getOrigamiHoldingOrder(a) - getOrigamiHoldingOrder(b))
-                    .map((item) => (
-                    <article className="biohacking-pillar-card origami-holding-card" key={item.id}>
-                      <span className="biohacking-list-icon" aria-hidden="true">
-                        {item.logo ? <img src={item.logo} alt={item.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} /> : getOrigamiHoldingIcon(item.slug)}
-                      </span>
-                      <h4 className="biohacking-pillar-title">{item.title}</h4>
-                    </article>
-                  ))
+                    .map((item) => {
+                      const CardTag = item.link?.trim() ? "a" : "article";
+                      return (
+                        <CardTag
+                          className="biohacking-pillar-card origami-holding-card"
+                          key={item.id}
+                          {...(item.link?.trim()
+                            ? { href: item.link, target: "_blank", rel: "noreferrer" }
+                            : {})}
+                        >
+                          <span className="biohacking-list-icon" aria-hidden="true">
+                            {item.logo ? <img src={item.logo} alt={item.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} /> : getOrigamiHoldingIcon(item.slug)}
+                          </span>
+                          <h4 className="biohacking-pillar-title">{item.title}</h4>
+                        </CardTag>
+                      );
+                    })
                 ) : (
                   aboutHoldingStats.map((item) => (
                     <article className="biohacking-pillar-card origami-holding-card" key={item.label}>

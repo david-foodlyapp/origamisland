@@ -2162,6 +2162,8 @@ html[data-theme="dark"] .direction-card-description {
 .biohacking-pillar-card {
   min-height: 188px;
   padding: 1.5rem;
+  color: inherit;
+  text-decoration: none;
   border-radius: var(--radius-lg);
   border: 1px solid rgba(var(--primary-gold-rgb), 0.16);
   background:
@@ -2198,6 +2200,7 @@ html[data-theme="dark"] .direction-card-description {
   line-height: 1.2;
   color: #20242b;
   text-align: center;
+  text-decoration: none;
 }
 
 .biohacking-list-icon {
