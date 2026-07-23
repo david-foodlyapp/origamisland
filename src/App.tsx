@@ -1653,6 +1653,39 @@ function App() {
           </div>
         </section>
 
+        <section id="biohacking" className="biohacking-section" style={apiBiohackingData?.background_image ? { "--biohacking-bg": `url(${apiBiohackingData.background_image})` } as React.CSSProperties : undefined}>
+          <div className="container">
+            <div className="biohacking-heading">
+              <h2 className="biohacking-title section-title">
+                <span className="biohacking-title-highlight">{t("bio_title")}</span>
+              </h2>
+            </div>
+            {apiBiohackingData?.description ? (
+              <p className="biohacking-description">{apiBiohackingData.description}</p>
+            ) : null}
+
+            <div className="biohacking-layout reveal-scroll">
+              {apiBiohackingData && apiBiohackingData.items.length > 0 ? (
+                apiBiohackingData.items.map((item) => (
+                  <article key={item.id} className="biohacking-pillar-card">
+                    <span className="biohacking-list-icon">
+                      {item.logo ? <img src={item.logo} alt={item.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} /> : getBiohackingIcon(item.slug)}
+                    </span>
+                    <h4 className="biohacking-pillar-title">{item.title}</h4>
+                  </article>
+                ))
+              ) : (
+                biohackingPillars.map((item) => (
+                  <article key={item.label} className="biohacking-pillar-card">
+                    <span className="biohacking-list-icon">{item.icon}</span>
+                    <h4 className="biohacking-pillar-title">{item.label}</h4>
+                  </article>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
         <section id="infrastructure" className="infrastructure-section" ref={infrastructureSectionRef}>
           <div className="container">
             <div className="infrastructure-header">
@@ -1697,39 +1730,6 @@ function App() {
                     <div className="infrastructure-content">
                       <p className="infrastructure-desc">{item.description}</p>
                     </div>
-                  </article>
-                ))
-              )}
-            </div>
-          </div>
-        </section>
-
-        <section id="biohacking" className="biohacking-section" style={apiBiohackingData?.background_image ? { "--biohacking-bg": `url(${apiBiohackingData.background_image})` } as React.CSSProperties : undefined}>
-          <div className="container">
-            <div className="biohacking-heading">
-              <h2 className="biohacking-title section-title">
-                <span className="biohacking-title-highlight">{t("bio_title")}</span>
-              </h2>
-            </div>
-            {apiBiohackingData?.description ? (
-              <p className="biohacking-description">{apiBiohackingData.description}</p>
-            ) : null}
-
-            <div className="biohacking-layout reveal-scroll">
-              {apiBiohackingData && apiBiohackingData.items.length > 0 ? (
-                apiBiohackingData.items.map((item) => (
-                  <article key={item.id} className="biohacking-pillar-card">
-                    <span className="biohacking-list-icon">
-                      {item.logo ? <img src={item.logo} alt={item.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} /> : getBiohackingIcon(item.slug)}
-                    </span>
-                    <h4 className="biohacking-pillar-title">{item.title}</h4>
-                  </article>
-                ))
-              ) : (
-                biohackingPillars.map((item) => (
-                  <article key={item.label} className="biohacking-pillar-card">
-                    <span className="biohacking-list-icon">{item.icon}</span>
-                    <h4 className="biohacking-pillar-title">{item.label}</h4>
                   </article>
                 ))
               )}
