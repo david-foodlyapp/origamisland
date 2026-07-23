@@ -365,7 +365,7 @@ function App() {
     { value: t("about_stat2_value"), label: t("about_stat2_label"), icon: <BuildingIcon /> },
     { value: t("about_stat4_value"), label: t("about_stat4_label"), icon: <HotelSuiteIcon /> }
   ];
-  const financeHighlights: Array<{ title: string; description?: string }> = [
+  const financeHighlights: Array<{ title: string; description?: string; image?: string; id?: number }> = [
     { title: t("finance_why_batumi") },
     { title: t("finance_island_investment") },
     { title: t("finance_tourism") },
@@ -1751,12 +1751,12 @@ function App() {
 
             <div className="finance-layout reveal-scroll">
               {(apiFinanceData?.items.length ? apiFinanceData.items : financeHighlights).map((item, index) => {
-                const image = "id" in item ? normalizeApiImageUrl(item.image) : "";
+                const image = item.image ? normalizeApiImageUrl(item.image) : "";
                 const description = item.description;
 
                 return (
                   <article
-                    key={"id" in item ? item.id : item.title}
+                    key={item.id ?? item.title}
                     className={`finance-row${index % 2 === 1 ? " finance-row-reverse" : ""}`}
                   >
                     <div className="finance-row-content">
