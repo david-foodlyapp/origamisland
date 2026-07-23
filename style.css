@@ -2348,109 +2348,112 @@ html[data-theme="dark"] .biohacking-description {
 }
 
 .finance-layout {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.15rem;
-  align-items: stretch;
-}
-
-.finance-card {
-  min-height: 188px;
-  padding: 1.5rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(var(--primary-gold-rgb), 0.16);
-  background:
-    radial-gradient(circle at top left, rgba(197, 168, 128, 0.1), transparent 34%),
-    radial-gradient(circle at top right, rgba(157, 191, 244, 0.1), transparent 36%),
-    rgba(255, 252, 247, 0.84);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
+  gap: 3.5rem;
+}
+
+.finance-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 3rem;
   align-items: center;
-  justify-content: center;
-  gap: 1.35rem;
-  transition: var(--transition-smooth);
-  box-shadow: none;
-  text-align: center;
 }
 
-.finance-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(var(--primary-gold-rgb), 0.3);
-  background:
-    radial-gradient(circle at top left, rgba(197, 168, 128, 0.14), transparent 36%),
-    radial-gradient(circle at top right, rgba(157, 191, 244, 0.14), transparent 38%),
-    rgba(255, 252, 247, 0.9);
-  box-shadow: none;
+.finance-row-reverse .finance-row-content {
+  order: 2;
 }
 
-.finance-card-icon {
-  color: #c9a56e;
+.finance-row-reverse .finance-row-media {
+  order: 1;
+}
+
+.finance-row-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.1rem;
+  text-align: left;
+}
+
+.finance-row-media {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  border: 1px solid rgba(var(--primary-gold-rgb), 0.16);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.12);
+}
+
+.finance-row-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .finance-card-title {
   margin: 0;
   font-family: 'FiraGO', var(--font-sans), sans-serif;
-  font-size: 1.05rem;
+  font-size: 1.6rem;
   font-weight: 700;
   line-height: 1.2;
   color: #20242b;
-  text-align: center;
+  text-align: left;
 }
 
-html[data-theme="dark"] .finance-card {
-  background:
-    radial-gradient(circle at top left, rgba(197, 168, 128, 0.12), transparent 34%),
-    radial-gradient(circle at top right, rgba(157, 191, 244, 0.12), transparent 36%),
-    rgba(24, 24, 28, 0.78);
-}
-
-html[data-theme="dark"] .finance-card:hover {
-  background:
-    radial-gradient(circle at top left, rgba(197, 168, 128, 0.16), transparent 36%),
-    radial-gradient(circle at top right, rgba(157, 191, 244, 0.16), transparent 38%),
-    rgba(28, 28, 34, 0.84);
+.finance-row-desc {
+  margin: 0;
+  font-family: 'FiraGO', var(--font-sans), sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(32, 36, 43, 0.78);
+  white-space: pre-line;
 }
 
 html[data-theme="dark"] .finance-card-title {
   color: #f3efe9;
 }
 
+html[data-theme="dark"] .finance-row-desc {
+  color: rgba(243, 239, 233, 0.78);
+}
+
 html[data-theme="dark"] .finance-description {
   color: rgba(243, 239, 233, 0.86);
 }
 
-@media (max-width: 1024px) {
-  .finance-layout {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+html[data-theme="dark"] .finance-row-media {
+  border-color: rgba(var(--primary-gold-rgb), 0.24);
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.4);
 }
 
 @media (max-width: 760px) {
   .finance-layout {
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(78vw, 78vw);
-    grid-template-columns: none;
-    gap: 1rem;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    padding: 0 0.35rem 0.8rem;
-    margin: 0 -0.35rem;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    gap: 2.5rem;
   }
 
-  .finance-layout::-webkit-scrollbar {
-    display: none;
+  .finance-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
   }
 
-  .finance-card {
-    min-height: 156px;
-    padding: 1.25rem;
-    gap: 1.4rem;
-    scroll-snap-align: start;
+  .finance-row-reverse .finance-row-content,
+  .finance-row-reverse .finance-row-media {
+    order: initial;
+  }
+
+  .finance-row-content {
+    align-items: center;
+    text-align: center;
+  }
+
+  .finance-card-title {
+    text-align: center;
+  }
+
+  .finance-row-desc {
+    text-align: center;
   }
 }
 

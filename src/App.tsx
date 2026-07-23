@@ -14,7 +14,7 @@ import {
   FacebookIcon, InstagramIcon, LinkedInIcon, CloseIcon, ChatIcon, CheckIcon,
   ChevronIcon, LifestyleIcon, WellnessIcon, ParkingIcon, RestaurantsIcon, RetailIcon,
   WaterfrontIcon, LoungeIcon, FamilyIcon, LongevityIcon, RecoveryIcon, HealthyLivingIcon,
-  FitnessIcon, MeditationIcon, SpaIcon, EnergyBalanceIcon, GlobeOutlineIcon,
+  FitnessIcon, MeditationIcon, SpaIcon, EnergyBalanceIcon,
   AudienceOutlineIcon, PriceTagIcon, InstallmentIcon, ResidenceIcon, HotelSuiteIcon, PenthouseIcon
 } from "./components/Icons";
 import {
@@ -365,11 +365,11 @@ function App() {
     { value: t("about_stat2_value"), label: t("about_stat2_label"), icon: <BuildingIcon /> },
     { value: t("about_stat4_value"), label: t("about_stat4_label"), icon: <HotelSuiteIcon /> }
   ];
-  const financeHighlights: Array<{ title: string; description?: string; icon: JSX.Element }> = [
-    { title: t("finance_why_batumi"), icon: <GlobeOutlineIcon /> },
-    { title: t("finance_island_investment"), icon: <ResidenceIcon /> },
-    { title: t("finance_tourism"), icon: <AudienceOutlineIcon /> },
-    { title: t("finance_rental_model"), icon: <CalendarIcon /> }
+  const financeHighlights: Array<{ title: string; description?: string }> = [
+    { title: t("finance_why_batumi") },
+    { title: t("finance_island_investment") },
+    { title: t("finance_tourism") },
+    { title: t("finance_rental_model") }
   ];
   const primaryNavItems = (apiFooterMenuItems.length > 0
     ? apiFooterMenuItems
@@ -1063,15 +1063,6 @@ function App() {
     return 99;
   };
 
-  const getFinanceIcon = (slug: string) => {
-    if (slug.includes("batumi")) return <GlobeOutlineIcon />;
-    if (slug.includes("island") || slug.includes("investment")) return <ResidenceIcon />;
-    if (slug.includes("roi")) return <PriceTagIcon />;
-    if (slug.includes("tour")) return <AudienceOutlineIcon />;
-    if (slug.includes("rental")) return <CalendarIcon />;
-    return <PriceTagIcon />;
-  };
-
   const openModal = () => {
     setSelectedChooseItem(null);
     setShowSuccessState(false);
@@ -1759,19 +1750,24 @@ function App() {
             ) : null}
 
             <div className="finance-layout reveal-scroll">
-              {(apiFinanceData?.items.length ? apiFinanceData.items : financeHighlights).map((item) => {
-                const iconContent = "id" in item
-                  ? item.logo
-                    ? <img src={item.logo} alt={item.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} />
-                    : getFinanceIcon(item.slug)
-                  : item.icon;
+              {(apiFinanceData?.items.length ? apiFinanceData.items : financeHighlights).map((item, index) => {
+                const image = "id" in item ? normalizeApiImageUrl(item.image) : "";
+                const description = item.description;
 
                 return (
-                  <article key={"id" in item ? item.id : item.title} className="finance-card">
-                    <span className="biohacking-list-icon finance-card-icon">
-                      {iconContent}
-                    </span>
-                    <h4 className="finance-card-title">{item.title}</h4>
+                  <article
+                    key={"id" in item ? item.id : item.title}
+                    className={`finance-row${index % 2 === 1 ? " finance-row-reverse" : ""}`}
+                  >
+                    <div className="finance-row-content">
+                      <h4 className="finance-card-title">{item.title}</h4>
+                      {description ? <p className="finance-row-desc">{description}</p> : null}
+                    </div>
+                    {image ? (
+                      <div className="finance-row-media">
+                        <img src={image} alt={item.title} loading="lazy" />
+                      </div>
+                    ) : null}
                   </article>
                 );
               })}
