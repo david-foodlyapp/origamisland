@@ -245,7 +245,8 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [openFooterSection, setOpenFooterSection] = useState<FooterSection | null>(null);
-  const [isWidgetOpen, setIsWidgetOpen] = useState(true);
+  const [isWidgetVisible, setIsWidgetVisible] = useState(false);
+  const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [headerShrunk, setHeaderShrunk] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<RoomFilter>("all");
   const [selectedPropertyType, setSelectedPropertyType] = useState<SearchPropertyTypeFilter>("all");
@@ -272,6 +273,16 @@ function App() {
   const [selectedChooseItem, setSelectedChooseItem] = useState<ChooseApiItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessState, setShowSuccessState] = useState(false);
+
+  useEffect(() => {
+    const widgetTimer = window.setTimeout(() => {
+      setIsWidgetVisible(true);
+    }, 5000);
+
+    return () => {
+      window.clearTimeout(widgetTimer);
+    };
+  }, []);
   const [submitError, setSubmitError] = useState("");
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
@@ -2138,39 +2149,41 @@ function App() {
         </div>
       </footer>
 
-      <div className={`floating-widget ${isWidgetOpen ? "is-open" : "is-collapsed"}`}>
-        {isWidgetOpen ? (
-          <div className="floating-widget-card" role="complementary" aria-label="Origami quick enquiry widget">
-            <div className="floating-widget-brand">
-              <div className="floating-widget-badge">
-                <HomeIcon />
+      {isWidgetVisible ? (
+        <div className={`floating-widget ${isWidgetOpen ? "is-open" : "is-collapsed"}`}>
+          {isWidgetOpen ? (
+            <div className="floating-widget-card" role="complementary" aria-label="Origami quick enquiry widget">
+              <div className="floating-widget-brand">
+                <div className="floating-widget-badge">
+                  <HomeIcon />
+                </div>
+                <div className="floating-widget-copy">
+                  <span className="floating-widget-kicker">{t("widget_badge")}</span>
+                  <h3>{t("widget_title")}</h3>
+                  <p>{t("widget_desc")}</p>
+                </div>
               </div>
-              <div className="floating-widget-copy">
-                <span className="floating-widget-kicker">{t("widget_badge")}</span>
-                <h3>{t("widget_title")}</h3>
-                <p>{t("widget_desc")}</p>
+
+              <div className="floating-widget-body">
+                <div className="floating-widget-actions">
+                  <button type="button" className="floating-widget-chip floating-widget-chip-accent" onClick={() => openModal()}>
+                    {t("widget_consult")}
+                  </button>
+                </div>
               </div>
             </div>
+          ) : null}
 
-            <div className="floating-widget-body">
-              <div className="floating-widget-actions">
-                <button type="button" className="floating-widget-chip floating-widget-chip-accent" onClick={() => openModal()}>
-                  {t("widget_consult")}
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : null}
-
-        <button
-          type="button"
-          className="floating-widget-toggle"
-          aria-label={isWidgetOpen ? t("widget_toggle_close") : t("widget_toggle_open")}
-          onClick={() => setIsWidgetOpen((open) => !open)}
-        >
-          {isWidgetOpen ? <CloseIcon /> : <ChatIcon />}
-        </button>
-      </div>
+          <button
+            type="button"
+            className="floating-widget-toggle"
+            aria-label={isWidgetOpen ? t("widget_toggle_close") : t("widget_toggle_open")}
+            onClick={() => setIsWidgetOpen((open) => !open)}
+          >
+            {isWidgetOpen ? <CloseIcon /> : <ChatIcon />}
+          </button>
+        </div>
+      ) : null}
 
       <div id="vip-modal" className={`modal ${isModalOpen ? "active" : ""}`}>
         <div id="modal-overlay" className="modal-overlay" onClick={closeModal}></div>
