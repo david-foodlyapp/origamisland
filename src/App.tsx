@@ -14,7 +14,7 @@ import {
   FacebookIcon, InstagramIcon, LinkedInIcon, CloseIcon, ChatIcon, CheckIcon,
   ChevronIcon, LifestyleIcon, WellnessIcon, ParkingIcon, RestaurantsIcon, RetailIcon,
   WaterfrontIcon, LoungeIcon, FamilyIcon, LongevityIcon, RecoveryIcon, HealthyLivingIcon,
-  FitnessIcon, MeditationIcon, SpaIcon, EnergyBalanceIcon,
+  FitnessIcon, MeditationIcon, SpaIcon, EnergyBalanceIcon, ArrowIcon,
   AudienceOutlineIcon, PriceTagIcon, InstallmentIcon, ResidenceIcon, HotelSuiteIcon, PenthouseIcon
 } from "./components/Icons";
 import {
@@ -47,14 +47,22 @@ import {
   type AboutUsApiItem,
   type AboutUsResponse,
   type Community,
+  type ExplorerUnit,
   type SocialNetworkItem,
   type SocialNetworksResponse
 } from "./types";
 import {
   DEFAULT_BUILDING_SLUG,
   buildUnitCatalogSearch,
+  convertPrice,
   fetchCurrencyRates,
+  fetchUnits,
+  formatArea,
+  formatPrice,
+  getUnitDisplayTitle,
   getUnitCatalogRoute,
+  mapUnitStatusLabel,
+  mapUnitTypeLabel,
   navigateTo,
   type CurrencyRates,
   type SupportedCurrency
@@ -152,6 +160,7 @@ const phoneCountryCodeFallbackOptions: PhoneCountryCodeOption[] = [
 const defaultPhoneCountryCode = phoneCountryCodeFallbackOptions[0].dialCode;
 
 type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute;
+type FeaturedUnitsFilter = "all" | "hotel_room" | "apartment";
 
 function getInitialTheme(): Theme {
   const savedTheme = localStorage.getItem("origami_theme");
@@ -257,6 +266,9 @@ function App() {
   const [currency, setCurrency] = useState<SupportedCurrency>("USD");
   const [currencyRates, setCurrencyRates] = useState<CurrencyRates | null>(null);
   const [newsItems, setNewsItems] = useState<NewsCard[]>([]);
+  const [featuredUnits, setFeaturedUnits] = useState<ExplorerUnit[]>([]);
+  const [isFeaturedUnitsLoading, setIsFeaturedUnitsLoading] = useState(true);
+  const [featuredUnitsFilter, setFeaturedUnitsFilter] = useState<FeaturedUnitsFilter>("all");
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [apiInfrastructureItems, setApiInfrastructureItems] = useState<InfrastructureApiItem[]>([]);
@@ -277,7 +289,7 @@ function App() {
   useEffect(() => {
     const widgetTimer = window.setTimeout(() => {
       setIsWidgetVisible(true);
-    }, 5000);
+    }, 8000);
 
     return () => {
       window.clearTimeout(widgetTimer);
@@ -294,6 +306,35 @@ function App() {
   const galleryTrackRef = useRef<HTMLDivElement | null>(null);
   const infrastructureSectionRef = useRef<HTMLElement | null>(null);
   const t = (key: TranslationKey) => translations[language][key];
+  const featuredUnitsCopy = language === "ka"
+    ? {
+      cta: "დეტალები",
+      priceFrom: "ფასი იწყება",
+      floor: "სართული",
+      loading: "იტვირთება...",
+      empty: "ბინები ვერ მოიძებნა",
+      bedrooms: "საძინებელი",
+      rooms: "ოთახი",
+      bathrooms: "სველი წერტილი",
+      priceOnRequest: "ფასი შეთანხმებით",
+      hotelRooms: "სასტუმროს ნომრები",
+      apartments: "აპარტამენტები",
+      all: "ყველა"
+    }
+    : {
+      cta: "View details",
+      priceFrom: "Starting from",
+      floor: "Floor",
+      loading: "Loading...",
+      empty: "No units found",
+      bedrooms: "Bedroom",
+      rooms: "Room",
+      bathrooms: "Bathroom",
+      priceOnRequest: "Price on request",
+      hotelRooms: "Hotel Rooms",
+      apartments: "Apartments",
+      all: "All"
+    };
   const infrastructureItems = [
     {
       title: t("infra_lifestyle"),
@@ -467,6 +508,50 @@ function App() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    setIsFeaturedUnitsLoading(true);
+    setFeaturedUnitsFilter("all");
+
+    fetchUnits(
+      DEFAULT_BUILDING_SLUG,
+      {
+        page: 1,
+        perPage: 9,
+        floors: [],
+        types: [],
+        statuses: [],
+        rooms: [],
+        bedrooms: [],
+        bathrooms: [],
+        sort: "rank",
+        view: "grid"
+      },
+      language
+    )
+      .then((response) => {
+        if (!cancelled) {
+          setFeaturedUnits(response.data);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error("Failed to load featured units:", error);
+          setFeaturedUnits([]);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsFeaturedUnitsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -1074,6 +1159,36 @@ function App() {
     return 99;
   };
 
+  const getFeaturedUnitPriceText = (unit: ExplorerUnit) => {
+    const convertedPrice = convertPrice(unit.price, unit.currency || undefined, currency, currencyRates);
+    const displayCurrency = convertedPrice != null ? currency : unit.currency || currency;
+    const formattedPrice = formatPrice(convertedPrice ?? unit.price, displayCurrency);
+    return formattedPrice || featuredUnitsCopy.priceOnRequest;
+  };
+
+  const getFeaturedMetricLabel = (count: number | null | undefined, singular: string) => {
+    const safeCount = count ?? 0;
+    return `${safeCount} ${singular}`;
+  };
+
+  const filteredFeaturedUnits = featuredUnitsFilter === "all"
+    ? featuredUnits
+    : featuredUnits.filter((unit) => unit.type === featuredUnitsFilter);
+
+  const getPlanningUnitsRoute = (types: string[] = []) =>
+    `/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
+      page: 1,
+      perPage: 9,
+      floors: [],
+      types,
+      statuses: [],
+      rooms: [],
+      bedrooms: [],
+      bathrooms: [],
+      sort: "rank",
+      view: "grid"
+    }, language)}`;
+
   const openModal = () => {
     setSelectedChooseItem(null);
     setShowSuccessState(false);
@@ -1562,12 +1677,10 @@ function App() {
           </div>
         </section>
 
-        {/*
         <section className="render-section">
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              <span className="section-tag">{t("render_tag")}</span>
-              <h2 className="section-title">{t("render_title")}</h2>
+              <h2 className="section-title">პროექტის გეგმარება</h2>
             </div>
             <div className="render-gallery reveal-scroll">
               <div className="render-main">
@@ -1579,7 +1692,6 @@ function App() {
             </div>
           </div>
         </section>
-        */}
 
         <section className="directions-section">
           <div className="container">
@@ -1636,31 +1748,96 @@ function App() {
               )}
             </div>
 
-            {/*
-            <div className="directions-search-banner">
-              <div className="search-banner-bg">
-                <img src="/assets/hero_bg_2.png" alt="Search properties background" />
+          </div>
+        </section>
+
+        <section className="planning-units-section">
+          <div className="container">
+            <div className="planning-units-toolbar">
+              <div className="planning-units-links">
+                <button
+                  type="button"
+                  className={`planning-units-link${featuredUnitsFilter === "hotel_room" ? " is-active" : ""}`}
+                  onClick={() => setFeaturedUnitsFilter("hotel_room")}
+                >
+                  {featuredUnitsCopy.hotelRooms}
+                </button>
+                <button
+                  type="button"
+                  className={`planning-units-link${featuredUnitsFilter === "apartment" ? " is-active" : ""}`}
+                  onClick={() => setFeaturedUnitsFilter("apartment")}
+                >
+                  {featuredUnitsCopy.apartments}
+                </button>
               </div>
-              <div className="search-banner-content">
-                <div className="banner-filter-group">
-                  <label>PROPERTY TYPE <ChevronIcon direction="down" /></label>
-                </div>
-                <div className="banner-filter-divider"></div>
-                <div className="banner-filter-group">
-                  <label>BEDROOMS <ChevronIcon direction="down" /></label>
-                </div>
-                <div className="banner-filter-divider"></div>
-                <div className="banner-filter-group">
-                  <label>PRICE RANGE <ChevronIcon direction="down" /></label>
-                </div>
-                <div className="banner-filter-divider"></div>
-                <div className="banner-filter-group">
-                  <label>COMMUNITY <ChevronIcon direction="down" /></label>
-                </div>
-                <button className="banner-search-btn" type="button">SEARCH PROPERTIES</button>
-              </div>
+
+              <button
+                type="button"
+                className="planning-units-link planning-units-link-all"
+                onClick={() => navigateTo(getPlanningUnitsRoute())}
+              >
+                <span>{featuredUnitsCopy.all}</span>
+                <ArrowIcon direction="right" />
+              </button>
             </div>
-            */}
+
+            {isFeaturedUnitsLoading ? (
+              <div className="units-state">{featuredUnitsCopy.loading}</div>
+            ) : filteredFeaturedUnits.length > 0 ? (
+              <div className="planning-units-carousel">
+                <div className="planning-units-grid">
+                  {filteredFeaturedUnits.map((unit) => (
+                    <article
+                      key={unit.id}
+                      className="unit-card planning-unit-card"
+                      onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units/${unit.slug}`)}
+                    >
+                      <div className="unit-card-topline">
+                        <span className={`unit-card-badge unit-card-badge--${unit.status}`}>{mapUnitStatusLabel(unit.status, language)}</span>
+                        <span className="unit-card-floor">{featuredUnitsCopy.floor} {unit.floor?.number ?? "-"}</span>
+                      </div>
+
+                      <div className="unit-card-image">
+                        {unit.image ? <img src={unit.image} alt={getUnitDisplayTitle(unit, language)} /> : <div className="units-image-placeholder" />}
+                      </div>
+
+                      <div className="unit-card-body">
+                        <p className="unit-card-number">{getUnitDisplayTitle(unit, language)}</p>
+                        <h3>{mapUnitTypeLabel(unit.type, language)}</h3>
+                        <strong>{formatArea(unit.area)}</strong>
+
+                        <div className="planning-unit-metrics">
+                          <span>{getFeaturedMetricLabel(unit.bedrooms_count, featuredUnitsCopy.bedrooms)}</span>
+                          <span>{getFeaturedMetricLabel(unit.rooms_count, featuredUnitsCopy.rooms)}</span>
+                          <span>{getFeaturedMetricLabel(unit.bathrooms_count, featuredUnitsCopy.bathrooms)}</span>
+                        </div>
+
+                        <div className="planning-unit-footer">
+                          <button
+                            type="button"
+                            className="planning-unit-button"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units/${unit.slug}`);
+                            }}
+                          >
+                            <span>{featuredUnitsCopy.cta}</span>
+                            <ArrowIcon direction="right" />
+                          </button>
+
+                          <div className="planning-unit-price-block">
+                            <span>{featuredUnitsCopy.priceFrom}</span>
+                            <strong>{getFeaturedUnitPriceText(unit)}</strong>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="units-state">{featuredUnitsCopy.empty}</div>
+            )}
           </div>
         </section>
 
