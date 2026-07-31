@@ -1492,21 +1492,22 @@ html[data-theme="light"] .origami-info-label {
 }
 
 .render-gallery {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: block;
 }
 
-.render-main img, .render-secondary img {
+.render-main img {
   width: 100%;
-  height: auto;
+  height: min(68vh, 700px);
+  max-height: min(68vh, 700px);
   border-radius: var(--radius-lg);
   box-shadow: 0 10px 30px rgba(0,0,0,0.3);
   transition: transform 0.5s ease;
   object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
-.render-main img:hover, .render-secondary img:hover {
+.render-main img:hover {
   transform: scale(1.02);
 }
 
@@ -1680,18 +1681,9 @@ html[data-theme="light"] .origami-info-label {
 }
 
 @media (min-width: 900px) {
-  .render-gallery {
-    flex-direction: row;
-  }
   .render-main {
-    flex: 2;
-  }
-  .render-secondary {
-    flex: 1;
-    display: flex;
-  }
-  .render-secondary img {
-    height: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
   }
 }
 

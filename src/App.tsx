@@ -49,6 +49,8 @@ import {
   type AboutUsApiItem,
   type AboutUsResponse,
   type Community,
+  type ExplorerProperty,
+  type ExplorerPropertyResponse,
   type ExplorerUnit,
   type SocialNetworkItem,
   type SocialNetworksResponse
@@ -278,6 +280,7 @@ function App() {
   const [featuredUnits, setFeaturedUnits] = useState<ExplorerUnit[]>([]);
   const [isFeaturedUnitsLoading, setIsFeaturedUnitsLoading] = useState(true);
   const [featuredUnitsFilter, setFeaturedUnitsFilter] = useState<FeaturedUnitsFilter>("all");
+  const [apiBuildingVisual, setApiBuildingVisual] = useState<ExplorerProperty | null>(null);
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [apiInfrastructureItems, setApiInfrastructureItems] = useState<InfrastructureApiItem[]>([]);
@@ -856,6 +859,32 @@ function App() {
     loadSocialNetworks();
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadBuildingVisual = async () => {
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`https://admin.origamiholding.com/api/buildings/${DEFAULT_BUILDING_SLUG}?locale=${locale}`, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Building visual request failed: ${response.status}`);
+        }
+
+        const payload: ExplorerPropertyResponse = await response.json();
+        setApiBuildingVisual(payload.data);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load building visual:", error);
+        setApiBuildingVisual(null);
+      }
+    };
+
+    loadBuildingVisual();
+    return () => controller.abort();
+  }, [language]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1736,10 +1765,10 @@ function App() {
             </div>
             <div className="render-gallery reveal-scroll">
               <div className="render-main">
-                <img src="/assets/3d/1.png" alt="3D Render 1" />
-              </div>
-              <div className="render-secondary">
-                <img src="/assets/3d/2.png" alt="3D Render 2" />
+                <img
+                  src={apiBuildingVisual?.image || "/assets/3d/1.png"}
+                  alt={apiBuildingVisual?.title || "Origami Island building visual"}
+                />
               </div>
             </div>
           </div>
