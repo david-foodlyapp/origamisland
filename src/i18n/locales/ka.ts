@@ -64,7 +64,7 @@ export const ka: Record<TranslationKey, string> = {
   origami_info_6_value: "20",
   origami_info_6_label: "პენთჰაუსი",
   render_tag: "ვიზუალიზაცია",
-  render_title: "3D არქიტექტურა და დიზაინი",
+  render_title: "პროექტის გეგმარება",
   render_desc: "შეიგრძენით Origami Island-ის ესთეტიკა ჩვენი რეალისტური 3D მოდელების მეშვეობით. თითოეული დეტალი შექმნილია პრემიუმ გამოცდილებისა და ჰარმონიული გარემოს უზრუნველსაყოფად.",
   directions_title: "აირჩიე",
   directions_hotel: "სასტუმროს ნომრები",

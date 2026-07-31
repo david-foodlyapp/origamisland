@@ -475,6 +475,25 @@ export type AboutSectionResponse = {
   };
 };
 
+export type WebsiteSectionResponse = {
+  data: {
+    slug: string;
+    type: string;
+    status: boolean;
+    eyebrow: string;
+    title: string;
+    description: string;
+    button_text: string;
+    button_link: string;
+    background_image: string;
+    meta_title: string;
+    meta_description: string;
+    rank: number;
+    updated_at: string;
+    items: SectionGridCardItem[];
+  };
+};
+
 export type AboutUsApiItem = {
   id: number;
   type: string;

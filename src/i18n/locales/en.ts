@@ -64,7 +64,7 @@ export const en: Record<TranslationKey, string> = {
   origami_info_6_value: "20",
   origami_info_6_label: "Penthouses",
   render_tag: "Visualization",
-  render_title: "3D Architecture & Design",
+  render_title: "Project Layout",
   render_desc: "Experience the aesthetics of Origami Island through our realistic 3D models. Every detail is carefully crafted to ensure a premium lifestyle and a harmonious environment.",
   directions_title: "Directions",
   directions_hotel: "Hotel Rooms",

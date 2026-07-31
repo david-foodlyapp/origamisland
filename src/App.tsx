@@ -52,11 +52,13 @@ import {
   type AboutUsResponse,
   type Community,
   type ExplorerFloor,
+  type ExplorerPropertyListResponse,
   type ExplorerPropertyDetail,
   type ExplorerPropertyResponse,
   type ExplorerUnit,
   type SocialNetworkItem,
-  type SocialNetworksResponse
+  type SocialNetworksResponse,
+  type WebsiteSectionResponse
 } from "./types";
 import {
   DEFAULT_BUILDING_SLUG,
@@ -292,7 +294,9 @@ function App() {
   const [apiChooseData, setApiChooseData] = useState<{ title: string; items: ChooseApiItem[] } | null>(null);
   const [apiFinanceData, setApiFinanceData] = useState<{ title: string; description: string; items: FinanceApiItem[] } | null>(null);
   const [apiCompanyProjectsData, setApiCompanyProjectsData] = useState<{ title: string; items: CompanyProjectApiItem[] } | null>(null);
+  const [apiSection3Data, setApiSection3Data] = useState<{ title: string; background_image: string } | null>(null);
   const [apiFooterMenuItems, setApiFooterMenuItems] = useState<FooterMenuApiItem[]>([]);
+  const [apiFooterLegalItems, setApiFooterLegalItems] = useState<SectionGridCardItem[]>([]);
   const [apiContactSettings, setApiContactSettings] = useState<ContactSettings | null>(null);
   const [apiSocialNetworks, setApiSocialNetworks] = useState<SocialNetworkItem[]>([]);
   const [branding, setBranding] = useState<BrandingSettings | null>(null);
@@ -813,6 +817,36 @@ function App() {
   useEffect(() => {
     const controller = new AbortController();
 
+    const loadFooterLegalMenu = async () => {
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`https://admin.origamiholding.com/api/sections/footer-menu?locale=${locale}`, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Footer legal menu request failed: ${response.status}`);
+        }
+
+        const payload: WebsiteSectionResponse = await response.json();
+        setApiFooterLegalItems(
+          payload.data.items
+            .filter((item) => item.status)
+            .sort((a, b) => a.rank - b.rank)
+        );
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load footer legal menu:", error);
+        setApiFooterLegalItems([]);
+      }
+    };
+
+    loadFooterLegalMenu();
+    return () => controller.abort();
+  }, [language]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
     const loadContactSettings = async () => {
       try {
         const response = await fetch("https://admin.origamiholding.com/api/settings/contact", { signal: controller.signal });
@@ -867,16 +901,64 @@ function App() {
   useEffect(() => {
     const controller = new AbortController();
 
+    const loadSection3 = async () => {
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`https://admin.origamiholding.com/api/sections/section-3?locale=${locale}`, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Section 3 request failed: ${response.status}`);
+        }
+
+        const payload: WebsiteSectionResponse = await response.json();
+        setApiSection3Data({
+          title: payload.data.title,
+          background_image: payload.data.background_image
+        });
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load section 3 fallback data:", error);
+        setApiSection3Data(null);
+      }
+    };
+
+    loadSection3();
+    return () => controller.abort();
+  }, [language]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
     const loadBuildingVisual = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/buildings/${DEFAULT_BUILDING_SLUG}?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`https://admin.origamiholding.com/api/buildings?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Building visual request failed: ${response.status}`);
         }
 
-        const payload: ExplorerPropertyResponse = await response.json();
-        setApiBuildingVisual(payload.data);
+        const payload: ExplorerPropertyListResponse = await response.json();
+        const selectedBuilding = payload.data.find((building) => building.slug.toLowerCase() === DEFAULT_BUILDING_SLUG.toLowerCase()) || payload.data[0];
+        if (!selectedBuilding) {
+          throw new Error("Building visual request returned no buildings");
+        }
+
+        try {
+          const detailResponse = await fetch(`https://admin.origamiholding.com/api/buildings/${selectedBuilding.slug}?locale=${locale}`, { signal: controller.signal });
+          if (!detailResponse.ok) {
+            throw new Error(`Building detail request failed: ${detailResponse.status}`);
+          }
+
+          const detailPayload: ExplorerPropertyResponse = await detailResponse.json();
+          setApiBuildingVisual(detailPayload.data);
+        } catch (detailError) {
+          if (detailError instanceof DOMException && detailError.name === "AbortError") {
+            return;
+          }
+          console.error("Failed to load building floor details:", detailError);
+          setApiBuildingVisual({ ...selectedBuilding, floors: [] });
+        }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           return;
@@ -1280,6 +1362,9 @@ function App() {
     floor.building_map_polygon?.map((point) => `${point.x},${point.y}`).join(" ") || "";
 
   const buildingVisualFloors = apiBuildingVisual?.floors.filter((floor) => (floor.building_map_polygon?.length || 0) >= 3) || [];
+  const renderSectionTitle = apiSection3Data?.title || t("render_title");
+  const renderSectionImage = apiBuildingVisual?.image || apiSection3Data?.background_image || "/assets/3d/1.png";
+  const renderSectionImageAlt = apiBuildingVisual?.title || apiSection3Data?.title || "Origami Island building visual";
 
   const footerContactAddress = apiContactSettings?.address || t("footer_contact_address");
   const footerContactEmail = apiContactSettings?.email || t("footer_contact_email");
@@ -1808,14 +1893,14 @@ function App() {
         <section className="render-section">
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              <h2 className="section-title">პროექტის გეგმარება</h2>
+              <h2 className="section-title">{renderSectionTitle}</h2>
             </div>
             <div className="render-gallery reveal-scroll">
               <div className="render-main">
                 <div className="building-visual-map">
                   <img
-                    src={apiBuildingVisual?.image || "/assets/3d/1.png"}
-                    alt={apiBuildingVisual?.title || "Origami Island building visual"}
+                    src={renderSectionImage}
+                    alt={renderSectionImageAlt}
                   />
                   {buildingVisualFloors.length > 0 ? (
                     <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -2512,9 +2597,18 @@ function App() {
           <div className="footer-bottom">
             <p>{t("footer_copyright")}</p>
             <div className="footer-legal">
-              <a href="#">{t("footer_privacy")}</a>
-              <a href="#">{t("footer_terms")}</a>
-              <a href="#">{t("footer_cookies")}</a>
+              {(apiFooterLegalItems.length > 0
+                ? apiFooterLegalItems.map((item) => ({ label: item.title, link: item.link || "#0" }))
+                : [
+                    { label: t("footer_privacy"), link: "#0" },
+                    { label: t("footer_terms"), link: "#0" },
+                    { label: t("footer_cookies"), link: "#0" }
+                  ]
+              ).map((item) => (
+                <a key={`${item.label}-${item.link}`} href={item.link}>
+                  {item.label}
+                </a>
+              ))}
             </div>
             <p>
               {t("footer_author_label")} :{" "}
