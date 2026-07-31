@@ -24,6 +24,9 @@ export type UnitCatalogQueryState = {
   rooms: string[];
   bedrooms: string[];
   bathrooms: string[];
+  areaMin: string;
+  areaMax: string;
+  condition: string;
   sort: string;
   view: UnitViewMode;
 };
@@ -102,6 +105,9 @@ export function readUnitCatalogQuery(): UnitCatalogQueryState {
     rooms: readCsv(params.get("rooms")),
     bedrooms: readCsv(params.get("bedrooms")),
     bathrooms: readCsv(params.get("bathrooms")),
+    areaMin: normalizeNumberParam(params.get("area_min")),
+    areaMax: normalizeNumberParam(params.get("area_max")),
+    condition: params.get("condition") || "",
     sort: params.get("sort") || "rank",
     view: params.get("view") === "table" ? "table" : "grid"
   };
@@ -122,6 +128,9 @@ export function buildUnitCatalogSearch(state: UnitCatalogQueryState, language: L
   if (state.rooms.length) params.set("rooms", state.rooms.join(","));
   if (state.bedrooms.length) params.set("bedrooms", state.bedrooms.join(","));
   if (state.bathrooms.length) params.set("bathrooms", state.bathrooms.join(","));
+  if (state.areaMin) params.set("area_min", state.areaMin);
+  if (state.areaMax) params.set("area_max", state.areaMax);
+  if (state.condition) params.set("condition", state.condition);
 
   return params.toString();
 }
@@ -302,4 +311,12 @@ function readCsv(value: string | null) {
 function normalizePositiveInt(value: string | null, fallback: number) {
   const numeric = Number(value);
   return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
+}
+
+function normalizeNumberParam(value: string | null) {
+  if (!value) {
+    return "";
+  }
+
+  return /^\d+(\.\d+)?$/.test(value) ? value : "";
 }

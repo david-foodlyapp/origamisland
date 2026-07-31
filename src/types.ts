@@ -46,6 +46,7 @@ export type ExplorerUnit = {
   title: string;
   description: string;
   status: string;
+  condition?: string | null;
   rank: number;
   type: string;
   area?: string;
@@ -402,6 +403,21 @@ export type FooterMenuSectionResponse = {
     title: string;
     items: FooterMenuApiItem[];
   };
+};
+
+export type ContactSettings = {
+  email: string | null;
+  contact_form_recipient_email: string | null;
+  contact_form_subject_prefix: string | null;
+  phone: string | null;
+  secondary_phone: string | null;
+  address: string | null;
+  map_link: string | null;
+  map_iframe: string | null;
+};
+
+export type ContactSettingsResponse = {
+  data: ContactSettings;
 };
 
 export type SocialNetworkItem = {

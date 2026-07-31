@@ -42,6 +42,8 @@ import {
   type InfrastructureSectionResponse,
   type FooterMenuApiItem,
   type FooterMenuSectionResponse,
+  type ContactSettings,
+  type ContactSettingsResponse,
   type CompanyProjectApiItem,
   type CompanyProjectsSectionResponse,
   type AboutUsApiItem,
@@ -92,6 +94,12 @@ const communities: Community[] = [
     descKey: "comm_marina_desc"
   }
 ];
+
+const searchAreaRanges: Record<Exclude<RoomFilter, "all">, { min: string; max: string }> = {
+  "1room": { min: "30", max: "40" },
+  "2room": { min: "40", max: "60" },
+  "3room": { min: "60", max: "" }
+};
 
 const serviceLinks = [
   "VIP Private Viewings",
@@ -161,6 +169,7 @@ const defaultPhoneCountryCode = phoneCountryCodeFallbackOptions[0].dialCode;
 
 type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute;
 type FeaturedUnitsFilter = "all" | "hotel_room" | "apartment";
+const SHOW_FEATURED_UNITS_SECTION = false;
 
 function getInitialTheme(): Theme {
   const savedTheme = localStorage.getItem("origami_theme");
@@ -278,6 +287,7 @@ function App() {
   const [apiFinanceData, setApiFinanceData] = useState<{ title: string; description: string; items: FinanceApiItem[] } | null>(null);
   const [apiCompanyProjectsData, setApiCompanyProjectsData] = useState<{ title: string; items: CompanyProjectApiItem[] } | null>(null);
   const [apiFooterMenuItems, setApiFooterMenuItems] = useState<FooterMenuApiItem[]>([]);
+  const [apiContactSettings, setApiContactSettings] = useState<ContactSettings | null>(null);
   const [apiSocialNetworks, setApiSocialNetworks] = useState<SocialNetworkItem[]>([]);
   const [branding, setBranding] = useState<BrandingSettings | null>(null);
   const [isCompanyProjectsLoading, setIsCompanyProjectsLoading] = useState(true);
@@ -526,6 +536,9 @@ function App() {
         rooms: [],
         bedrooms: [],
         bathrooms: [],
+        areaMin: "",
+        areaMax: "",
+        condition: "",
         sort: "rank",
         view: "grid"
       },
@@ -789,6 +802,31 @@ function App() {
     loadFooterMenu();
     return () => controller.abort();
   }, [language]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadContactSettings = async () => {
+      try {
+        const response = await fetch("https://admin.origamiholding.com/api/settings/contact", { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Contact settings request failed: ${response.status}`);
+        }
+
+        const payload: ContactSettingsResponse = await response.json();
+        setApiContactSettings(payload.data);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load contact settings:", error);
+        setApiContactSettings(null);
+      }
+    };
+
+    loadContactSettings();
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1175,6 +1213,12 @@ function App() {
     ? featuredUnits
     : featuredUnits.filter((unit) => unit.type === featuredUnitsFilter);
 
+  const footerContactAddress = apiContactSettings?.address || t("footer_contact_address");
+  const footerContactEmail = apiContactSettings?.email || t("footer_contact_email");
+  const footerContactPhone = apiContactSettings?.phone || t("footer_contact_phone");
+  const footerContactSecondaryPhone = apiContactSettings?.secondary_phone;
+  const formatTelHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
+
   const getPlanningUnitsRoute = (types: string[] = []) =>
     `/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
       page: 1,
@@ -1185,6 +1229,9 @@ function App() {
       rooms: [],
       bedrooms: [],
       bathrooms: [],
+      areaMin: "",
+      areaMax: "",
+      condition: "",
       sort: "rank",
       view: "grid"
     }, language)}`;
@@ -1233,6 +1280,8 @@ function App() {
   };
 
   const handleSearch = () => {
+    const selectedAreaRange = selectedRoom === "all" ? null : searchAreaRanges[selectedRoom];
+
     setMobileFilterOpen(false);
     navigateTo(
       `/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
@@ -1241,9 +1290,12 @@ function App() {
         floors: [],
         types: selectedPropertyType === "all" ? [] : [selectedPropertyType === "investment" ? "apartment" : "hotel_room"],
         statuses: [],
-        rooms: selectedRoom === "all" ? [] : [selectedRoom === "1room" ? "1" : selectedRoom === "2room" ? "2" : "3"],
-        bedrooms: selectedRoom === "all" ? [] : [selectedRoom === "1room" ? "0" : selectedRoom === "2room" ? "1" : "2"],
+        rooms: [],
+        bedrooms: [],
         bathrooms: [],
+        areaMin: selectedAreaRange?.min || "",
+        areaMax: selectedAreaRange?.max || "",
+        condition: selectedCondition === "all" ? "" : selectedCondition,
         sort: "rank",
         view: "grid"
       }, language)}`
@@ -1751,95 +1803,97 @@ function App() {
           </div>
         </section>
 
-        <section className="planning-units-section">
-          <div className="container">
-            <div className="planning-units-toolbar">
-              <div className="planning-units-links">
+        {SHOW_FEATURED_UNITS_SECTION && (
+          <section className="planning-units-section">
+            <div className="container">
+              <div className="planning-units-toolbar">
+                <div className="planning-units-links">
+                  <button
+                    type="button"
+                    className={`planning-units-link${featuredUnitsFilter === "hotel_room" ? " is-active" : ""}`}
+                    onClick={() => setFeaturedUnitsFilter("hotel_room")}
+                  >
+                    {featuredUnitsCopy.hotelRooms}
+                  </button>
+                  <button
+                    type="button"
+                    className={`planning-units-link${featuredUnitsFilter === "apartment" ? " is-active" : ""}`}
+                    onClick={() => setFeaturedUnitsFilter("apartment")}
+                  >
+                    {featuredUnitsCopy.apartments}
+                  </button>
+                </div>
+
                 <button
                   type="button"
-                  className={`planning-units-link${featuredUnitsFilter === "hotel_room" ? " is-active" : ""}`}
-                  onClick={() => setFeaturedUnitsFilter("hotel_room")}
+                  className="planning-units-link planning-units-link-all"
+                  onClick={() => navigateTo(getPlanningUnitsRoute())}
                 >
-                  {featuredUnitsCopy.hotelRooms}
-                </button>
-                <button
-                  type="button"
-                  className={`planning-units-link${featuredUnitsFilter === "apartment" ? " is-active" : ""}`}
-                  onClick={() => setFeaturedUnitsFilter("apartment")}
-                >
-                  {featuredUnitsCopy.apartments}
+                  <span>{featuredUnitsCopy.all}</span>
+                  <ArrowIcon direction="right" />
                 </button>
               </div>
 
-              <button
-                type="button"
-                className="planning-units-link planning-units-link-all"
-                onClick={() => navigateTo(getPlanningUnitsRoute())}
-              >
-                <span>{featuredUnitsCopy.all}</span>
-                <ArrowIcon direction="right" />
-              </button>
-            </div>
-
-            {isFeaturedUnitsLoading ? (
-              <div className="units-state">{featuredUnitsCopy.loading}</div>
-            ) : filteredFeaturedUnits.length > 0 ? (
-              <div className="planning-units-carousel">
-                <div className="planning-units-grid">
-                  {filteredFeaturedUnits.map((unit) => (
-                    <article
-                      key={unit.id}
-                      className="unit-card planning-unit-card"
-                      onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units/${unit.slug}`)}
-                    >
-                      <div className="unit-card-topline">
-                        <span className={`unit-card-badge unit-card-badge--${unit.status}`}>{mapUnitStatusLabel(unit.status, language)}</span>
-                        <span className="unit-card-floor">{featuredUnitsCopy.floor} {unit.floor?.number ?? "-"}</span>
-                      </div>
-
-                      <div className="unit-card-image">
-                        {unit.image ? <img src={unit.image} alt={getUnitDisplayTitle(unit, language)} /> : <div className="units-image-placeholder" />}
-                      </div>
-
-                      <div className="unit-card-body">
-                        <p className="unit-card-number">{getUnitDisplayTitle(unit, language)}</p>
-                        <h3>{mapUnitTypeLabel(unit.type, language)}</h3>
-                        <strong>{formatArea(unit.area)}</strong>
-
-                        <div className="planning-unit-metrics">
-                          <span>{getFeaturedMetricLabel(unit.bedrooms_count, featuredUnitsCopy.bedrooms)}</span>
-                          <span>{getFeaturedMetricLabel(unit.rooms_count, featuredUnitsCopy.rooms)}</span>
-                          <span>{getFeaturedMetricLabel(unit.bathrooms_count, featuredUnitsCopy.bathrooms)}</span>
+              {isFeaturedUnitsLoading ? (
+                <div className="units-state">{featuredUnitsCopy.loading}</div>
+              ) : filteredFeaturedUnits.length > 0 ? (
+                <div className="planning-units-carousel">
+                  <div className="planning-units-grid">
+                    {filteredFeaturedUnits.map((unit) => (
+                      <article
+                        key={unit.id}
+                        className="unit-card planning-unit-card"
+                        onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units/${unit.slug}`)}
+                      >
+                        <div className="unit-card-topline">
+                          <span className={`unit-card-badge unit-card-badge--${unit.status}`}>{mapUnitStatusLabel(unit.status, language)}</span>
+                          <span className="unit-card-floor">{featuredUnitsCopy.floor} {unit.floor?.number ?? "-"}</span>
                         </div>
 
-                        <div className="planning-unit-footer">
-                          <button
-                            type="button"
-                            className="planning-unit-button"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units/${unit.slug}`);
-                            }}
-                          >
-                            <span>{featuredUnitsCopy.cta}</span>
-                            <ArrowIcon direction="right" />
-                          </button>
+                        <div className="unit-card-image">
+                          {unit.image ? <img src={unit.image} alt={getUnitDisplayTitle(unit, language)} /> : <div className="units-image-placeholder" />}
+                        </div>
 
-                          <div className="planning-unit-price-block">
-                            <span>{featuredUnitsCopy.priceFrom}</span>
-                            <strong>{getFeaturedUnitPriceText(unit)}</strong>
+                        <div className="unit-card-body">
+                          <p className="unit-card-number">{getUnitDisplayTitle(unit, language)}</p>
+                          <h3>{mapUnitTypeLabel(unit.type, language)}</h3>
+                          <strong>{formatArea(unit.area)}</strong>
+
+                          <div className="planning-unit-metrics">
+                            <span>{getFeaturedMetricLabel(unit.bedrooms_count, featuredUnitsCopy.bedrooms)}</span>
+                            <span>{getFeaturedMetricLabel(unit.rooms_count, featuredUnitsCopy.rooms)}</span>
+                            <span>{getFeaturedMetricLabel(unit.bathrooms_count, featuredUnitsCopy.bathrooms)}</span>
+                          </div>
+
+                          <div className="planning-unit-footer">
+                            <button
+                              type="button"
+                              className="planning-unit-button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units/${unit.slug}`);
+                              }}
+                            >
+                              <span>{featuredUnitsCopy.cta}</span>
+                              <ArrowIcon direction="right" />
+                            </button>
+
+                            <div className="planning-unit-price-block">
+                              <span>{featuredUnitsCopy.priceFrom}</span>
+                              <strong>{getFeaturedUnitPriceText(unit)}</strong>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <div className="units-state">{featuredUnitsCopy.empty}</div>
-            )}
-          </div>
-        </section>
+              ) : (
+                <div className="units-state">{featuredUnitsCopy.empty}</div>
+              )}
+            </div>
+          </section>
+        )}
 
         <section id="biohacking" className="biohacking-section" style={apiBiohackingData?.background_image ? { "--biohacking-bg": `url(${apiBiohackingData.background_image})` } as React.CSSProperties : undefined}>
           <div className="container">
@@ -2297,13 +2351,26 @@ function App() {
                 <ChevronIcon direction={openFooterSection === "legal" ? "up" : "down"} />
               </button>
               <ul className="footer-contact-list">
-                <li>{t("footer_contact_address")}</li>
                 <li>
-                  <a href={`mailto:${t("footer_contact_email")}`}>{t("footer_contact_email")}</a>
+                  {apiContactSettings?.map_link ? (
+                    <a href={apiContactSettings.map_link} target="_blank" rel="noreferrer">
+                      {footerContactAddress}
+                    </a>
+                  ) : (
+                    footerContactAddress
+                  )}
                 </li>
                 <li>
-                  <a href={`tel:${t("footer_contact_phone").replace(/\s+/g, "")}`}>{t("footer_contact_phone")}</a>
+                  <a href={`mailto:${footerContactEmail}`}>{footerContactEmail}</a>
                 </li>
+                <li>
+                  <a href={formatTelHref(footerContactPhone)}>{footerContactPhone}</a>
+                </li>
+                {footerContactSecondaryPhone ? (
+                  <li>
+                    <a href={formatTelHref(footerContactSecondaryPhone)}>{footerContactSecondaryPhone}</a>
+                  </li>
+                ) : null}
               </ul>
             </div>
           </div>

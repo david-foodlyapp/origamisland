@@ -76,8 +76,9 @@ const copyKa = {
   bedroomLabel: "საძინებელი",
   studio: "სტუდიო",
   condition: "კონდიცია",
-  conditionWhite: "მწვანე",
-  conditionFull: "სრულად აღჭურვილი",
+  conditionWhite: "თეთრი კარკასი",
+  conditionFull: "რემონტით",
+  conditionTurnkey: "თურნ ქეი",
   typeHotelRoom: "სასტუმროს ნომერი",
   typeBrandedResidence: "ბრენდული რეზიდენცია",
   bathroomLabel: "სველი წერტილი",
@@ -108,6 +109,12 @@ const copyKa = {
   switchToLight: "ღია რეჟიმზე გადართვა"
 };
 
+const areaRangeOptions = [
+  { value: "30-40", min: "30", max: "40" },
+  { value: "40-60", min: "40", max: "60" },
+  { value: "60-", min: "60", max: "" }
+];
+
 const copyEn: typeof copyKa = {
   listingTitle: "Choose an apartment",
   floor: "Floor",
@@ -132,8 +139,9 @@ const copyEn: typeof copyKa = {
   bedroomLabel: "Bedroom",
   studio: "Studio",
   condition: "Condition",
-  conditionWhite: "Green",
-  conditionFull: "Turn key",
+  conditionWhite: "White frame",
+  conditionFull: "Renovated",
+  conditionTurnkey: "Turn key",
   typeHotelRoom: "Hotel Room",
   typeBrandedResidence: "Branded Residence",
   bathroomLabel: "Bathroom",
@@ -169,20 +177,33 @@ function getCopy(language: Language) {
 }
 
 function sanitizeCatalogQueryState(state: UnitCatalogQueryState): UnitCatalogQueryState {
+  const allowedConditions = ["white", "full", "turnkey"];
+
   return {
     ...state,
-    rooms: []
+    rooms: [],
+    bedrooms: [],
+    condition: allowedConditions.includes(state.condition) ? state.condition : ""
   };
 }
 
-function bedroomOptionLabel(count: number, copy: typeof copyKa) {
-  return count === 0 ? copy.studio : `${count} ${copy.bedroomLabel}`;
+function getAreaRangeLabel(option: { min: string; max: string }) {
+  return option.max ? `${option.min}-${option.max} მ²` : `${option.min}+ მ²`;
+}
+
+function getAreaRangeValue(query: UnitCatalogQueryState) {
+  return areaRangeOptions.find((option) => option.min === query.areaMin && option.max === query.areaMax)?.value || "";
+}
+
+function getAreaRangeFromValue(value: string) {
+  return areaRangeOptions.find((option) => option.value === value) || null;
 }
 
 function getConditionOptions(copy: typeof copyKa) {
   return [
-    { value: "green", label: copy.conditionWhite },
-    { value: "turnkey", label: copy.conditionFull }
+    { value: "white", label: copy.conditionWhite },
+    { value: "full", label: copy.conditionFull },
+    { value: "turnkey", label: copy.conditionTurnkey }
   ];
 }
 
@@ -222,7 +243,6 @@ export function UnitCatalogPage({
   const [mediaMode, setMediaMode] = useState<"3d" | "2d" | "floorPlan">("3d");
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-  const [condition, setCondition] = useState("");
 
   useEffect(() => {
     const nextQuery = sanitizeCatalogQueryState(readUnitCatalogQuery());
@@ -369,13 +389,17 @@ export function UnitCatalogPage({
   const filteredUnits = useMemo(() => {
     // TODO: temporary — show only available units, remove when ready to show all statuses again
     const availableUnits = units.filter((item) => item.status === "available");
+    const shouldFilterByCondition = Boolean(query.condition) && availableUnits.some((item) => Boolean(item.condition));
+    const conditionUnits = shouldFilterByCondition
+      ? availableUnits.filter((item) => item.condition === query.condition)
+      : availableUnits;
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     if (!normalizedSearch) {
-      return availableUnits;
+      return conditionUnits;
     }
 
-    return availableUnits.filter((item) => {
+    return conditionUnits.filter((item) => {
       const displayTitle = getUnitDisplayTitle(item, language).toLowerCase();
       const typeLabel = mapUnitTypeLabel(item.type, language).toLowerCase();
       const unitNumber = item.unit_number?.toLowerCase() || "";
@@ -398,13 +422,13 @@ export function UnitCatalogPage({
         priceText
       ].some((value) => value.includes(normalizedSearch));
     });
-  }, [language, searchTerm, units, currency, currencyRates]);
+  }, [language, query.condition, searchTerm, units, currency, currencyRates]);
 
   const activeFilterCount = [
     draftQuery.floors.length,
     draftQuery.types.length,
-    draftQuery.bedrooms.length,
-    condition ? 1 : 0,
+    draftQuery.areaMin || draftQuery.areaMax ? 1 : 0,
+    draftQuery.condition ? 1 : 0,
     searchTerm.trim() ? 1 : 0
   ].reduce((sum, value) => sum + value, 0);
 
@@ -414,15 +438,14 @@ export function UnitCatalogPage({
   const selectedTypeLabel = draftQuery.types[0]
     ? typeOptions.find((item) => item.value === draftQuery.types[0])?.label || draftQuery.types[0]
     : "";
-  const selectedBedroomsLabel = draftQuery.bedrooms[0]
-    ? bedroomOptionLabel(Number(draftQuery.bedrooms[0]), copy)
-    : "";
-  const selectedConditionLabel = condition
-    ? conditionOptions.find((item) => item.value === condition)?.label || condition
+  const selectedAreaRange = areaRangeOptions.find((option) => option.value === getAreaRangeValue(draftQuery));
+  const selectedAreaLabel = selectedAreaRange ? getAreaRangeLabel(selectedAreaRange) : "";
+  const selectedConditionLabel = draftQuery.condition
+    ? conditionOptions.find((item) => item.value === draftQuery.condition)?.label || draftQuery.condition
     : "";
 
   const mobileFilterSummary = [
-    selectedBedroomsLabel ? `${copy.area}: ${selectedBedroomsLabel}` : "",
+    selectedAreaLabel ? `${copy.area}: ${selectedAreaLabel}` : "",
     selectedTypeLabel ? `${copy.type}: ${selectedTypeLabel}` : "",
     selectedConditionLabel ? `${copy.condition}: ${selectedConditionLabel}` : "",
     selectedFloorLabel ? `${copy.floor}: ${selectedFloorLabel}` : "",
@@ -431,12 +454,14 @@ export function UnitCatalogPage({
 
   const resetFilters = () => {
     setSearchTerm("");
-    setCondition("");
     applyQuery({
       ...draftQuery,
       floors: [],
       types: [],
       bedrooms: [],
+      areaMin: "",
+      areaMax: "",
+      condition: "",
       page: 1
     });
   };
@@ -673,10 +698,17 @@ export function UnitCatalogPage({
                     <div className="units-filterbar">
                       <FilterSelect
                         label={copy.area}
-                        value={draftQuery.bedrooms[0] || ""}
-                        options={(filters?.bedrooms || []).map((count) => ({ value: String(count), label: bedroomOptionLabel(count, copy) }))}
+                        value={getAreaRangeValue(draftQuery)}
+                        options={areaRangeOptions.map((option) => ({ value: option.value, label: getAreaRangeLabel(option) }))}
                         allLabel={copy.all}
-                        onChange={(value) => updateDraftQuery((current) => ({ ...current, bedrooms: value ? [value] : [] }), true)}
+                        onChange={(value) => {
+                          const range = getAreaRangeFromValue(value);
+                          updateDraftQuery((current) => ({
+                            ...current,
+                            areaMin: range?.min || "",
+                            areaMax: range?.max || ""
+                          }), true);
+                        }}
                       />
                       <FilterSelect
                         label={copy.type}
@@ -687,10 +719,10 @@ export function UnitCatalogPage({
                       />
                       <FilterSelect
                         label={copy.condition}
-                        value={condition}
+                        value={draftQuery.condition}
                         options={conditionOptions}
                         allLabel={copy.all}
-                        onChange={(value) => setCondition(value)}
+                        onChange={(value) => updateDraftQuery((current) => ({ ...current, condition: value }), true)}
                       />
                       <FilterSelect
                         label={copy.floor}
