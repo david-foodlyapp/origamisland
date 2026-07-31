@@ -49,7 +49,8 @@ import {
   type AboutUsApiItem,
   type AboutUsResponse,
   type Community,
-  type ExplorerProperty,
+  type ExplorerFloor,
+  type ExplorerPropertyDetail,
   type ExplorerPropertyResponse,
   type ExplorerUnit,
   type SocialNetworkItem,
@@ -280,7 +281,7 @@ function App() {
   const [featuredUnits, setFeaturedUnits] = useState<ExplorerUnit[]>([]);
   const [isFeaturedUnitsLoading, setIsFeaturedUnitsLoading] = useState(true);
   const [featuredUnitsFilter, setFeaturedUnitsFilter] = useState<FeaturedUnitsFilter>("all");
-  const [apiBuildingVisual, setApiBuildingVisual] = useState<ExplorerProperty | null>(null);
+  const [apiBuildingVisual, setApiBuildingVisual] = useState<ExplorerPropertyDetail | null>(null);
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [apiInfrastructureItems, setApiInfrastructureItems] = useState<InfrastructureApiItem[]>([]);
@@ -1242,6 +1243,11 @@ function App() {
     ? featuredUnits
     : featuredUnits.filter((unit) => unit.type === featuredUnitsFilter);
 
+  const getFloorPolygonPoints = (floor: ExplorerFloor) =>
+    floor.building_map_polygon?.map((point) => `${point.x},${point.y}`).join(" ") || "";
+
+  const buildingVisualFloors = apiBuildingVisual?.floors.filter((floor) => (floor.building_map_polygon?.length || 0) >= 3) || [];
+
   const footerContactAddress = apiContactSettings?.address || t("footer_contact_address");
   const footerContactEmail = apiContactSettings?.email || t("footer_contact_email");
   const footerContactPhone = apiContactSettings?.phone || t("footer_contact_phone");
@@ -1765,10 +1771,68 @@ function App() {
             </div>
             <div className="render-gallery reveal-scroll">
               <div className="render-main">
-                <img
-                  src={apiBuildingVisual?.image || "/assets/3d/1.png"}
-                  alt={apiBuildingVisual?.title || "Origami Island building visual"}
-                />
+                <div className="building-visual-map">
+                  <img
+                    src={apiBuildingVisual?.image || "/assets/3d/1.png"}
+                    alt={apiBuildingVisual?.title || "Origami Island building visual"}
+                  />
+                  {buildingVisualFloors.length > 0 ? (
+                    <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                      {buildingVisualFloors.map((floor) => (
+                        <g key={floor.id} className="building-floor-hotspot">
+                          <polygon
+                            points={getFloorPolygonPoints(floor)}
+                            onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
+                              page: 1,
+                              perPage: 9,
+                              floors: [floor.slug],
+                              types: [],
+                              statuses: [],
+                              rooms: [],
+                              bedrooms: [],
+                              bathrooms: [],
+                              areaMin: "",
+                              areaMax: "",
+                              condition: "",
+                              sort: "rank",
+                              view: "grid"
+                            }, language)}`)}
+                          />
+                        </g>
+                      ))}
+                    </svg>
+                  ) : null}
+                  {buildingVisualFloors.map((floor) => (
+                    floor.building_map_label_position ? (
+                      <button
+                        key={floor.id}
+                        type="button"
+                        className="building-floor-label"
+                        style={{
+                          "--floor-label-x": `${floor.building_map_label_position.x}%`,
+                          "--floor-label-y": `${floor.building_map_label_position.y}%`
+                        } as React.CSSProperties}
+                        onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
+                          page: 1,
+                          perPage: 9,
+                          floors: [floor.slug],
+                          types: [],
+                          statuses: [],
+                          rooms: [],
+                          bedrooms: [],
+                          bathrooms: [],
+                          areaMin: "",
+                          areaMax: "",
+                          condition: "",
+                          sort: "rank",
+                          view: "grid"
+                        }, language)}`)}
+                      >
+                        {floor.number}
+                      </button>
+                    ) : null
+                  ))}
+                </div>
               </div>
             </div>
           </div>

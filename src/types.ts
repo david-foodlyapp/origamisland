@@ -39,6 +39,11 @@ export type ExplorerMediaItem = {
   alt: string;
 };
 
+export type VisualPoint = {
+  x: number;
+  y: number;
+};
+
 export type ExplorerUnit = {
   id: number;
   slug: string;
@@ -72,6 +77,8 @@ export type ExplorerFloor = {
   title: string;
   description: string;
   units_count: number;
+  building_map_polygon?: VisualPoint[];
+  building_map_label_position?: VisualPoint | null;
   media: ExplorerMediaItem[];
   updated_at: string;
 };
