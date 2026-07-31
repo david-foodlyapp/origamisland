@@ -44,6 +44,8 @@ import {
   type FooterMenuSectionResponse,
   type ContactSettings,
   type ContactSettingsResponse,
+  type SectionGridCardItem,
+  type AboutSectionResponse,
   type CompanyProjectApiItem,
   type CompanyProjectsSectionResponse,
   type AboutUsApiItem,
@@ -110,13 +112,13 @@ const serviceLinks = [
   "Property Valuation"
 ];
 
-const origamiInfoItems: Array<{ valueKey: TranslationKey; labelKey: TranslationKey; icon: JSX.Element }> = [
-  { valueKey: "origami_info_1_value", labelKey: "origami_info_1_label", icon: <PriceTagIcon /> },
-  { valueKey: "origami_info_2_value", labelKey: "origami_info_2_label", icon: <CalendarIcon /> },
-  { valueKey: "origami_info_3_value", labelKey: "origami_info_3_label", icon: <InstallmentIcon /> },
-  { valueKey: "origami_info_4_value", labelKey: "origami_info_4_label", icon: <ResidenceIcon /> },
-  { valueKey: "origami_info_5_value", labelKey: "origami_info_5_label", icon: <HotelSuiteIcon /> },
-  { valueKey: "origami_info_6_value", labelKey: "origami_info_6_label", icon: <PenthouseIcon /> }
+const origamiInfoIcons = [
+  <PriceTagIcon />,
+  <CalendarIcon />,
+  <InstallmentIcon />,
+  <ResidenceIcon />,
+  <HotelSuiteIcon />,
+  <PenthouseIcon />
 ];
 
 const languageOptions: Array<{ code: Language; label: string; shortLabel: string }> = [
@@ -296,6 +298,7 @@ function App() {
   const [branding, setBranding] = useState<BrandingSettings | null>(null);
   const [isCompanyProjectsLoading, setIsCompanyProjectsLoading] = useState(true);
   const [apiAboutData, setApiAboutData] = useState<AboutUsApiItem | null>(null);
+  const [apiAboutInfoItems, setApiAboutInfoItems] = useState<SectionGridCardItem[]>([]);
   const [selectedChooseItem, setSelectedChooseItem] = useState<ChooseApiItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessState, setShowSuccessState] = useState(false);
@@ -753,7 +756,7 @@ function App() {
         const rect = card.getBoundingClientRect();
         const cardCenter = rect.top + rect.height / 2;
         const distanceFromViewportCenter = (cardCenter - viewportHeight / 2) / viewportHeight;
-        const offset = Math.max(-64, Math.min(64, distanceFromViewportCenter * speed * -68));
+        const offset = Math.max(-120, Math.min(120, distanceFromViewportCenter * speed * -128));
         card.style.setProperty("--infra-parallax", `${offset.toFixed(2)}px`);
       });
     };
@@ -1165,6 +1168,36 @@ function App() {
     };
 
     loadCompanyProjects();
+    return () => controller.abort();
+  }, [language]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadAboutInfoItems = async () => {
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`https://admin.origamiholding.com/api/sections/about?locale=${locale}`, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`About section request failed: ${response.status}`);
+        }
+
+        const payload: AboutSectionResponse = await response.json();
+        setApiAboutInfoItems(
+          payload.data.items
+            .filter((item) => item.status)
+            .sort((a, b) => a.rank - b.rank)
+        );
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load about section cards:", error);
+        setApiAboutInfoItems([]);
+      }
+    };
+
+    loadAboutInfoItems();
     return () => controller.abort();
   }, [language]);
 
@@ -1750,17 +1783,25 @@ function App() {
                 />
               </div>
             </div>
-            <div className="origami-info-section reveal-scroll">
-              <div className="origami-info-grid">
-                {origamiInfoItems.map((item) => (
-                  <article key={item.valueKey} className="origami-info-card">
-                    <span className="origami-info-icon">{item.icon}</span>
-                    <span className="origami-info-value">{t(item.valueKey)}</span>
-                    <span className="origami-info-label">{t(item.labelKey)}</span>
-                  </article>
-                ))}
+            {apiAboutInfoItems.length > 0 ? (
+              <div className="origami-info-section reveal-scroll">
+                <div className="origami-info-grid">
+	                  {apiAboutInfoItems.map((item, index) => (
+	                    <article key={item.id} className="origami-info-card">
+	                      <span className="origami-info-icon">
+	                        {item.image ? (
+	                          <img src={item.image} alt="" aria-hidden="true" />
+	                        ) : (
+	                          origamiInfoIcons[index % origamiInfoIcons.length]
+	                        )}
+	                      </span>
+	                      <span className="origami-info-value">{item.title}</span>
+	                      <span className="origami-info-label">{item.subtitle}</span>
+	                    </article>
+                  ))}
+                </div>
               </div>
-            </div>
+            ) : null}
           </div>
         </section>
 
