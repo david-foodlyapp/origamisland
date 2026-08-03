@@ -52,6 +52,8 @@ type UnitCatalogPageProps = {
   currencyRates: CurrencyRates | null;
 };
 
+type PaginationItem = number | "ellipsis";
+
 const copyKa = {
   listingTitle: "ბინების არჩევა",
   floor: "სართული",
@@ -187,6 +189,33 @@ function sanitizeCatalogQueryState(state: UnitCatalogQueryState): UnitCatalogQue
   };
 }
 
+function getPaginationItems(currentPage: number, lastPage: number): PaginationItem[] {
+  if (lastPage <= 7) {
+    return Array.from({ length: lastPage }, (_, index) => index + 1);
+  }
+
+  const pages = new Set<number>([1, lastPage]);
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(lastPage - 1, currentPage + 1);
+
+  for (let page = start; page <= end; page += 1) {
+    pages.add(page);
+  }
+
+  const sortedPages = Array.from(pages).sort((a, b) => a - b);
+  const items: PaginationItem[] = [];
+
+  sortedPages.forEach((page, index) => {
+    const previousPage = sortedPages[index - 1];
+    if (previousPage && page - previousPage > 1) {
+      items.push("ellipsis");
+    }
+    items.push(page);
+  });
+
+  return items;
+}
+
 function getAreaRangeLabel(option: { min: string; max: string }) {
   return option.max ? `${option.min}-${option.max} მ²` : `${option.min}+ მ²`;
 }
@@ -243,6 +272,10 @@ export function UnitCatalogPage({
   const [mediaMode, setMediaMode] = useState<"3d" | "2d" | "floorPlan">("3d");
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const paginationItems = useMemo(
+    () => getPaginationItems(meta?.current_page || 1, meta?.last_page || 1),
+    [meta?.current_page, meta?.last_page]
+  );
 
   useEffect(() => {
     const nextQuery = sanitizeCatalogQueryState(readUnitCatalogQuery());
@@ -859,16 +892,34 @@ export function UnitCatalogPage({
 
                 {!loading && !error && meta?.last_page && meta.last_page > 1 ? (
                   <div className="units-pagination">
-                    {Array.from({ length: meta.last_page }, (_, index) => index + 1).map((pageNumber) => (
+                    <button
+                      type="button"
+                      className="units-pagination-arrow"
+                      disabled={meta.current_page <= 1}
+                      onClick={() => applyQuery({ ...query, page: Math.max(1, meta.current_page - 1) })}
+                    >
+                      ‹
+                    </button>
+                    {paginationItems.map((item, index) => item === "ellipsis" ? (
+                      <span key={`ellipsis-${index}`} className="units-pagination-ellipsis">…</span>
+                    ) : (
                       <button
-                        key={pageNumber}
+                        key={item}
                         type="button"
-                        className={meta.current_page === pageNumber ? "active" : ""}
-                        onClick={() => applyQuery({ ...query, page: pageNumber })}
+                        className={meta.current_page === item ? "active" : ""}
+                        onClick={() => applyQuery({ ...query, page: item })}
                       >
-                        {pageNumber}
+                        {item}
                       </button>
                     ))}
+                    <button
+                      type="button"
+                      className="units-pagination-arrow"
+                      disabled={meta.current_page >= meta.last_page}
+                      onClick={() => applyQuery({ ...query, page: Math.min(meta.last_page, meta.current_page + 1) })}
+                    >
+                      ›
+                    </button>
                   </div>
                 ) : null}
               </>
