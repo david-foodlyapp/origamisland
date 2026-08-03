@@ -55,6 +55,10 @@ export type ExplorerUnit = {
   rank: number;
   type: string;
   area?: string;
+  summer_area?: string | number | null;
+  living_area?: string | number | null;
+  indoor_area?: string | number | null;
+  indor_area?: string | number | null;
   rooms_count?: number | null;
   bedrooms_count?: number | null;
   bathrooms_count?: number | null;

@@ -91,6 +91,8 @@ const copyKa = {
   available: "ხელმისაწვდომი",
   unitOverview: "მოკლე აღწერა",
   totalArea: "საერთო ფართი",
+  indoorArea: "შიდა ფართი",
+  summerArea: "საზაფხულო ფართი",
   area: "ფართი",
   number: "ბინა",
   image: "სურათი",
@@ -156,6 +158,8 @@ const copyEn: typeof copyKa = {
   available: "Available",
   unitOverview: "Overview",
   totalArea: "Total area",
+  indoorArea: "Indoor area",
+  summerArea: "Summer area",
   area: "Area",
   number: "Unit",
   image: "Image",
@@ -231,6 +235,14 @@ function getAreaRangeValue(query: UnitCatalogQueryState) {
 
 function getAreaRangeFromValue(value: string) {
   return areaRangeOptions.find((option) => option.value === value) || null;
+}
+
+function formatOptionalArea(value: string | number | null | undefined) {
+  if (value == null || value === "") {
+    return "-";
+  }
+
+  return formatArea(value);
 }
 
 function getConditionOptions(copy: typeof copyKa) {
@@ -419,8 +431,11 @@ export function UnitCatalogPage({
     setDraftQuery(nextQuery);
   };
 
+  const unitIndoorArea = unit?.living_area ?? unit?.indoor_area ?? unit?.indor_area;
   const detailSpecs = unit ? [
     { icon: <HomeIcon />, label: copy.totalArea, value: formatArea(unit.area) },
+    { icon: <HomeIcon />, label: copy.indoorArea, value: formatOptionalArea(unitIndoorArea) },
+    { icon: <HomeIcon />, label: copy.summerArea, value: formatOptionalArea(unit.summer_area) },
     { icon: <BuildingIcon />, label: copy.floorLabel, value: unit.floor?.number ? String(unit.floor.number) : "-" },
     { icon: <BedIcon />, label: copy.bedroomLabel, value: unit.bedrooms_count ?? 0 },
     { icon: <BathIcon />, label: copy.bathroomLabel, value: unit.bathrooms_count ?? 0 },
