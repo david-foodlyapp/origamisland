@@ -286,6 +286,7 @@ function App() {
   const [isFeaturedUnitsLoading, setIsFeaturedUnitsLoading] = useState(true);
   const [featuredUnitsFilter, setFeaturedUnitsFilter] = useState<FeaturedUnitsFilter>("all");
   const [apiBuildingVisual, setApiBuildingVisual] = useState<ExplorerPropertyDetail | null>(null);
+  const [isBuildingVisualLoading, setIsBuildingVisualLoading] = useState(true);
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [apiInfrastructureItems, setApiInfrastructureItems] = useState<InfrastructureApiItem[]>([]);
@@ -931,6 +932,7 @@ function App() {
     const controller = new AbortController();
 
     const loadBuildingVisual = async () => {
+      setIsBuildingVisualLoading(true);
       try {
         const locale = getNewsLocale(language);
         const response = await fetch(`https://admin.origamiholding.com/api/buildings?locale=${locale}`, { signal: controller.signal });
@@ -965,6 +967,10 @@ function App() {
         }
         console.error("Failed to load building visual:", error);
         setApiBuildingVisual(null);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsBuildingVisualLoading(false);
+        }
       }
     };
 
@@ -1898,16 +1904,52 @@ function App() {
             <div className="render-gallery reveal-scroll">
               <div className="render-main">
                 <div className="building-visual-map">
-                  <img
-                    src={renderSectionImage}
-                    alt={renderSectionImageAlt}
-                  />
-                  {buildingVisualFloors.length > 0 ? (
-                    <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                  {isBuildingVisualLoading ? (
+                    <div className="building-visual-skeleton" aria-hidden="true">
+                      <div className="building-visual-skeleton-shimmer" />
+                    </div>
+                  ) : (
+                    <>
+                      <img
+                        src={renderSectionImage}
+                        alt={renderSectionImageAlt}
+                      />
+                      {buildingVisualFloors.length > 0 ? (
+                        <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                          {buildingVisualFloors.map((floor) => (
+                            <g key={floor.id} className="building-floor-hotspot">
+                              <polygon
+                                points={getFloorPolygonPoints(floor)}
+                                onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
+                                  page: 1,
+                                  perPage: 9,
+                                  floors: [floor.slug],
+                                  types: [],
+                                  statuses: [],
+                                  rooms: [],
+                                  bedrooms: [],
+                                  bathrooms: [],
+                                  areaMin: "",
+                                  areaMax: "",
+                                  condition: "",
+                                  sort: "rank",
+                                  view: "grid"
+                                }, language)}`)}
+                              />
+                            </g>
+                          ))}
+                        </svg>
+                      ) : null}
                       {buildingVisualFloors.map((floor) => (
-                        <g key={floor.id} className="building-floor-hotspot">
-                          <polygon
-                            points={getFloorPolygonPoints(floor)}
+                        floor.building_map_label_position ? (
+                          <button
+                            key={floor.id}
+                            type="button"
+                            className="building-floor-label"
+                            style={{
+                              "--floor-label-x": `${floor.building_map_label_position.x}%`,
+                              "--floor-label-y": `${floor.building_map_label_position.y}%`
+                            } as React.CSSProperties}
                             onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
                               page: 1,
                               perPage: 9,
@@ -1923,41 +1965,13 @@ function App() {
                               sort: "rank",
                               view: "grid"
                             }, language)}`)}
-                          />
-                        </g>
+                          >
+                            {floor.number}
+                          </button>
+                        ) : null
                       ))}
-                    </svg>
-                  ) : null}
-                  {buildingVisualFloors.map((floor) => (
-                    floor.building_map_label_position ? (
-                      <button
-                        key={floor.id}
-                        type="button"
-                        className="building-floor-label"
-                        style={{
-                          "--floor-label-x": `${floor.building_map_label_position.x}%`,
-                          "--floor-label-y": `${floor.building_map_label_position.y}%`
-                        } as React.CSSProperties}
-                        onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
-                          page: 1,
-                          perPage: 9,
-                          floors: [floor.slug],
-                          types: [],
-                          statuses: [],
-                          rooms: [],
-                          bedrooms: [],
-                          bathrooms: [],
-                          areaMin: "",
-                          areaMax: "",
-                          condition: "",
-                          sort: "rank",
-                          view: "grid"
-                        }, language)}`)}
-                      >
-                        {floor.number}
-                      </button>
-                    ) : null
-                  ))}
+                    </>
+                  )}
                 </div>
               </div>
             </div>
