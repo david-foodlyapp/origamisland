@@ -1527,6 +1527,11 @@ html[data-theme="light"] .origami-info-label {
   line-height: 0;
 }
 
+.building-visual-frame {
+  position: relative;
+  width: 100%;
+}
+
 .render-main img {
   width: 100%;
   height: auto;
@@ -1594,6 +1599,36 @@ html[data-theme="light"] .origami-info-label {
 .building-floor-label:hover {
   transform: translate(-50%, -50%) scale(1.08);
   background: rgba(198, 163, 119, 0.9);
+}
+
+@media (max-width: 767px) {
+  .render-section {
+    padding: 4rem 0 5rem;
+  }
+
+  .render-section .container {
+    padding: 0 0.9rem;
+  }
+
+  .render-main {
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .building-visual-map {
+    aspect-ratio: 0.72;
+    display: flex;
+    align-items: center;
+  }
+
+  .building-visual-frame {
+    flex: 0 0 255%;
+    transform: translateX(-5%);
+  }
+
+  .building-visual-skeleton {
+    aspect-ratio: 0.72;
+  }
 }
 
 .planning-units-section {

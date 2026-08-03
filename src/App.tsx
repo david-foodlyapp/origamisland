@@ -1909,7 +1909,7 @@ function App() {
                       <div className="building-visual-skeleton-shimmer" />
                     </div>
                   ) : (
-                    <>
+                    <div className="building-visual-frame">
                       <img
                         src={renderSectionImage}
                         alt={renderSectionImageAlt}
@@ -1970,7 +1970,7 @@ function App() {
                           </button>
                         ) : null
                       ))}
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
