@@ -287,6 +287,7 @@ function App() {
   const [featuredUnitsFilter, setFeaturedUnitsFilter] = useState<FeaturedUnitsFilter>("all");
   const [apiBuildingVisual, setApiBuildingVisual] = useState<ExplorerPropertyDetail | null>(null);
   const [isBuildingVisualLoading, setIsBuildingVisualLoading] = useState(true);
+  const [availableUnitsByFloorSlug, setAvailableUnitsByFloorSlug] = useState<Record<string, number>>({});
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [apiInfrastructureItems, setApiInfrastructureItems] = useState<InfrastructureApiItem[]>([]);
@@ -930,9 +931,48 @@ function App() {
 
   useEffect(() => {
     const controller = new AbortController();
+    let cancelled = false;
 
     const loadBuildingVisual = async () => {
       setIsBuildingVisualLoading(true);
+      setAvailableUnitsByFloorSlug({});
+
+      const loadAvailableUnitCounts = async (floors: ExplorerFloor[]) => {
+        const counts = await Promise.all(
+          floors.map(async (floor) => {
+            try {
+              const response = await fetchUnits(
+                DEFAULT_BUILDING_SLUG,
+                {
+                  page: 1,
+                  perPage: 1,
+                  floors: [floor.slug],
+                  types: [],
+                  statuses: ["available"],
+                  rooms: [],
+                  bedrooms: [],
+                  bathrooms: [],
+                  areaMin: "",
+                  areaMax: "",
+                  condition: "",
+                  sort: "rank",
+                  view: "grid"
+                },
+                language
+              );
+              return [floor.slug, response.meta.total] as const;
+            } catch (countError) {
+              console.error(`Failed to load available units count for floor ${floor.slug}:`, countError);
+              return [floor.slug, 0] as const;
+            }
+          })
+        );
+
+        if (!cancelled) {
+          setAvailableUnitsByFloorSlug(Object.fromEntries(counts));
+        }
+      };
+
       try {
         const locale = getNewsLocale(language);
         const response = await fetch(`https://admin.origamiholding.com/api/buildings?locale=${locale}`, { signal: controller.signal });
@@ -953,29 +993,40 @@ function App() {
           }
 
           const detailPayload: ExplorerPropertyResponse = await detailResponse.json();
-          setApiBuildingVisual(detailPayload.data);
+          if (!cancelled) {
+            setApiBuildingVisual(detailPayload.data);
+          }
+          await loadAvailableUnitCounts(detailPayload.data.floors);
         } catch (detailError) {
           if (detailError instanceof DOMException && detailError.name === "AbortError") {
             return;
           }
           console.error("Failed to load building floor details:", detailError);
-          setApiBuildingVisual({ ...selectedBuilding, floors: [] });
+          const fallbackBuilding = { ...selectedBuilding, floors: [] };
+          if (!cancelled) {
+            setApiBuildingVisual(fallbackBuilding);
+          }
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
           return;
         }
         console.error("Failed to load building visual:", error);
-        setApiBuildingVisual(null);
+        if (!cancelled) {
+          setApiBuildingVisual(null);
+        }
       } finally {
-        if (!controller.signal.aborted) {
+        if (!cancelled && !controller.signal.aborted) {
           setIsBuildingVisualLoading(false);
         }
       }
     };
 
     loadBuildingVisual();
-    return () => controller.abort();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
   }, [language]);
 
   useEffect(() => {
@@ -1366,6 +1417,14 @@ function App() {
 
   const getFloorPolygonPoints = (floor: ExplorerFloor) =>
     floor.building_map_polygon?.map((point) => `${point.x},${point.y}`).join(" ") || "";
+
+  const getBuildingFloorTooltip = (floor: ExplorerFloor) =>
+    language === "ka"
+      ? `ხელმისაწვდომია ${availableUnitsByFloorSlug[floor.slug] ?? 0} შეთავაზება`
+      : `Available ${availableUnitsByFloorSlug[floor.slug] ?? 0} offers`;
+
+  const getBuildingFloorLabel = (floor: ExplorerFloor) =>
+    language === "ka" ? `სართული ${floor.number}` : `Floor ${floor.number}`;
 
   const buildingVisualFloors = apiBuildingVisual?.floors.filter((floor) => (floor.building_map_polygon?.length || 0) >= 3) || [];
   const renderSectionTitle = apiSection3Data?.title || t("render_title");
@@ -1966,7 +2025,11 @@ function App() {
                               view: "grid"
                             }, language)}`)}
                           >
-                            {floor.number}
+                            <span className="building-floor-label-number">{floor.number}</span>
+                            <span className="building-floor-tooltip" role="tooltip">
+                              <span className="building-floor-tooltip-title">{getBuildingFloorLabel(floor)}</span>
+                              <span className="building-floor-tooltip-meta">{getBuildingFloorTooltip(floor)}</span>
+                            </span>
                           </button>
                         ) : null
                       ))}
