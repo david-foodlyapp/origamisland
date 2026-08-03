@@ -27,6 +27,7 @@ import {
 import {
   ArrowIcon,
   BuildingIcon,
+  CheckIcon,
   ChevronIcon,
   CloseIcon,
   FilterAdjustIcon,
@@ -66,6 +67,8 @@ const copyKa = {
   filters: "ფილტრი",
   filtersClose: "ფილტრების დახურვა",
   activeFilters: "აქტიური ფილტრი",
+  sort: "სორტირება",
+  view: "ხედი",
   grid: "ვიზუალური",
   table: "სია",
   all: "ყველა",
@@ -129,6 +132,8 @@ const copyEn: typeof copyKa = {
   filters: "Filters",
   filtersClose: "Close filters",
   activeFilters: "active filters",
+  sort: "Sort",
+  view: "View",
   grid: "Grid",
   table: "List",
   all: "All",
@@ -272,6 +277,7 @@ export function UnitCatalogPage({
   const [mediaMode, setMediaMode] = useState<"3d" | "2d" | "floorPlan">("3d");
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [mobileSortOpen, setMobileSortOpen] = useState(false);
   const paginationItems = useMemo(
     () => getPaginationItems(meta?.current_page || 1, meta?.last_page || 1),
     [meta?.current_page, meta?.last_page]
@@ -284,7 +290,7 @@ export function UnitCatalogPage({
   }, [propertySlug, unitSlug]);
 
   useEffect(() => {
-    if (!mobileFilterOpen) {
+    if (!mobileFilterOpen && !mobileSortOpen) {
       document.body.style.removeProperty("overflow");
       return;
     }
@@ -294,22 +300,23 @@ export function UnitCatalogPage({
     return () => {
       document.body.style.removeProperty("overflow");
     };
-  }, [mobileFilterOpen]);
+  }, [mobileFilterOpen, mobileSortOpen]);
 
   useEffect(() => {
-    if (!mobileFilterOpen) {
+    if (!mobileFilterOpen && !mobileSortOpen) {
       return;
     }
 
     const handleResize = () => {
       if (window.innerWidth > 840) {
         setMobileFilterOpen(false);
+        setMobileSortOpen(false);
       }
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [mobileFilterOpen]);
+  }, [mobileFilterOpen, mobileSortOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -397,6 +404,7 @@ export function UnitCatalogPage({
     setQuery(sanitizedQuery);
     setDraftQuery(sanitizedQuery);
     setMobileFilterOpen(false);
+    setMobileSortOpen(false);
     window.history.replaceState({}, "", `${window.location.pathname}?${search}`);
   };
 
@@ -476,6 +484,7 @@ export function UnitCatalogPage({
   const selectedConditionLabel = draftQuery.condition
     ? conditionOptions.find((item) => item.value === draftQuery.condition)?.label || draftQuery.condition
     : "";
+  const selectedSortLabel = filters?.sorts.find((item) => item.value === draftQuery.sort)?.label || draftQuery.sort;
 
   const mobileFilterSummary = [
     selectedAreaLabel ? `${copy.area}: ${selectedAreaLabel}` : "",
@@ -703,9 +712,12 @@ export function UnitCatalogPage({
                   </div>
 
                   <div
-                    className={`units-filter-backdrop ${mobileFilterOpen ? "active" : ""}`}
-                    onClick={() => setMobileFilterOpen(false)}
-                    aria-hidden={!mobileFilterOpen}
+                    className={`units-filter-backdrop ${mobileFilterOpen || mobileSortOpen ? "active" : ""}`}
+                    onClick={() => {
+                      setMobileFilterOpen(false);
+                      setMobileSortOpen(false);
+                    }}
+                    aria-hidden={!mobileFilterOpen && !mobileSortOpen}
                   />
 
                   <div
@@ -817,6 +829,69 @@ export function UnitCatalogPage({
                       </div>
                     </div>
                   </div>
+
+                  <div
+                    id="units-mobile-sort-sheet"
+                    className={`units-sort-sheet ${mobileSortOpen ? "mobile-open" : ""}`}
+                    aria-hidden={!mobileSortOpen}
+                  >
+                    <div className="units-filter-mobile-sheet-head">
+                      <div>
+                        <strong>{copy.sort}</strong>
+                        <span>{selectedSortLabel}</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="units-filter-mobile-close"
+                        aria-label={copy.filtersClose}
+                        onClick={() => setMobileSortOpen(false)}
+                      >
+                        <CloseIcon />
+                      </button>
+                    </div>
+                    <div className="units-sort-options">
+                      {(filters?.sorts || []).map((item) => (
+                        <button
+                          key={item.value}
+                          type="button"
+                          className={draftQuery.sort === item.value ? "active" : ""}
+                          onClick={() => updateDraftQuery((current) => ({ ...current, sort: item.value, page: 1 }), true)}
+                        >
+                          <span>{item.label}</span>
+                          {draftQuery.sort === item.value ? <CheckIcon /> : null}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="units-mobile-actionbar">
+                    <button
+                      type="button"
+                      onClick={() => setMobileFilterOpen(true)}
+                      aria-expanded={mobileFilterOpen}
+                      aria-controls="units-mobile-filter-sheet"
+                    >
+                      <FilterAdjustIcon />
+                      <span>{copy.filters}</span>
+                      {activeFilterCount ? <strong>{activeFilterCount}</strong> : null}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMobileSortOpen(true)}
+                      aria-expanded={mobileSortOpen}
+                      aria-controls="units-mobile-sort-sheet"
+                    >
+                      <SortIcon />
+                      <span>{copy.sort}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateDraftQuery((current) => ({ ...current, view: current.view === "grid" ? "table" : "grid" }), true)}
+                    >
+                      {draftQuery.view === "grid" ? <GridViewIcon /> : <ListViewIcon />}
+                      <span>{copy.view}</span>
+                    </button>
+                  </div>
                 </section>
 
                 {loading ? <div className="units-state">{copy.pageLoading}</div> : null}
@@ -886,6 +961,37 @@ export function UnitCatalogPage({
                         ))}
                       </tbody>
                     </table>
+                    <div className="units-mobile-list">
+                      {filteredUnits.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          className="units-mobile-list-item"
+                          onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}
+                        >
+                          <span className="units-mobile-list-media">
+                            {item.image ? (
+                              <img src={item.image} alt={getUnitDisplayTitle(item, language)} />
+                            ) : (
+                              <span className="units-table-image-placeholder" />
+                            )}
+                          </span>
+                          <span className="units-mobile-list-copy">
+                            <span className="units-mobile-list-topline">
+                              <span className={`unit-card-badge unit-card-badge--${item.status}`}>{mapUnitStatusLabel(item.status, language)}</span>
+                              <span className="unit-card-floor">{copy.floorLabel} {item.floor?.number ?? "-"}</span>
+                            </span>
+                            <strong>{getUnitDisplayTitle(item, language)}</strong>
+                            <span>{mapUnitTypeLabel(item.type, language)}</span>
+                            <span className="units-mobile-list-meta">
+                              <span>{formatArea(item.area)}</span>
+                              <span>{item.bedrooms_count ?? 0} {copy.bedroomLabel}</span>
+                            </span>
+                            <span className="unit-card-price">{getUnitPriceText(item.price, item.currency)}</span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                     {!filteredUnits.length ? <div className="units-state">{copy.noResults}</div> : null}
                   </section>
                 ) : null}
@@ -1009,6 +1115,18 @@ function ListViewIcon() {
       <path d="M4 7h.01" />
       <path d="M4 12h.01" />
       <path d="M4 17h.01" />
+    </svg>
+  );
+}
+
+function SortIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M4 7h10" />
+      <path d="M4 12h7" />
+      <path d="M4 17h4" />
+      <path d="M17 6v12" />
+      <path d="M14 15l3 3 3-3" />
     </svg>
   );
 }
