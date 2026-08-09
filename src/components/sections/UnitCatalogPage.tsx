@@ -96,7 +96,6 @@ const copyKa = {
   area: "ფართი",
   number: "ბინა",
   image: "სურათი",
-  image3d: "3D",
   image2d: "2D",
   floorPlan: "Floor Plan",
   detailBack: "ყველა ბინა",
@@ -163,7 +162,6 @@ const copyEn: typeof copyKa = {
   area: "Area",
   number: "Unit",
   image: "Image",
-  image3d: "3D",
   image2d: "2D",
   floorPlan: "Floor Plan",
   detailBack: "All units",
@@ -286,7 +284,7 @@ export function UnitCatalogPage({
   const [unit, setUnit] = useState<ExplorerUnit | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [mediaMode, setMediaMode] = useState<"3d" | "2d" | "floorPlan">("3d");
+  const [mediaMode, setMediaMode] = useState<"2d" | "floorPlan">("2d");
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [mobileSortOpen, setMobileSortOpen] = useState(false);
@@ -400,7 +398,6 @@ export function UnitCatalogPage({
     };
   }, [propertySlug, unitSlug, query, language]);
 
-  const unitImage3d = unit?.media?.find((item) => item.type === "model_3d" && item.url)?.url || "";
   const unitImage2d = unit?.media?.find((item) => item.type === "image" && item.url)?.url || unit?.image || "";
   const unitFloorPlanImage = unit?.media?.find((item) => item.type === "floor_plan" && item.url)?.url || "";
   const unitPdfUrl = unit?.media?.find((item) => item.type === "document" && item.url)?.url || "";
@@ -439,7 +436,6 @@ export function UnitCatalogPage({
     { icon: <BuildingIcon />, label: copy.floorLabel, value: unit.floor?.number ? String(unit.floor.number) : "-" },
     { icon: <BedIcon />, label: copy.bedroomLabel, value: unit.bedrooms_count ?? 0 },
     { icon: <BathIcon />, label: copy.bathroomLabel, value: unit.bathrooms_count ?? 0 },
-    { icon: <DoorIcon />, label: copy.roomLabel, value: unit.rooms_count ?? 0 },
     { icon: <KeyIcon />, label: copy.status, value: mapUnitStatusLabel(unit.status, language) }
   ] : [];
   const filteredUnits = useMemo(() => {
@@ -535,7 +531,6 @@ export function UnitCatalogPage({
 
                   <div className="unit-detail-toolbar">
                     <div className="unit-mode-switch">
-                      <button type="button" className={mediaMode === "3d" ? "active" : ""} onClick={() => setMediaMode("3d")}>{copy.image3d}</button>
                       <button type="button" className={mediaMode === "2d" ? "active" : ""} onClick={() => setMediaMode("2d")}>{copy.image2d}</button>
                       <button
                         type="button"
@@ -605,9 +600,7 @@ export function UnitCatalogPage({
 
                 <div className="unit-detail-visual">
                   <div className="unit-image-stage">
-                    {mediaMode === "3d" ? (
-                      unitImage3d ? <img src={unitImage3d} alt={getUnitDisplayTitle(unit, language)} /> : <div className="units-image-placeholder" />
-                    ) : mediaMode === "floorPlan" ? (
+                    {mediaMode === "floorPlan" ? (
                       unitFloorPlanImage ? <img src={unitFloorPlanImage} alt={`${getUnitDisplayTitle(unit, language)} floor plan`} /> : <div className="units-image-placeholder" />
                     ) : (
                       unitImage2d ? <img src={unitImage2d} alt={`${getUnitDisplayTitle(unit, language)} plan`} /> : <div className="units-image-placeholder" />

@@ -5,7 +5,7 @@ import { CloseIcon, GlobeOutlineIcon, MoonIcon, SunIcon } from "../Icons";
 
 type HeaderProps = {
   headerShrunk: boolean;
-  variant?: "default" | "units";
+  variant?: "default" | "units" | "surface";
   darkThemeLogoSrc: string;
   lightThemeLogoSrc: string;
   mobileMenuOpen: boolean;
@@ -42,6 +42,7 @@ export function Header({
 }: HeaderProps) {
   const hasConsultationMenuItem = primaryNavItems.some((item) => item.isModalAction);
   const isUnitsVariant = variant === "units";
+  const isSurfaceVariant = variant === "surface";
 
   const handleNavItemClick = (item: { href: string; label: string; isModalAction?: boolean }) => {
     setMobileMenuOpen(false);
@@ -52,9 +53,9 @@ export function Header({
   };
 
   return (
-    <header id="main-header" className={`${headerShrunk ? "header-shrunk" : ""} ${variant === "units" ? "header-units" : ""}`.trim()}>
+    <header id="main-header" className={`${headerShrunk ? "header-shrunk" : ""} ${isUnitsVariant ? "header-units" : ""} ${isSurfaceVariant ? "header-surface" : ""}`.trim()}>
       <div className="container">
-        <a href={isUnitsVariant ? "/" : "#"} className="logo-container">
+        <a href={isUnitsVariant || isSurfaceVariant ? "/" : "#"} className="logo-container">
           <img
             src={darkThemeLogoSrc}
             alt="ORIGAMI"

@@ -248,12 +248,16 @@ export type NewsApiItem = {
   slug: string;
   title: string | null;
   excerpt: string | null;
+  content?: string | null;
   image_url: string;
   published_at: string;
   status: string;
   category: {
     name: string;
-  };
+  } | null;
+  author?: {
+    name: string;
+  } | null;
 };
 
 export type NewsCard = {

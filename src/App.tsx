@@ -174,7 +174,8 @@ const phoneCountryCodeFallbackOptions: PhoneCountryCodeOption[] = [
 
 const defaultPhoneCountryCode = phoneCountryCodeFallbackOptions[0].dialCode;
 
-type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute;
+type NewsDetailRoute = { name: "newsDetail"; slug: string };
+type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute | NewsDetailRoute;
 type FeaturedUnitsFilter = "all" | "hotel_room" | "apartment";
 const SHOW_FEATURED_UNITS_SECTION = false;
 
@@ -255,6 +256,13 @@ function getAppRoute(): AppRouteState {
     return unitRoute;
   }
 
+  const path = window.location.pathname;
+  const normalized = path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path;
+  const newsMatch = normalized.match(/^\/news\/([^/]+)$/);
+  if (newsMatch) {
+    return { name: "newsDetail", slug: decodeURIComponent(newsMatch[1]) };
+  }
+
   const explorerRoute = getExplorerRoute();
   if (explorerRoute.name !== "unknown" && explorerRoute.name !== "home") {
     return explorerRoute;
@@ -282,6 +290,9 @@ function App() {
   const [currency, setCurrency] = useState<SupportedCurrency>("USD");
   const [currencyRates, setCurrencyRates] = useState<CurrencyRates | null>(null);
   const [newsItems, setNewsItems] = useState<NewsCard[]>([]);
+  const [newsDetail, setNewsDetail] = useState<NewsApiItem | null>(null);
+  const [isNewsDetailLoading, setIsNewsDetailLoading] = useState(false);
+  const [newsDetailError, setNewsDetailError] = useState("");
   const [featuredUnits, setFeaturedUnits] = useState<ExplorerUnit[]>([]);
   const [isFeaturedUnitsLoading, setIsFeaturedUnitsLoading] = useState(true);
   const [featuredUnitsFilter, setFeaturedUnitsFilter] = useState<FeaturedUnitsFilter>("all");
@@ -1126,6 +1137,46 @@ function App() {
   }, [language]);
 
   useEffect(() => {
+    if (routeState.name !== "newsDetail") {
+      setNewsDetail(null);
+      setNewsDetailError("");
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const loadNewsDetail = async () => {
+      setIsNewsDetailLoading(true);
+      setNewsDetailError("");
+
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`https://admin.origamiholding.com/api/news/${routeState.slug}?locale=${locale}`, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`News detail request failed: ${response.status}`);
+        }
+
+        const payload: { data: NewsApiItem } = await response.json();
+        setNewsDetail(payload.data);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load news detail:", error);
+        setNewsDetail(null);
+        setNewsDetailError(language === "ka" ? "სიახლე ვერ მოიძებნა" : "News article was not found");
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsNewsDetailLoading(false);
+        }
+      }
+    };
+
+    loadNewsDetail();
+    return () => controller.abort();
+  }, [routeState, language]);
+
+  useEffect(() => {
     const controller = new AbortController();
 
     const loadInfrastructure = async () => {
@@ -1620,6 +1671,87 @@ function App() {
 
   const isUnitsRoute = routeState.name === "unitList" || routeState.name === "unitDetail";
   const isPropertiesRoute = routeState.name === "properties" || routeState.name === "property" || routeState.name === "floor";
+
+  if (routeState.name === "newsDetail") {
+    const detailTitle = newsDetail?.title?.trim() || (isNewsDetailLoading ? "" : formatNewsFallbackTitle(routeState.slug));
+    const detailCategory = newsDetail?.category?.name || t("news_category");
+    const detailDate = newsDetail?.published_at ? formatNewsDate(newsDetail.published_at, language) : "";
+    const detailBody = stripHtmlContent(newsDetail?.content || newsDetail?.excerpt || "");
+
+    return (
+      <>
+        <Header
+          headerShrunk={headerShrunk}
+          variant="surface"
+          darkThemeLogoSrc={darkThemeLogoSrc}
+          lightThemeLogoSrc={lightThemeLogoSrc}
+          mobileMenuOpen={mobileMenuOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
+          primaryNavItems={primaryNavItems}
+          t={t}
+          openModal={openModal}
+          isLanguageModalOpen={isLanguageModalOpen}
+          setIsLanguageModalOpen={setIsLanguageModalOpen}
+          language={language}
+          languageOptions={languageOptions}
+          handleLanguageSelect={handleLanguageSelect}
+          theme={theme}
+          handleThemeToggle={handleThemeToggle}
+        />
+
+        <main className="news-detail-page">
+          <article className="container news-detail-container">
+            {isNewsDetailLoading ? (
+              <div className="news-detail-state">{language === "ka" ? "იტვირთება..." : "Loading..."}</div>
+            ) : newsDetailError ? (
+              <div className="news-detail-state">{newsDetailError}</div>
+            ) : (
+              <>
+                <div className="news-detail-hero">
+                  <div className="news-detail-copy">
+                    <div className="news-detail-meta">
+                      <div className="news-detail-meta-info">
+                        <span className="news-detail-category">{detailCategory}</span>
+                        {detailDate ? (
+                          <span className="news-detail-meta-item">
+                            <span className="news-detail-meta-label">{language === "ka" ? "თარიღი" : "Date"}</span>
+                            <span>{detailDate}</span>
+                          </span>
+                        ) : null}
+                        {newsDetail?.author?.name ? (
+                          <span className="news-detail-meta-item">
+                            <span className="news-detail-meta-label">{language === "ka" ? "ავტორი" : "Author"}</span>
+                            <span>{newsDetail.author.name}</span>
+                          </span>
+                        ) : null}
+                      </div>
+                      <button className="news-detail-back" type="button" onClick={() => navigateTo("/")}>
+                        <ArrowIcon direction="left" />
+                        <span>{language === "ka" ? "უკან" : "Back"}</span>
+                      </button>
+                    </div>
+                    <h1>{detailTitle}</h1>
+                    {newsDetail?.excerpt ? <p className="news-detail-excerpt">{newsDetail.excerpt}</p> : null}
+                  </div>
+                  {newsDetail?.image_url ? (
+                    <img src={newsDetail.image_url} alt={detailTitle} />
+                  ) : null}
+                </div>
+
+                {detailBody ? (
+                  <div className="news-detail-body">
+                    {detailBody.split("\n").filter(Boolean).map((paragraph, index) => (
+                      <p key={index}>{paragraph}</p>
+                    ))}
+                  </div>
+                ) : null}
+              </>
+            )}
+          </article>
+        </main>
+      </>
+    );
+  }
 
   if (isUnitsRoute) {
     return (
@@ -2440,9 +2572,12 @@ function App() {
                       <h3 className="news-card-title">{item.title}</h3>
 
                       <a
-                        href="#"
+                        href={`/news/${item.slug}`}
                         className="news-card-link"
-                        onClick={(event) => event.preventDefault()}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          navigateTo(`/news/${item.slug}`);
+                        }}
                       >
                         <span>{t("news_read_more")}</span>
                         <span className="news-all-arrow">{">"}</span>
