@@ -17,6 +17,12 @@ type HeroSectionProps = {
   handleSearch: () => void;
 };
 
+const CONDITIONS_BY_PROPERTY_TYPE: Record<SearchPropertyTypeFilter, ConditionFilter[]> = {
+  all: ["white", "full", "turnkey"],
+  investment: ["white", "full", "turnkey"],
+  hotel: ["turnkey"]
+};
+
 export function HeroSection({
   t,
   selectedRoom,
@@ -30,6 +36,15 @@ export function HeroSection({
   setMobileFilterOpen,
   handleSearch
 }: HeroSectionProps) {
+  const availableConditions = CONDITIONS_BY_PROPERTY_TYPE[selectedPropertyType];
+
+  const handlePropertyTypeChange = (value: SearchPropertyTypeFilter) => {
+    setSelectedPropertyType(value);
+    if (!CONDITIONS_BY_PROPERTY_TYPE[value].includes(selectedCondition)) {
+      setSelectedCondition("all");
+    }
+  };
+
   return (
         <section className="hero">
           <div className="hero-bg">
@@ -91,7 +106,7 @@ export function HeroSection({
                 </span>
                 <select
                   value={selectedPropertyType}
-                  onChange={(event) => setSelectedPropertyType(event.target.value as SearchPropertyTypeFilter)}
+                  onChange={(event) => handlePropertyTypeChange(event.target.value as SearchPropertyTypeFilter)}
                 >
                   <option value="all">{t("filter_kind_all")}</option>
                   <option value="hotel">{t("filter_kind_hotel")}</option>
@@ -109,9 +124,9 @@ export function HeroSection({
                   onChange={(event) => setSelectedCondition(event.target.value as ConditionFilter)}
                 >
                   <option value="all">{t("filter_condition_all")}</option>
-                  <option value="white">{t("filter_condition_white")}</option>
-                  <option value="full">{t("filter_condition_full")}</option>
-                  <option value="turnkey">{t("filter_condition_turnkey")}</option>
+                  {availableConditions.includes("white") && <option value="white">{t("filter_condition_white")}</option>}
+                  {availableConditions.includes("full") && <option value="full">{t("filter_condition_full")}</option>}
+                  {availableConditions.includes("turnkey") && <option value="turnkey">{t("filter_condition_turnkey")}</option>}
                 </select>
               </div>
 

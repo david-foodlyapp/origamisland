@@ -102,10 +102,10 @@ const communities: Community[] = [
   }
 ];
 
-const searchAreaRanges: Record<Exclude<RoomFilter, "all">, { min: string; max: string }> = {
-  "1room": { min: "30", max: "40" },
-  "2room": { min: "40", max: "60" },
-  "3room": { min: "60", max: "" }
+const searchBedroomCounts: Record<Exclude<RoomFilter, "all">, string> = {
+  "1room": "0",
+  "2room": "1",
+  "3room": "2"
 };
 
 const serviceLinks = [
