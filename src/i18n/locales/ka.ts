@@ -32,7 +32,7 @@ export const ka: Record<TranslationKey, string> = {
   filter_room_1: "სტუდიო",
   filter_room_2: "1 საძინებელი",
   filter_room_3: "2 საძინებელი",
-  filter_kind_all: "უძრავი ქონების ტიპი",
+  filter_kind_all: "ტიპი",
   filter_kind_hotel: "სასტუმროს ნომერი",
   filter_kind_investment: "ბრენდული რეზიდენცია",
   filter_condition_all: "მდგომარეობა",

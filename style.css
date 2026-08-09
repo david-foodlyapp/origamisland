@@ -1315,6 +1315,14 @@ section {
   margin-bottom: 2.5rem;
 }
 
+.concept-desc p {
+  margin: 0 0 1rem;
+}
+
+.concept-desc p:last-child {
+  margin-bottom: 0;
+}
+
 .concept-btn {
   font-size: 0.8rem;
   padding: 0.8rem 2rem;

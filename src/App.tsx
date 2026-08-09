@@ -2055,7 +2055,11 @@ function App() {
             <div className="concept-card">
               <div className="concept-content">
                 <h2 className="concept-title">{apiAboutData?.title || t("concept_title")}</h2>
-                <p className="concept-desc">{apiAboutData?.body ? stripHtmlContent(apiAboutData.body) : t("concept_desc")}</p>
+                {apiAboutData?.body ? (
+                  <div className="concept-desc" dangerouslySetInnerHTML={{ __html: apiAboutData.body }} />
+                ) : (
+                  <p className="concept-desc">{t("concept_desc")}</p>
+                )}
               </div>
               <div className="concept-render">
                 <img
