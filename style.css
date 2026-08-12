@@ -6079,6 +6079,7 @@ html[data-theme="dark"] .modal-content {
   gap: 0.55rem;
   align-items: start;
   margin-top: 0.2rem;
+  padding: 0;
 }
 
 .floor-plan-rail {
