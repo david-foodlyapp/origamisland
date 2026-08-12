@@ -1591,23 +1591,38 @@ html[data-theme="light"] .origami-info-label {
   display: block;
 }
 
+.render-main {
+  max-width: min(1480px, 92vw);
+  margin: 0 auto;
+}
+
 .building-visual-map {
   position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  border-radius: 28px;
+  box-shadow: none;
   line-height: 0;
+  text-align: center;
 }
 
 .building-visual-frame {
   position: relative;
-  width: 100%;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  border-radius: inherit;
 }
 
 .render-main img {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: min(840px, calc(100vh - 170px));
   height: auto;
   display: block;
+  border-radius: inherit;
 }
 
 .building-visual-skeleton {
@@ -1767,15 +1782,37 @@ html[data-theme="light"] .origami-info-label {
     margin: 0 auto;
   }
 
+  .render-main img {
+    width: 100%;
+    max-height: none;
+  }
+
   .building-visual-map {
-    aspect-ratio: 0.72;
+    width: 100%;
+    aspect-ratio: 0.54;
     display: flex;
     align-items: center;
+    justify-content: center;
+    border-radius: 24px;
+    clip-path: inset(0 round 24px);
   }
 
   .building-visual-frame {
-    flex: 0 0 255%;
-    transform: translateX(-5%);
+    flex: 0 0 auto;
+    height: 92%;
+    max-width: none;
+    border-radius: 24px;
+    overflow: hidden;
+    transform: translateX(13%);
+  }
+
+  .building-visual-frame img {
+    width: auto;
+    max-width: none;
+    height: 100%;
+    max-height: none;
+    border-radius: 24px;
+    clip-path: inset(0 round 24px);
   }
 
   .building-floor-label {
@@ -1795,7 +1832,7 @@ html[data-theme="light"] .origami-info-label {
   }
 
   .building-visual-skeleton {
-    aspect-ratio: 0.72;
+    aspect-ratio: 0.54;
   }
 }
 
