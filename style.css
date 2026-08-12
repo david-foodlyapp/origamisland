@@ -6203,28 +6203,23 @@ html[data-theme="dark"] .modal-content {
 
 .floor-plan-media {
   width: 100%;
-  height: clamp(430px, calc(100svh - 390px), 680px);
-  overflow: hidden;
+  overflow: auto;
   border-radius: 16px;
   background: #f7f8f6;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   padding: 0.65rem;
 }
 
 .floor-plan-image-map {
   position: relative;
-  display: inline-block;
-  max-width: 100%;
-  max-height: 100%;
+  display: block;
+  width: 100%;
   line-height: 0;
 }
 
 .floor-plan-image-map img {
-  width: auto;
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  max-width: none;
+  max-height: none;
   height: auto;
   display: block;
 }
@@ -7496,10 +7491,10 @@ html[data-theme="light"] .units-table tbody tr:hover {
 
   .floor-plan-media {
     border-radius: 15px;
-    overflow-x: auto;
   }
 
   .floor-plan-image-map {
+    width: 760px;
     min-width: 760px;
   }
 
