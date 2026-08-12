@@ -100,7 +100,9 @@ const copyKa = {
   image: "სურათი",
   image2d: "2D",
   floorPlan: "Floor Plan",
-  detailBack: "ყველა ბინა",
+  detailBack: "უკან",
+  previousUnit: "წინა",
+  nextUnit: "შემდეგი",
   details: "დეტალები",
   floorPlanTitle: "სართულის გეგმარება",
   viewUnits: "ბინების ნახვა",
@@ -170,6 +172,8 @@ const copyEn: typeof copyKa = {
   image2d: "2D",
   floorPlan: "Floor Plan",
   detailBack: "All units",
+  previousUnit: "prev",
+  nextUnit: "next",
   details: "Details",
   floorPlanTitle: "Floor plan",
   viewUnits: "View units",
@@ -308,6 +312,43 @@ function getFloorFilterOptions(filters: UnitFilterOptions | null, copy: typeof c
     }));
 }
 
+function getUnitNavigationNumber(unit: ExplorerUnit) {
+  const candidates = [
+    unit.unit_number,
+    unit.title,
+    unit.slug
+  ];
+
+  for (const candidate of candidates) {
+    const match = candidate?.match(/\d+/);
+    if (match) {
+      return Number(match[0]);
+    }
+  }
+
+  return Number.POSITIVE_INFINITY;
+}
+
+function sortUnitsByFloorAndNumber(units: ExplorerUnit[]) {
+  return [...units].sort((first, second) => {
+    const firstFloor = first.floor?.number ?? Number.POSITIVE_INFINITY;
+    const secondFloor = second.floor?.number ?? Number.POSITIVE_INFINITY;
+
+    if (firstFloor !== secondFloor) {
+      return firstFloor - secondFloor;
+    }
+
+    const firstNumber = getUnitNavigationNumber(first);
+    const secondNumber = getUnitNavigationNumber(second);
+
+    if (firstNumber !== secondNumber) {
+      return firstNumber - secondNumber;
+    }
+
+    return first.rank - second.rank || first.slug.localeCompare(second.slug);
+  });
+}
+
 function normalizePlanPoint(point: { x: number; y: number }) {
   const x = point.x <= 1 ? point.x * 100 : point.x;
   const y = point.y <= 1 ? point.y * 100 : point.y;
@@ -358,6 +399,7 @@ export function UnitCatalogPage({
   const [filters, setFilters] = useState<UnitFilterOptions | null>(null);
   const [units, setUnits] = useState<ExplorerUnit[]>([]);
   const [floorPlanUnits, setFloorPlanUnits] = useState<ExplorerUnit[]>([]);
+  const [detailFloorUnits, setDetailFloorUnits] = useState<ExplorerUnit[]>([]);
   const [meta, setMeta] = useState<UnitListMeta | null>(null);
   const [unit, setUnit] = useState<ExplorerUnit | null>(null);
   const [loading, setLoading] = useState(true);
@@ -434,6 +476,7 @@ export function UnitCatalogPage({
         setFilters(filterData);
         setUnits(unitsData.data);
         setFloorPlanUnits(floorPlanUnitsData?.data || []);
+        setDetailFloorUnits([]);
         setMeta(unitsData.meta);
         setUnit(null);
       } catch (loadError) {
@@ -452,9 +495,11 @@ export function UnitCatalogPage({
       setError("");
 
       try {
-        const [unitData] = await Promise.all([
-          fetchUnit(propertySlug, unitSlug!, language)
-        ]);
+        const unitData = await fetchUnit(propertySlug, unitSlug!, language);
+        const detailQuery = sanitizeCatalogQueryState(readUnitCatalogQuery());
+        const detailFloorUnitsData = unitData.floor?.slug
+          ? await fetchUnits(propertySlug, { ...detailQuery, page: 1, perPage: 500, floors: [unitData.floor.slug] }, language)
+          : null;
 
         if (cancelled) {
           return;
@@ -463,6 +508,7 @@ export function UnitCatalogPage({
         setUnit(unitData);
         setUnits([]);
         setFloorPlanUnits([]);
+        setDetailFloorUnits(detailFloorUnitsData?.data || []);
         setMeta(null);
       } catch (loadError) {
         if (!cancelled) {
@@ -496,6 +542,14 @@ export function UnitCatalogPage({
   const unitBackPath = unitBackSearch
     ? `/properties/${propertySlug}/units?${unitBackSearch}`
     : `/properties/${propertySlug}/units`;
+  const detailNavigationUnits = useMemo(() => sortUnitsByFloorAndNumber(detailFloorUnits), [detailFloorUnits]);
+  const detailUnitIndex = unit ? detailNavigationUnits.findIndex((item) => item.slug === unit.slug) : -1;
+  const previousUnit = detailUnitIndex > 0 ? detailNavigationUnits[detailUnitIndex - 1] : null;
+  const nextUnit = detailUnitIndex >= 0 && detailUnitIndex < detailNavigationUnits.length - 1
+    ? detailNavigationUnits[detailUnitIndex + 1]
+    : null;
+  const previousUnitTitle = previousUnit ? getUnitDisplayTitle(previousUnit, language) : copy.previousUnit;
+  const nextUnitTitle = nextUnit ? getUnitDisplayTitle(nextUnit, language) : copy.nextUnit;
   const getUnitPriceText = (price?: string | number | null, priceCurrency?: string | null) => {
     const convertedPrice = convertPrice(price, priceCurrency || undefined, currency, currencyRates);
     const formattedPrice = formatPrice(convertedPrice, currency);
@@ -729,6 +783,31 @@ export function UnitCatalogPage({
                       unitImage2d ? <img src={unitImage2d} alt={`${getUnitDisplayTitle(unit, language)} plan`} /> : <div className="units-image-placeholder" />
                     )}
                   </div>
+                </div>
+
+                <div className="unit-detail-nav" aria-label="Unit navigation">
+                  <button
+                    type="button"
+                    className="unit-detail-nav-button"
+                    onClick={() => previousUnit && navigateTo(`/properties/${propertySlug}/units/${previousUnit.slug}`)}
+                    disabled={!previousUnit}
+                    aria-label={`${copy.previousUnit}: ${previousUnitTitle}`}
+                    title={previousUnitTitle}
+                  >
+                    <ArrowIcon direction="left" />
+                    <span>{previousUnitTitle}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="unit-detail-nav-button"
+                    onClick={() => nextUnit && navigateTo(`/properties/${propertySlug}/units/${nextUnit.slug}`)}
+                    disabled={!nextUnit}
+                    aria-label={`${copy.nextUnit}: ${nextUnitTitle}`}
+                    title={nextUnitTitle}
+                  >
+                    <span>{nextUnitTitle}</span>
+                    <ArrowIcon direction="right" />
+                  </button>
                 </div>
               </section>
             ) : (
