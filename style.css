@@ -6078,7 +6078,7 @@ html[data-theme="dark"] .modal-content {
   grid-template-columns: minmax(0, 1fr);
   gap: 0.55rem;
   align-items: start;
-  margin-top: 0;
+  margin-top: clamp(-8.5rem, -7vw, -4.5rem);
 }
 
 .floor-plan-rail {
@@ -6201,16 +6201,32 @@ html[data-theme="dark"] .modal-content {
 
 .floor-plan-media {
   width: 100%;
-  overflow: hidden;
+  max-height: min(62vh, 720px);
+  overflow: auto;
   border-radius: 16px;
   background: #f7f8f6;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(49, 86, 104, 0.28) transparent;
+}
+
+.floor-plan-media::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.floor-plan-media::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.floor-plan-media::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(49, 86, 104, 0.28);
 }
 
 .floor-plan-image-map {
   position: relative;
   width: 100%;
-  max-height: min(62vh, 720px);
-  overflow: hidden;
 }
 
 .floor-plan-image-map img {
@@ -7444,6 +7460,7 @@ html[data-theme="light"] .units-table tbody tr:hover {
 
   .floor-plan-view {
     gap: 0.65rem;
+    margin-top: 0;
   }
 
   .floor-plan-rail {
