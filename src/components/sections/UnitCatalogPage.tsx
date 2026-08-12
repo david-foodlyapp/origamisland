@@ -1070,7 +1070,8 @@ export function UnitCatalogPage({
                                 style={{ left: `${labelPoint.x}%`, top: `${labelPoint.y}%` }}
                                 onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}
                               >
-                                {mapUnitStatusLabel(item.status, language)}
+                                <span>{item.unit_number ? `#${item.unit_number}` : getUnitDisplayTitle(item, language)}</span>
+                                <strong>{formatArea(item.area)}</strong>
                               </button>
                             );
                           })}
