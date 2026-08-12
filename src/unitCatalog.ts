@@ -21,6 +21,7 @@ export type UnitCatalogQueryState = {
   floors: string[];
   types: string[];
   statuses: string[];
+  roomTypes: string[];
   rooms: string[];
   bedrooms: string[];
   bathrooms: string[];
@@ -102,6 +103,7 @@ export function readUnitCatalogQuery(): UnitCatalogQueryState {
     floors: readCsv(params.get("floor")),
     types: readCsv(params.get("type")),
     statuses: readCsv(params.get("status")),
+    roomTypes: readCsv(params.get("room_type")),
     rooms: readCsv(params.get("rooms")),
     bedrooms: readCsv(params.get("bedrooms")),
     bathrooms: readCsv(params.get("bathrooms")),
@@ -125,6 +127,7 @@ export function buildUnitCatalogSearch(state: UnitCatalogQueryState, language: L
   if (state.floors.length) params.set("floor", state.floors.join(","));
   if (state.types.length) params.set("type", state.types.join(","));
   if (state.statuses.length) params.set("status", state.statuses.join(","));
+  if (state.roomTypes.length) params.set("room_type", state.roomTypes.join(","));
   if (state.rooms.length) params.set("rooms", state.rooms.join(","));
   if (state.bedrooms.length) params.set("bedrooms", state.bedrooms.join(","));
   if (state.bathrooms.length) params.set("bathrooms", state.bathrooms.join(","));

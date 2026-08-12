@@ -40,6 +40,7 @@ export type TranslationKey =
   | "filter_condition_full"
   | "filter_condition_turnkey"
   | "filter_search"
+  | "filter_reset"
   | "concept_title"
   | "concept_desc"
   | "concept_btn"

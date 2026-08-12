@@ -21,9 +21,6 @@ import {
   type Theme,
   type BrandingSettings,
   type BrandingSettingsResponse,
-  type RoomFilter,
-  type SearchPropertyTypeFilter,
-  type ConditionFilter,
   type FooterSection,
   type GalleryItem,
   type GalleryApiItem,
@@ -56,6 +53,7 @@ import {
   type ExplorerPropertyDetail,
   type ExplorerPropertyResponse,
   type ExplorerUnit,
+  type UnitFilterOptions,
   type SocialNetworkItem,
   type SocialNetworksResponse,
   type WebsiteSectionResponse
@@ -65,6 +63,7 @@ import {
   buildUnitCatalogSearch,
   convertPrice,
   fetchCurrencyRates,
+  fetchUnitFilters,
   fetchUnits,
   formatArea,
   formatPrice,
@@ -101,12 +100,6 @@ const communities: Community[] = [
     descKey: "comm_marina_desc"
   }
 ];
-
-const searchBedroomCounts: Record<Exclude<RoomFilter, "all">, string> = {
-  "1room": "0",
-  "2room": "1",
-  "3room": "2"
-};
 
 const serviceLinks = [
   "VIP Private Viewings",
@@ -281,9 +274,10 @@ function App() {
   const [isWidgetVisible, setIsWidgetVisible] = useState(false);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [headerShrunk, setHeaderShrunk] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState<RoomFilter>("all");
-  const [selectedPropertyType, setSelectedPropertyType] = useState<SearchPropertyTypeFilter>("all");
-  const [selectedCondition, setSelectedCondition] = useState<ConditionFilter>("all");
+  const [heroUnitFilters, setHeroUnitFilters] = useState<UnitFilterOptions | null>(null);
+  const [selectedRoomType, setSelectedRoomType] = useState("");
+  const [selectedPropertyType, setSelectedPropertyType] = useState("");
+  const [selectedCondition, setSelectedCondition] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
@@ -481,18 +475,6 @@ function App() {
     image: normalizeApiImageUrl(item.image),
     badge: String(index + 1).padStart(2, "0")
   }));
-  const getRoomLabel = (room: RoomFilter) => {
-    switch (room) {
-      case "1room":
-        return t("filter_room_1");
-      case "2room":
-        return t("filter_room_2");
-      case "3room":
-        return t("filter_room_3");
-      default:
-        return t("filter_room_all");
-    }
-  };
   const darkThemeLogoSrc = resolveBrandingLogo(branding, language, "dark");
   const lightThemeLogoSrc = resolveBrandingLogo(branding, language, "default");
 
@@ -546,6 +528,24 @@ function App() {
   useEffect(() => {
     let cancelled = false;
 
+    fetchUnitFilters(DEFAULT_BUILDING_SLUG, language)
+      .then((filters) => {
+        if (!cancelled) {
+          setHeroUnitFilters(filters);
+        }
+      })
+      .catch((error) => {
+        console.error("Failed to load hero unit filters:", error);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [language]);
+
+  useEffect(() => {
+    let cancelled = false;
+
     setIsFeaturedUnitsLoading(true);
     setFeaturedUnitsFilter("all");
 
@@ -557,6 +557,7 @@ function App() {
         floors: [],
         types: [],
         statuses: [],
+        roomTypes: [],
         rooms: [],
         bedrooms: [],
         bathrooms: [],
@@ -960,6 +961,7 @@ function App() {
                   floors: [floor.slug],
                   types: [],
                   statuses: ["available"],
+                  roomTypes: [],
                   rooms: [],
                   bedrooms: [],
                   bathrooms: [],
@@ -1495,6 +1497,7 @@ function App() {
       floors: [],
       types,
       statuses: [],
+      roomTypes: [],
       rooms: [],
       bedrooms: [],
       bathrooms: [],
@@ -1549,22 +1552,21 @@ function App() {
   };
 
   const handleSearch = () => {
-    const selectedAreaRange = selectedRoom === "all" ? null : searchAreaRanges[selectedRoom];
-
     setMobileFilterOpen(false);
     navigateTo(
       `/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
         page: 1,
         perPage: 9,
         floors: [],
-        types: selectedPropertyType === "all" ? [] : [selectedPropertyType === "investment" ? "apartment" : "hotel_room"],
+        types: selectedPropertyType ? [selectedPropertyType] : [],
         statuses: [],
+        roomTypes: selectedRoomType ? [selectedRoomType] : [],
         rooms: [],
         bedrooms: [],
         bathrooms: [],
-        areaMin: selectedAreaRange?.min || "",
-        areaMax: selectedAreaRange?.max || "",
-        condition: selectedCondition === "all" ? "" : selectedCondition,
+        areaMin: "",
+        areaMax: "",
+        condition: selectedCondition,
         sort: "rank",
         view: "grid"
       }, language)}`
@@ -2039,13 +2041,13 @@ function App() {
         <>
       <HeroSection
         t={t}
-        selectedRoom={selectedRoom}
-        setSelectedRoom={setSelectedRoom}
+        unitFilters={heroUnitFilters}
+        selectedRoomType={selectedRoomType}
+        setSelectedRoomType={setSelectedRoomType}
         selectedPropertyType={selectedPropertyType}
         setSelectedPropertyType={setSelectedPropertyType}
         selectedCondition={selectedCondition}
         setSelectedCondition={setSelectedCondition}
-        getRoomLabel={getRoomLabel}
         mobileFilterOpen={mobileFilterOpen}
         setMobileFilterOpen={setMobileFilterOpen}
         handleSearch={handleSearch}
@@ -2121,6 +2123,7 @@ function App() {
                                   floors: [floor.slug],
                                   types: [],
                                   statuses: [],
+                                  roomTypes: [],
                                   rooms: [],
                                   bedrooms: [],
                                   bathrooms: [],
@@ -2151,6 +2154,7 @@ function App() {
                               floors: [floor.slug],
                               types: [],
                               statuses: [],
+                              roomTypes: [],
                               rooms: [],
                               bedrooms: [],
                               bathrooms: [],

@@ -40,6 +40,7 @@ export const en: Record<TranslationKey, string> = {
   filter_condition_full: "Fully renovated",
   filter_condition_turnkey: "Turnkey",
   filter_search: "Search",
+  filter_reset: "Clear filters",
   concept_title: "Origami Residence",
   concept_desc: "Origami Island is an innovative project that combines premium lifestyle, modern technology, and wellness. It is not just real estate — it is a completely different experience that perfectly reflects the vision of Origami Holding: to create a harmonious, eco-friendly, and future-oriented living environment.",
   concept_btn: "KNOW MORE",

@@ -68,6 +68,9 @@ export type ExplorerUnit = {
   meta_title?: string;
   meta_description?: string;
   floor?: UnitFloorSummary;
+  plan_polygon?: VisualPoint[];
+  plan_label_position?: VisualPoint | null;
+  hotspot_color?: string;
   media: ExplorerMediaItem[];
   updated_at: string;
 };
@@ -139,11 +142,20 @@ export type UnitFloorSummary = {
   number: number;
   title: string;
   units_count?: number;
+  image?: string | null;
+  floor_plan_image?: string | null;
 };
 
-export type UnitTypeOption = {
-  value: string;
+export type UnitFilterOptionValue = string | number;
+
+export type UnitFilterOption = {
+  value: UnitFilterOptionValue;
   label: string;
+  id?: number;
+  number?: number;
+  units_count?: number;
+  image?: string | null;
+  floor_plan_image?: string | null;
 };
 
 export type UnitStatusOption = {
@@ -157,21 +169,25 @@ export type UnitSortOption = {
 };
 
 export type UnitFilterOptions = {
-  floors: UnitFloorSummary[];
-  types: UnitTypeOption[];
-  statuses: UnitStatusOption[];
-  rooms: number[];
-  bedrooms: number[];
-  bathrooms: number[];
-  area: {
+  floors?: UnitFloorSummary[];
+  floor_options?: UnitFilterOption[];
+  room_types?: UnitFilterOption[];
+  property_types?: UnitFilterOption[];
+  conditions?: UnitFilterOption[];
+  types?: UnitFilterOption[];
+  statuses?: UnitStatusOption[];
+  rooms?: number[];
+  bedrooms?: number[];
+  bathrooms?: number[];
+  area?: {
     min: number | null;
     max: number | null;
   };
-  price: {
+  price?: {
     min: number | null;
     max: number | null;
   };
-  sorts: UnitSortOption[];
+  sorts?: UnitSortOption[];
 };
 
 export type UnitFilterResponse = {

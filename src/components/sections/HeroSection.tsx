@@ -1,48 +1,56 @@
 import { Dispatch, SetStateAction } from "react";
 import { TranslationKey } from "../../i18n";
-import { RoomFilter, SearchPropertyTypeFilter, ConditionFilter } from "../../types";
-import { LocationIcon, SearchIcon, FilterAdjustIcon, BuildingIcon, CurrencyIcon } from "../Icons";
+import { UnitFilterOptions } from "../../types";
+import { LocationIcon, SearchIcon, FilterAdjustIcon, BuildingIcon, CurrencyIcon, CloseIcon } from "../Icons";
 
 type HeroSectionProps = {
   t: (key: TranslationKey) => string;
-  selectedRoom: RoomFilter;
-  setSelectedRoom: Dispatch<SetStateAction<RoomFilter>>;
-  selectedPropertyType: SearchPropertyTypeFilter;
-  setSelectedPropertyType: Dispatch<SetStateAction<SearchPropertyTypeFilter>>;
-  selectedCondition: ConditionFilter;
-  setSelectedCondition: Dispatch<SetStateAction<ConditionFilter>>;
-  getRoomLabel: (room: RoomFilter) => string;
+  unitFilters: UnitFilterOptions | null;
+  selectedRoomType: string;
+  setSelectedRoomType: Dispatch<SetStateAction<string>>;
+  selectedPropertyType: string;
+  setSelectedPropertyType: Dispatch<SetStateAction<string>>;
+  selectedCondition: string;
+  setSelectedCondition: Dispatch<SetStateAction<string>>;
   mobileFilterOpen: boolean;
   setMobileFilterOpen: Dispatch<SetStateAction<boolean>>;
   handleSearch: () => void;
 };
 
-const CONDITIONS_BY_PROPERTY_TYPE: Record<SearchPropertyTypeFilter, ConditionFilter[]> = {
-  all: ["white", "full", "turnkey"],
-  investment: ["white", "full", "turnkey"],
-  hotel: ["turnkey"]
-};
-
 export function HeroSection({
   t,
-  selectedRoom,
-  setSelectedRoom,
+  unitFilters,
+  selectedRoomType,
+  setSelectedRoomType,
   selectedPropertyType,
   setSelectedPropertyType,
   selectedCondition,
   setSelectedCondition,
-  getRoomLabel,
   mobileFilterOpen,
   setMobileFilterOpen,
   handleSearch
 }: HeroSectionProps) {
-  const availableConditions = CONDITIONS_BY_PROPERTY_TYPE[selectedPropertyType];
+  const roomTypeOptions = (unitFilters?.room_types || [
+    { value: 0, label: t("filter_room_1") },
+    { value: 1, label: t("filter_room_2") },
+    { value: 2, label: t("filter_room_3") }
+  ]).map((option) => ({ value: String(option.value), label: option.label }));
+  const propertyTypeOptions = (unitFilters?.property_types || [
+    { value: "hotel_room", label: t("filter_kind_hotel") },
+    { value: "apartment", label: t("filter_kind_investment") }
+  ]).map((option) => ({ value: String(option.value), label: option.label }));
+  const conditionOptions = (unitFilters?.conditions || [
+    { value: "white", label: t("filter_condition_white") },
+    { value: "full", label: t("filter_condition_full") },
+    { value: "turnkey", label: t("filter_condition_turnkey") }
+  ]).map((option) => ({ value: String(option.value), label: option.label }));
+  const selectedRoomLabel = roomTypeOptions.find((option) => option.value === selectedRoomType)?.label || t("filter_room_all");
+  const hasActiveFilters = Boolean(selectedRoomType || selectedPropertyType || selectedCondition);
 
-  const handlePropertyTypeChange = (value: SearchPropertyTypeFilter) => {
-    setSelectedPropertyType(value);
-    if (!CONDITIONS_BY_PROPERTY_TYPE[value].includes(selectedCondition)) {
-      setSelectedCondition("all");
-    }
+  const handleResetFilters = () => {
+    setSelectedRoomType("");
+    setSelectedPropertyType("");
+    setSelectedCondition("");
   };
 
   return (
@@ -63,7 +71,7 @@ export function HeroSection({
                 <span className="filter-icon">
                   <LocationIcon />
                 </span>
-                <span>{getRoomLabel(selectedRoom)}</span>
+                <span>{selectedRoomLabel}</span>
               </div>
               <button
                 className="mobile-filter-search"
@@ -89,13 +97,13 @@ export function HeroSection({
                   <LocationIcon />
                 </span>
                 <select
-                  value={selectedRoom}
-                  onChange={(event) => setSelectedRoom(event.target.value as RoomFilter)}
+                  value={selectedRoomType}
+                  onChange={(event) => setSelectedRoomType(event.target.value)}
                 >
-                  <option value="all">{t("filter_room_all")}</option>
-                  <option value="1room">{t("filter_room_1")}</option>
-                  <option value="2room">{t("filter_room_2")}</option>
-                  <option value="3room">{t("filter_room_3")}</option>
+                  <option value="">{t("filter_room_all")}</option>
+                  {roomTypeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
                 </select>
               </div>
               <div className="filter-divider"></div>
@@ -106,11 +114,12 @@ export function HeroSection({
                 </span>
                 <select
                   value={selectedPropertyType}
-                  onChange={(event) => handlePropertyTypeChange(event.target.value as SearchPropertyTypeFilter)}
+                  onChange={(event) => setSelectedPropertyType(event.target.value)}
                 >
-                  <option value="all">{t("filter_kind_all")}</option>
-                  <option value="hotel">{t("filter_kind_hotel")}</option>
-                  <option value="investment">{t("filter_kind_investment")}</option>
+                  <option value="">{t("filter_kind_all")}</option>
+                  {propertyTypeOptions.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
                 </select>
               </div>
               <div className="filter-divider"></div>
@@ -121,12 +130,12 @@ export function HeroSection({
                 </span>
                 <select
                   value={selectedCondition}
-                  onChange={(event) => setSelectedCondition(event.target.value as ConditionFilter)}
+                  onChange={(event) => setSelectedCondition(event.target.value)}
                 >
-                  <option value="all">{t("filter_condition_all")}</option>
-                  {availableConditions.includes("white") && <option value="white">{t("filter_condition_white")}</option>}
-                  {availableConditions.includes("full") && <option value="full">{t("filter_condition_full")}</option>}
-                  {availableConditions.includes("turnkey") && <option value="turnkey">{t("filter_condition_turnkey")}</option>}
+                  <option value="">{t("filter_condition_all")}</option>
+                  {conditionOptions.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
                 </select>
               </div>
 
@@ -134,6 +143,18 @@ export function HeroSection({
                 <SearchIcon />
                 <span>{t("filter_search")}</span>
               </button>
+
+              {hasActiveFilters ? (
+                <button
+                  className="filter-reset-btn"
+                  type="button"
+                  aria-label={t("filter_reset")}
+                  title={t("filter_reset")}
+                  onClick={handleResetFilters}
+                >
+                  <CloseIcon />
+                </button>
+              ) : null}
             </div>
           </div>
         </section>

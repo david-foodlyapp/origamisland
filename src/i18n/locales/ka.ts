@@ -40,6 +40,7 @@ export const ka: Record<TranslationKey, string> = {
   filter_condition_full: "სრული რემონტით",
   filter_condition_turnkey: "სრულად აღჭურვილი",
   filter_search: "ძიება",
+  filter_reset: "გასუფთავება",
   concept_title: "Origami Residence",
   concept_desc: "Origami Island არის ინოვაციური პროექტი, რომელიც აერთიანებს პრემიუმ ლაიფსთაილს, თანამედროვე ტექნოლოგიებსა და ველნესს. ეს არ არის უბრალოდ უძრავი ქონება — ეს არის სრულიად განსხვავებული გამოცდილება, რომელიც ზუსტად ასახავს Origami Holding-ის ხედვას: შექმნას ჰარმონიული, ეკოლოგიურად სუფთა და მომავალზე ორიენტირებული საცხოვრებელი გარემო.",
   concept_btn: "გაიგეთ მეტი",

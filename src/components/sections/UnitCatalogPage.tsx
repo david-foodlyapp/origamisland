@@ -21,6 +21,7 @@ import {
 } from "../../unitCatalog";
 import {
   type ExplorerUnit,
+  type UnitFilterOption,
   type UnitFilterOptions,
   type UnitListMeta
 } from "../../types";
@@ -68,6 +69,7 @@ const copyKa = {
   filtersClose: "ფილტრების დახურვა",
   activeFilters: "აქტიური ფილტრი",
   sort: "სორტირება",
+  sortRank: "რანკი",
   view: "ხედი",
   grid: "ვიზუალური",
   table: "სია",
@@ -100,6 +102,8 @@ const copyKa = {
   floorPlan: "Floor Plan",
   detailBack: "ყველა ბინა",
   details: "დეტალები",
+  floorPlanTitle: "სართულის გეგმარება",
+  viewUnits: "ბინების ნახვა",
   updated: "განახლდა",
   total: "სულ",
   page: "გვერდი",
@@ -134,6 +138,7 @@ const copyEn: typeof copyKa = {
   filtersClose: "Close filters",
   activeFilters: "active filters",
   sort: "Sort",
+  sortRank: "Rank",
   view: "View",
   grid: "Grid",
   table: "List",
@@ -166,6 +171,8 @@ const copyEn: typeof copyKa = {
   floorPlan: "Floor Plan",
   detailBack: "All units",
   details: "Details",
+  floorPlanTitle: "Floor plan",
+  viewUnits: "View units",
   updated: "Updated",
   total: "Total",
   page: "Page",
@@ -186,13 +193,12 @@ function getCopy(language: Language) {
 }
 
 function sanitizeCatalogQueryState(state: UnitCatalogQueryState): UnitCatalogQueryState {
-  const allowedConditions = ["white", "full", "turnkey"];
-
   return {
     ...state,
+    roomTypes: state.roomTypes.length ? state.roomTypes : state.bedrooms,
     rooms: [],
     bedrooms: [],
-    condition: allowedConditions.includes(state.condition) ? state.condition : ""
+    condition: state.condition || ""
   };
 }
 
@@ -258,6 +264,79 @@ function getTypeOptions(copy: typeof copyKa) {
   ];
 }
 
+function normalizeFilterOptions(options: UnitFilterOption[] | undefined) {
+  return (options || []).map((option) => ({
+    ...option,
+    value: String(option.value),
+    label: option.label
+  }));
+}
+
+function getRoomTypeOptions(filters: UnitFilterOptions | null, copy: typeof copyKa) {
+  const apiOptions = normalizeFilterOptions(filters?.room_types);
+
+  return apiOptions.length
+    ? apiOptions
+    : [
+      { value: "0", label: copy.studio },
+      { value: "1", label: `1 ${copy.bedroomLabel}` },
+      { value: "2", label: `2 ${copy.bedroomLabel}` }
+    ];
+}
+
+function getPropertyTypeOptions(filters: UnitFilterOptions | null, copy: typeof copyKa) {
+  const apiOptions = normalizeFilterOptions(filters?.property_types || filters?.types);
+
+  return apiOptions.length ? apiOptions : getTypeOptions(copy);
+}
+
+function getConditionFilterOptions(filters: UnitFilterOptions | null, copy: typeof copyKa) {
+  const apiOptions = normalizeFilterOptions(filters?.conditions);
+
+  return apiOptions.length ? apiOptions : getConditionOptions(copy);
+}
+
+function getFloorFilterOptions(filters: UnitFilterOptions | null, copy: typeof copyKa) {
+  const apiOptions = normalizeFilterOptions(filters?.floor_options);
+
+  return apiOptions.length
+    ? apiOptions
+    : (filters?.floors || []).map((item) => ({
+      ...item,
+      value: item.slug,
+      label: item.title?.trim() || `${copy.floorLabel} ${item.number}`
+    }));
+}
+
+function normalizePlanPoint(point: { x: number; y: number }) {
+  const x = point.x <= 1 ? point.x * 100 : point.x;
+  const y = point.y <= 1 ? point.y * 100 : point.y;
+
+  return {
+    x: Math.min(100, Math.max(0, x)),
+    y: Math.min(100, Math.max(0, y))
+  };
+}
+
+function getPolygonCentroid(points: Array<{ x: number; y: number }>) {
+  if (!points.length) {
+    return { x: 50, y: 50 };
+  }
+
+  return points.reduce((sum, point) => ({
+    x: sum.x + point.x / points.length,
+    y: sum.y + point.y / points.length
+  }), { x: 0, y: 0 });
+}
+
+function getFloorRailLabel(option: { number?: number; label: string }) {
+  if (option.number != null) {
+    return String(option.number);
+  }
+
+  return option.label.replace(/\D/g, "") || option.label;
+}
+
 export function UnitCatalogPage({
   language,
   darkThemeLogoSrc,
@@ -273,8 +352,6 @@ export function UnitCatalogPage({
   currencyRates
 }: UnitCatalogPageProps) {
   const copy = getCopy(language);
-  const conditionOptions = useMemo(() => getConditionOptions(copy), [copy]);
-  const typeOptions = useMemo(() => getTypeOptions(copy), [copy]);
   const initialQuery = useMemo(() => sanitizeCatalogQueryState(readUnitCatalogQuery()), []);
   const [query, setQuery] = useState<UnitCatalogQueryState>(initialQuery);
   const [draftQuery, setDraftQuery] = useState<UnitCatalogQueryState>(initialQuery);
@@ -288,6 +365,10 @@ export function UnitCatalogPage({
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [mobileSortOpen, setMobileSortOpen] = useState(false);
+  const roomTypeOptions = useMemo(() => getRoomTypeOptions(filters, copy), [filters, copy]);
+  const typeOptions = useMemo(() => getPropertyTypeOptions(filters, copy), [filters, copy]);
+  const conditionOptions = useMemo(() => getConditionFilterOptions(filters, copy), [filters, copy]);
+  const floorOptions = useMemo(() => getFloorFilterOptions(filters, copy), [filters, copy]);
   const paginationItems = useMemo(
     () => getPaginationItems(meta?.current_page || 1, meta?.last_page || 1),
     [meta?.current_page, meta?.last_page]
@@ -479,26 +560,45 @@ export function UnitCatalogPage({
   const activeFilterCount = [
     draftQuery.floors.length,
     draftQuery.types.length,
+    draftQuery.roomTypes.length,
     draftQuery.areaMin || draftQuery.areaMax ? 1 : 0,
     draftQuery.condition ? 1 : 0,
     searchTerm.trim() ? 1 : 0
   ].reduce((sum, value) => sum + value, 0);
 
   const selectedFloorLabel = draftQuery.floors[0]
-    ? (filters?.floors || []).find((item) => item.slug === draftQuery.floors[0])?.title?.trim() || `${copy.floorLabel} ${draftQuery.floors[0]}`
+    ? floorOptions.find((item) => item.value === draftQuery.floors[0])?.label || `${copy.floorLabel} ${draftQuery.floors[0]}`
     : "";
+  const selectedFloor = query.floors[0]
+    ? floorOptions.find((item) => item.value === query.floors[0])
+      || filters?.floors?.find((item) => item.slug === query.floors[0])
+      || null
+    : null;
+  const selectedFloorPlanImage = selectedFloor?.floor_plan_image || selectedFloor?.image || "";
+  const selectedFloorTitle = selectedFloor
+    ? ("label" in selectedFloor ? selectedFloor.label : selectedFloor.title)
+    : selectedFloorLabel;
+  const shouldShowFloorPlan = Boolean(!unitSlug && query.floors[0] && selectedFloorPlanImage);
   const selectedTypeLabel = draftQuery.types[0]
     ? typeOptions.find((item) => item.value === draftQuery.types[0])?.label || draftQuery.types[0]
+    : "";
+  const selectedRoomTypeLabel = draftQuery.roomTypes[0]
+    ? roomTypeOptions.find((item) => item.value === draftQuery.roomTypes[0])?.label || draftQuery.roomTypes[0]
     : "";
   const selectedAreaRange = areaRangeOptions.find((option) => option.value === getAreaRangeValue(draftQuery));
   const selectedAreaLabel = selectedAreaRange ? getAreaRangeLabel(selectedAreaRange) : "";
   const selectedConditionLabel = draftQuery.condition
     ? conditionOptions.find((item) => item.value === draftQuery.condition)?.label || draftQuery.condition
     : "";
-  const selectedSortLabel = filters?.sorts.find((item) => item.value === draftQuery.sort)?.label || draftQuery.sort;
+  const sortOptions = filters?.sorts || [
+    { value: "rank", label: copy.sortRank },
+    { value: "updated", label: copy.updated }
+  ];
+  const selectedSortLabel = sortOptions.find((item) => item.value === draftQuery.sort)?.label || draftQuery.sort;
 
   const mobileFilterSummary = [
     selectedAreaLabel ? `${copy.area}: ${selectedAreaLabel}` : "",
+    selectedRoomTypeLabel ? `${copy.rooms}: ${selectedRoomTypeLabel}` : "",
     selectedTypeLabel ? `${copy.type}: ${selectedTypeLabel}` : "",
     selectedConditionLabel ? `${copy.condition}: ${selectedConditionLabel}` : "",
     selectedFloorLabel ? `${copy.floor}: ${selectedFloorLabel}` : "",
@@ -511,6 +611,7 @@ export function UnitCatalogPage({
       ...draftQuery,
       floors: [],
       types: [],
+      roomTypes: [],
       bedrooms: [],
       areaMin: "",
       areaMax: "",
@@ -750,18 +851,11 @@ export function UnitCatalogPage({
 
                     <div className="units-filterbar">
                       <FilterSelect
-                        label={copy.area}
-                        value={getAreaRangeValue(draftQuery)}
-                        options={areaRangeOptions.map((option) => ({ value: option.value, label: getAreaRangeLabel(option) }))}
+                        label={copy.rooms}
+                        value={draftQuery.roomTypes[0] || ""}
+                        options={roomTypeOptions}
                         allLabel={copy.all}
-                        onChange={(value) => {
-                          const range = getAreaRangeFromValue(value);
-                          updateDraftQuery((current) => ({
-                            ...current,
-                            areaMin: range?.min || "",
-                            areaMax: range?.max || ""
-                          }), true);
-                        }}
+                        onChange={(value) => updateDraftQuery((current) => ({ ...current, roomTypes: value ? [value] : [] }), true)}
                       />
                       <FilterSelect
                         label={copy.type}
@@ -780,12 +874,23 @@ export function UnitCatalogPage({
                       <FilterSelect
                         label={copy.floor}
                         value={draftQuery.floors[0] || ""}
-                        options={(filters?.floors || []).map((item) => ({
-                          value: item.slug,
-                          label: item.title?.trim() || `${copy.floorLabel} ${item.number}`
-                        }))}
+                        options={floorOptions}
                         allLabel={copy.all}
                         onChange={(value) => updateDraftQuery((current) => ({ ...current, floors: value ? [value] : [] }), true)}
+                      />
+                      <FilterSelect
+                        label={copy.area}
+                        value={getAreaRangeValue(draftQuery)}
+                        options={areaRangeOptions.map((option) => ({ value: option.value, label: getAreaRangeLabel(option) }))}
+                        allLabel={copy.all}
+                        onChange={(value) => {
+                          const range = getAreaRangeFromValue(value);
+                          updateDraftQuery((current) => ({
+                            ...current,
+                            areaMin: range?.min || "",
+                            areaMax: range?.max || ""
+                          }), true);
+                        }}
                       />
                       <label className="units-filter-control units-filter-search">
                         <span>{copy.search}</span>
@@ -858,7 +963,7 @@ export function UnitCatalogPage({
                       </button>
                     </div>
                     <div className="units-sort-options">
-                      {(filters?.sorts || []).map((item) => (
+                      {sortOptions.map((item) => (
                         <button
                           key={item.value}
                           type="button"
@@ -905,7 +1010,107 @@ export function UnitCatalogPage({
                 {loading ? <div className="units-state">{copy.pageLoading}</div> : null}
                 {error ? <div className="units-state units-error">{error}</div> : null}
 
-                {!loading && !error && draftQuery.view === "grid" ? (
+                {!loading && !error && shouldShowFloorPlan ? (
+                  <section className="floor-plan-view">
+                    <div className="floor-plan-rail" aria-label={copy.floor}>
+                      <span>{copy.floorLabel}</span>
+                      <button
+                        type="button"
+                        className="floor-plan-rail-arrow"
+                        onClick={() => {
+                          const currentIndex = floorOptions.findIndex((item) => item.value === query.floors[0]);
+                          const nextFloor = floorOptions[Math.max(0, currentIndex - 1)];
+                          if (nextFloor) {
+                            applyQuery({ ...query, floors: [nextFloor.value], page: 1 });
+                          }
+                        }}
+                      >
+                        ‹
+                      </button>
+                      {floorOptions.map((item) => (
+                        <button
+                          key={item.value}
+                          type="button"
+                          className={item.value === query.floors[0] ? "active" : ""}
+                          onClick={() => applyQuery({ ...query, floors: [item.value], page: 1 })}
+                        >
+                          {getFloorRailLabel(item)}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        className="floor-plan-rail-arrow"
+                        onClick={() => {
+                          const currentIndex = floorOptions.findIndex((item) => item.value === query.floors[0]);
+                          const nextFloor = floorOptions[Math.min(floorOptions.length - 1, Math.max(0, currentIndex + 1))];
+                          if (nextFloor) {
+                            applyQuery({ ...query, floors: [nextFloor.value], page: 1 });
+                          }
+                        }}
+                      >
+                        ›
+                      </button>
+                    </div>
+
+                    <div className="floor-plan-stage">
+                      <div className="floor-plan-stage-head">
+                        <div>
+                          <p>{copy.floorPlanTitle}</p>
+                          <h2>{selectedFloorTitle}</h2>
+                        </div>
+                        <span>{filteredUnits.length} {copy.available}</span>
+                      </div>
+
+                      <div className="floor-plan-media">
+                        <div className="floor-plan-image-map">
+                          <img src={selectedFloorPlanImage} alt={selectedFloorTitle || copy.floorPlanTitle} />
+                          <svg className="floor-plan-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                            {filteredUnits.map((item) => {
+                              const points = (item.plan_polygon || []).map(normalizePlanPoint);
+                              if (!points.length) {
+                                return null;
+                              }
+
+                              return (
+                                <polygon
+                                  key={item.id}
+                                  points={points.map((point) => `${point.x},${point.y}`).join(" ")}
+                                  className={`floor-plan-unit-shape floor-plan-unit-shape--${item.status}`}
+                                  onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}
+                                />
+                              );
+                            })}
+                          </svg>
+
+                          {filteredUnits.map((item) => {
+                            const points = (item.plan_polygon || []).map(normalizePlanPoint);
+                            if (!points.length) {
+                              return null;
+                            }
+
+                            const labelPoint = item.plan_label_position
+                              ? normalizePlanPoint(item.plan_label_position)
+                              : getPolygonCentroid(points);
+
+                            return (
+                              <button
+                                key={`label-${item.id}`}
+                                type="button"
+                                className={`floor-plan-unit-label floor-plan-unit-label--${item.status}`}
+                                style={{ left: `${labelPoint.x}%`, top: `${labelPoint.y}%` }}
+                                onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}
+                              >
+                                {mapUnitStatusLabel(item.status, language)}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                ) : null}
+
+                {!loading && !error && !shouldShowFloorPlan && draftQuery.view === "grid" ? (
                   <section className="units-grid">
                     {filteredUnits.length ? filteredUnits.map((item) => (
                       <article key={item.id} className="unit-card" onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}>
@@ -935,7 +1140,7 @@ export function UnitCatalogPage({
                   </section>
                 ) : null}
 
-                {!loading && !error && draftQuery.view === "table" ? (
+                {!loading && !error && !shouldShowFloorPlan && draftQuery.view === "table" ? (
                   <section className="units-table-wrap">
                     <table className="units-table">
                       <thead>
@@ -1004,7 +1209,7 @@ export function UnitCatalogPage({
                   </section>
                 ) : null}
 
-                {!loading && !error && meta?.last_page && meta.last_page > 1 ? (
+                {!loading && !error && !shouldShowFloorPlan && meta?.last_page && meta.last_page > 1 ? (
                   <div className="units-pagination">
                     <button
                       type="button"
