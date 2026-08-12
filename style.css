@@ -6236,15 +6236,45 @@ html[data-theme="dark"] .modal-content {
 .floor-plan-unit-shape {
   pointer-events: auto;
   cursor: pointer;
-  fill: rgba(192, 62, 62, 0.38);
-  stroke: rgba(192, 62, 62, 0.82);
+  fill: rgba(58, 145, 89, 0.34);
+  stroke: rgba(58, 145, 89, 0.82);
   stroke-width: 0.32;
   vector-effect: non-scaling-stroke;
   transition: fill 0.2s ease, stroke 0.2s ease;
 }
 
 .floor-plan-unit-shape:hover {
-  fill: rgba(192, 62, 62, 0.48);
+  fill: rgba(58, 145, 89, 0.46);
+  stroke: rgba(38, 122, 72, 0.95);
+}
+
+.floor-plan-unit-shape--available {
+  fill: rgba(58, 145, 89, 0.34);
+  stroke: rgba(58, 145, 89, 0.82);
+}
+
+.floor-plan-unit-shape--available:hover {
+  fill: rgba(58, 145, 89, 0.46);
+  stroke: rgba(38, 122, 72, 0.95);
+}
+
+.floor-plan-unit-shape--reserved {
+  fill: rgba(49, 107, 184, 0.34);
+  stroke: rgba(49, 107, 184, 0.82);
+}
+
+.floor-plan-unit-shape--reserved:hover {
+  fill: rgba(49, 107, 184, 0.46);
+  stroke: rgba(31, 82, 154, 0.95);
+}
+
+.floor-plan-unit-shape--sold {
+  fill: rgba(196, 62, 62, 0.34);
+  stroke: rgba(196, 62, 62, 0.82);
+}
+
+.floor-plan-unit-shape--sold:hover {
+  fill: rgba(196, 62, 62, 0.46);
   stroke: rgba(165, 38, 38, 0.95);
 }
 
@@ -6323,8 +6353,8 @@ html[data-theme="dark"] .modal-content {
 }
 
 .unit-card-badge--reserved {
-  background: rgba(230, 196, 74, 0.18);
-  color: #e6c44a;
+  background: rgba(49, 107, 184, 0.18);
+  color: #6fa2ef;
 }
 
 .unit-card-badge--sold {
@@ -7085,8 +7115,8 @@ html[data-theme="light"] .unit-card-badge--available {
 }
 
 html[data-theme="light"] .unit-card-badge--reserved {
-  background: rgba(184, 145, 24, 0.16);
-  color: #b89118;
+  background: rgba(49, 107, 184, 0.14);
+  color: #316bb8;
 }
 
 html[data-theme="light"] .unit-card-badge--sold {
