@@ -362,7 +362,7 @@ export function UnitCatalogPage({
   const [unit, setUnit] = useState<ExplorerUnit | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [mediaMode, setMediaMode] = useState<"2d" | "floorPlan">("2d");
+  const [mediaMode, setMediaMode] = useState<"2d" | "3d" | "floorPlan">("2d");
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [mobileSortOpen, setMobileSortOpen] = useState(false);
@@ -487,8 +487,15 @@ export function UnitCatalogPage({
   }, [propertySlug, unitSlug, query, language]);
 
   const unitImage2d = unit?.media?.find((item) => item.type === "image" && item.url)?.url || unit?.image || "";
+  const unitImage3d = unit?.media?.find((item) => item.type === "render" && item.url)?.url || unitImage2d;
   const unitFloorPlanImage = unit?.media?.find((item) => item.type === "floor_plan" && item.url)?.url || "";
   const unitPdfUrl = unit?.media?.find((item) => item.type === "document" && item.url)?.url || "";
+  const unitBackSearch = unit?.floor?.slug
+    ? buildUnitCatalogSearch({ ...query, page: 1, floors: [unit.floor.slug] }, language)
+    : "";
+  const unitBackPath = unitBackSearch
+    ? `/properties/${propertySlug}/units?${unitBackSearch}`
+    : `/properties/${propertySlug}/units`;
   const getUnitPriceText = (price?: string | number | null, priceCurrency?: string | null) => {
     const convertedPrice = convertPrice(price, priceCurrency || undefined, currency, currencyRates);
     const formattedPrice = formatPrice(convertedPrice, currency);
@@ -643,6 +650,9 @@ export function UnitCatalogPage({
                   <div className="unit-detail-toolbar">
                     <div className="unit-mode-switch">
                       <button type="button" className={mediaMode === "2d" ? "active" : ""} onClick={() => setMediaMode("2d")}>{copy.image2d}</button>
+                      <button type="button" className={mediaMode === "3d" ? "active" : ""} onClick={() => setMediaMode("3d")}>
+                        3D
+                      </button>
                       <button
                         type="button"
                         className={mediaMode === "floorPlan" ? "active" : ""}
@@ -667,7 +677,7 @@ export function UnitCatalogPage({
                         <PdfIcon />
                         {copy.pdf}
                       </button>
-                      <button className="units-back-btn" type="button" onClick={() => navigateTo(`/properties/${propertySlug}/units`)}>
+                      <button className="units-back-btn" type="button" onClick={() => navigateTo(unitBackPath)}>
                         <ArrowIcon direction="left" />
                         <span>{copy.detailBack}</span>
                       </button>
@@ -713,6 +723,8 @@ export function UnitCatalogPage({
                   <div className="unit-image-stage">
                     {mediaMode === "floorPlan" ? (
                       unitFloorPlanImage ? <img src={unitFloorPlanImage} alt={`${getUnitDisplayTitle(unit, language)} floor plan`} /> : <div className="units-image-placeholder" />
+                    ) : mediaMode === "3d" ? (
+                      unitImage3d ? <img src={unitImage3d} alt={`${getUnitDisplayTitle(unit, language)} 3D render`} /> : <div className="units-image-placeholder" />
                     ) : (
                       unitImage2d ? <img src={unitImage2d} alt={`${getUnitDisplayTitle(unit, language)} plan`} /> : <div className="units-image-placeholder" />
                     )}
