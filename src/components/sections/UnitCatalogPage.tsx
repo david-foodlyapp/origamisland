@@ -1072,6 +1072,7 @@ export function UnitCatalogPage({
                               >
                                 <span>{item.unit_number ? `#${item.unit_number}` : getUnitDisplayTitle(item, language)}</span>
                                 <strong>{formatArea(item.area)}</strong>
+                                <em>{mapUnitStatusLabel(item.status, language)}</em>
                               </button>
                             );
                           })}
