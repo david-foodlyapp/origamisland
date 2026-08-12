@@ -6282,18 +6282,22 @@ html[data-theme="dark"] .modal-content {
   position: absolute;
   z-index: 2;
   transform: translate(-50%, -50%);
-  min-height: 34px;
-  padding: 0 1rem;
+  min-height: 28px;
+  max-width: 138px;
+  padding: 0 0.78rem;
   border: 0;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.95);
   color: #315668;
   font: inherit;
-  font-size: clamp(0.62rem, 1vw, 0.92rem);
+  font-size: clamp(0.56rem, 0.72vw, 0.76rem);
   font-weight: 800;
+  line-height: 1;
   box-shadow: 0 10px 22px rgba(74, 35, 35, 0.16);
   cursor: pointer;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .floor-plan-unit-label::after {
@@ -7530,9 +7534,10 @@ html[data-theme="light"] .units-table tbody tr:hover {
   }
 
   .floor-plan-unit-label {
-    min-height: 28px;
-    padding: 0 0.72rem;
-    font-size: 0.68rem;
+    min-height: 26px;
+    max-width: 116px;
+    padding: 0 0.62rem;
+    font-size: 0.58rem;
   }
 
   .units-table-wrap {
