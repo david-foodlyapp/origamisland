@@ -1012,46 +1012,6 @@ export function UnitCatalogPage({
 
                 {!loading && !error && shouldShowFloorPlan ? (
                   <section className="floor-plan-view">
-                    <div className="floor-plan-rail" aria-label={copy.floor}>
-                      <span>{copy.floorLabel}</span>
-                      <button
-                        type="button"
-                        className="floor-plan-rail-arrow"
-                        onClick={() => {
-                          const currentIndex = floorOptions.findIndex((item) => item.value === query.floors[0]);
-                          const nextFloor = floorOptions[Math.max(0, currentIndex - 1)];
-                          if (nextFloor) {
-                            applyQuery({ ...query, floors: [nextFloor.value], page: 1 });
-                          }
-                        }}
-                      >
-                        ‹
-                      </button>
-                      {floorOptions.map((item) => (
-                        <button
-                          key={item.value}
-                          type="button"
-                          className={item.value === query.floors[0] ? "active" : ""}
-                          onClick={() => applyQuery({ ...query, floors: [item.value], page: 1 })}
-                        >
-                          {getFloorRailLabel(item)}
-                        </button>
-                      ))}
-                      <button
-                        type="button"
-                        className="floor-plan-rail-arrow"
-                        onClick={() => {
-                          const currentIndex = floorOptions.findIndex((item) => item.value === query.floors[0]);
-                          const nextFloor = floorOptions[Math.min(floorOptions.length - 1, Math.max(0, currentIndex + 1))];
-                          if (nextFloor) {
-                            applyQuery({ ...query, floors: [nextFloor.value], page: 1 });
-                          }
-                        }}
-                      >
-                        ›
-                      </button>
-                    </div>
-
                     <div className="floor-plan-stage">
                       <div className="floor-plan-stage-head">
                         <div>
@@ -1106,6 +1066,46 @@ export function UnitCatalogPage({
                           })}
                         </div>
                       </div>
+                    </div>
+
+                    <div className="floor-plan-rail" aria-label={copy.floor}>
+                      <span>{copy.floorLabel}</span>
+                      <button
+                        type="button"
+                        className="floor-plan-rail-arrow"
+                        onClick={() => {
+                          const currentIndex = floorOptions.findIndex((item) => item.value === query.floors[0]);
+                          const nextFloor = floorOptions[Math.max(0, currentIndex - 1)];
+                          if (nextFloor) {
+                            applyQuery({ ...query, floors: [nextFloor.value], page: 1 });
+                          }
+                        }}
+                      >
+                        ‹
+                      </button>
+                      {floorOptions.map((item) => (
+                        <button
+                          key={item.value}
+                          type="button"
+                          className={item.value === query.floors[0] ? "active" : ""}
+                          onClick={() => applyQuery({ ...query, floors: [item.value], page: 1 })}
+                        >
+                          {getFloorRailLabel(item)}
+                        </button>
+                      ))}
+                      <button
+                        type="button"
+                        className="floor-plan-rail-arrow"
+                        onClick={() => {
+                          const currentIndex = floorOptions.findIndex((item) => item.value === query.floors[0]);
+                          const nextFloor = floorOptions[Math.min(floorOptions.length - 1, Math.max(0, currentIndex + 1))];
+                          if (nextFloor) {
+                            applyQuery({ ...query, floors: [nextFloor.value], page: 1 });
+                          }
+                        }}
+                      >
+                        ›
+                      </button>
                     </div>
                   </section>
                 ) : null}

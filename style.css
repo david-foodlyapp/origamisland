@@ -6078,7 +6078,7 @@ html[data-theme="dark"] .modal-content {
   grid-template-columns: minmax(0, 1fr);
   gap: 0.55rem;
   align-items: start;
-  margin-top: clamp(-8.5rem, -7vw, -4.5rem);
+  margin-top: 0.2rem;
 }
 
 .floor-plan-rail {
@@ -6089,15 +6089,17 @@ html[data-theme="dark"] .modal-content {
   gap: 0.45rem;
   max-width: 100%;
   min-height: 48px;
+  margin-top: 0.15rem;
   padding: 0.28rem 0.36rem;
   overflow-x: auto;
   overflow-y: hidden;
   border: 1px solid rgba(118, 151, 140, 0.1);
   border-radius: 20px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.02));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.025));
   color: rgba(238, 243, 239, 0.38);
   font-weight: 700;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
   scrollbar-width: thin;
   scrollbar-color: rgba(219, 231, 182, 0.28) transparent;
 }
@@ -6201,36 +6203,28 @@ html[data-theme="dark"] .modal-content {
 
 .floor-plan-media {
   width: 100%;
-  max-height: min(62vh, 720px);
-  overflow: auto;
+  height: clamp(430px, calc(100svh - 390px), 680px);
+  overflow: hidden;
   border-radius: 16px;
   background: #f7f8f6;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(49, 86, 104, 0.28) transparent;
-}
-
-.floor-plan-media::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.floor-plan-media::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.floor-plan-media::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgba(49, 86, 104, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem;
 }
 
 .floor-plan-image-map {
   position: relative;
-  width: 100%;
+  display: inline-block;
+  max-width: 100%;
+  max-height: 100%;
+  line-height: 0;
 }
 
 .floor-plan-image-map img {
-  width: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
   height: auto;
   display: block;
 }
