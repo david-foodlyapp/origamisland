@@ -357,6 +357,7 @@ export function UnitCatalogPage({
   const [draftQuery, setDraftQuery] = useState<UnitCatalogQueryState>(initialQuery);
   const [filters, setFilters] = useState<UnitFilterOptions | null>(null);
   const [units, setUnits] = useState<ExplorerUnit[]>([]);
+  const [floorPlanUnits, setFloorPlanUnits] = useState<ExplorerUnit[]>([]);
   const [meta, setMeta] = useState<UnitListMeta | null>(null);
   const [unit, setUnit] = useState<ExplorerUnit | null>(null);
   const [loading, setLoading] = useState(true);
@@ -417,9 +418,13 @@ export function UnitCatalogPage({
       setError("");
 
       try {
-        const [filterData, unitsData] = await Promise.all([
+        const floorPlanQuery = query.floors[0]
+          ? { ...query, page: 1, perPage: 500 }
+          : null;
+        const [filterData, unitsData, floorPlanUnitsData] = await Promise.all([
           fetchUnitFilters(propertySlug, language),
-          fetchUnits(propertySlug, query, language)
+          fetchUnits(propertySlug, query, language),
+          floorPlanQuery ? fetchUnits(propertySlug, floorPlanQuery, language) : Promise.resolve(null)
         ]);
 
         if (cancelled) {
@@ -428,6 +433,7 @@ export function UnitCatalogPage({
 
         setFilters(filterData);
         setUnits(unitsData.data);
+        setFloorPlanUnits(floorPlanUnitsData?.data || []);
         setMeta(unitsData.meta);
         setUnit(null);
       } catch (loadError) {
@@ -456,6 +462,7 @@ export function UnitCatalogPage({
 
         setUnit(unitData);
         setUnits([]);
+        setFloorPlanUnits([]);
         setMeta(null);
       } catch (loadError) {
         if (!cancelled) {
@@ -519,13 +526,11 @@ export function UnitCatalogPage({
     { icon: <BathIcon />, label: copy.bathroomLabel, value: unit.bathrooms_count ?? 0 },
     { icon: <KeyIcon />, label: copy.status, value: mapUnitStatusLabel(unit.status, language) }
   ] : [];
-  const filteredUnits = useMemo(() => {
-    // TODO: temporary — show only available units, remove when ready to show all statuses again
-    const availableUnits = units.filter((item) => item.status === "available");
-    const shouldFilterByCondition = Boolean(query.condition) && availableUnits.some((item) => Boolean(item.condition));
+  const filterUnitsForView = (sourceUnits: ExplorerUnit[]) => {
+    const shouldFilterByCondition = Boolean(query.condition) && sourceUnits.some((item) => Boolean(item.condition));
     const conditionUnits = shouldFilterByCondition
-      ? availableUnits.filter((item) => item.condition === query.condition)
-      : availableUnits;
+      ? sourceUnits.filter((item) => item.condition === query.condition)
+      : sourceUnits;
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     if (!normalizedSearch) {
@@ -555,7 +560,12 @@ export function UnitCatalogPage({
         priceText
       ].some((value) => value.includes(normalizedSearch));
     });
-  }, [language, query.condition, searchTerm, units, currency, currencyRates]);
+  };
+  const filteredUnits = useMemo(() => filterUnitsForView(units), [language, query.condition, searchTerm, units, currency, currencyRates]);
+  const filteredFloorPlanUnits = useMemo(
+    () => filterUnitsForView(floorPlanUnits.length ? floorPlanUnits : units),
+    [floorPlanUnits, language, query.condition, searchTerm, units, currency, currencyRates]
+  );
 
   const activeFilterCount = [
     draftQuery.floors.length,
@@ -1018,14 +1028,14 @@ export function UnitCatalogPage({
                           <p>{copy.floorPlanTitle}</p>
                           <h2>{selectedFloorTitle}</h2>
                         </div>
-                        <span>{filteredUnits.length} {copy.available}</span>
+                        <span>{copy.total}: {filteredFloorPlanUnits.length}</span>
                       </div>
 
                       <div className="floor-plan-media">
                         <div className="floor-plan-image-map">
                           <img src={selectedFloorPlanImage} alt={selectedFloorTitle || copy.floorPlanTitle} />
                           <svg className="floor-plan-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                            {filteredUnits.map((item) => {
+                            {filteredFloorPlanUnits.map((item) => {
                               const points = (item.plan_polygon || []).map(normalizePlanPoint);
                               if (!points.length) {
                                 return null;
@@ -1042,7 +1052,7 @@ export function UnitCatalogPage({
                             })}
                           </svg>
 
-                          {filteredUnits.map((item) => {
+                          {filteredFloorPlanUnits.map((item) => {
                             const points = (item.plan_polygon || []).map(normalizePlanPoint);
                             if (!points.length) {
                               return null;
