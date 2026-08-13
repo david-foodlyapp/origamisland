@@ -78,6 +78,7 @@ const copyKa = {
   noResults: "მონაცემები ვერ მოიძებნა",
   floorLabel: "სართული",
   fromPrice: "ფასი",
+  pricePerSqmLabel: "ფასი / კვ.მ",
   pricePerSqmSuffix: "კვ.მ დან",
   roomLabel: "ოთახი",
   bedroomLabel: "საძინებელი",
@@ -149,6 +150,7 @@ const copyEn: typeof copyKa = {
   noResults: "No results found",
   floorLabel: "Floor",
   fromPrice: "Price",
+  pricePerSqmLabel: "Price / sq.m",
   pricePerSqmSuffix: "sq.m from",
   roomLabel: "Room",
   bedroomLabel: "Bedroom",
@@ -555,6 +557,10 @@ export function UnitCatalogPage({
     const formattedPrice = formatPrice(convertedPrice, currency);
     return formattedPrice ? `${copy.fromPrice}: ${formattedPrice}/${copy.pricePerSqmSuffix}` : `${copy.fromPrice}:`;
   };
+  const getUnitTopPriceText = (price?: string | number | null, priceCurrency?: string | null) => {
+    const convertedPrice = convertPrice(price, priceCurrency || undefined, currency, currencyRates);
+    return formatPrice(convertedPrice, currency) || copy.priceOnRequest;
+  };
 
   const applyQuery = (nextQuery: UnitCatalogQueryState) => {
     const sanitizedQuery = sanitizeCatalogQueryState(nextQuery);
@@ -747,9 +753,9 @@ export function UnitCatalogPage({
                         <strong>{unit.floor?.number || 0}</strong>
                         <span>{copy.floorLabel}</span>
                       </div>
-                      <div>
-                        <strong>{unit.bedrooms_count ?? 0}</strong>
-                        <span>{copy.bedroomLabel}</span>
+                      <div className="unit-top-stat-price">
+                        <strong>{getUnitTopPriceText(unit.price, unit.currency)}</strong>
+                        <span>{copy.pricePerSqmLabel}</span>
                       </div>
                       <div>
                         <strong>{formatArea(unit.area)}</strong>

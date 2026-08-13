@@ -6706,6 +6706,10 @@ html[data-theme="dark"] .modal-content {
   margin-bottom: 0.2rem;
 }
 
+.unit-top-stat-price strong {
+  overflow-wrap: anywhere;
+}
+
 .unit-top-stats span {
   color: #8ea39a;
   font-size: 0.9rem;
