@@ -331,6 +331,10 @@ function getUnitNavigationNumber(unit: ExplorerUnit) {
   return Number.POSITIVE_INFINITY;
 }
 
+function getUnitNavigationLabel(unit: ExplorerUnit, language: Language) {
+  return unit.unit_number?.trim() || getUnitDisplayTitle(unit, language);
+}
+
 function sortUnitsByFloorAndNumber(units: ExplorerUnit[]) {
   return [...units].sort((first, second) => {
     const firstFloor = first.floor?.number ?? Number.POSITIVE_INFINITY;
@@ -550,8 +554,8 @@ export function UnitCatalogPage({
   const nextUnit = detailUnitIndex >= 0 && detailUnitIndex < detailNavigationUnits.length - 1
     ? detailNavigationUnits[detailUnitIndex + 1]
     : null;
-  const previousUnitTitle = previousUnit ? getUnitDisplayTitle(previousUnit, language) : copy.previousUnit;
-  const nextUnitTitle = nextUnit ? getUnitDisplayTitle(nextUnit, language) : copy.nextUnit;
+  const previousUnitTitle = previousUnit ? getUnitNavigationLabel(previousUnit, language) : copy.previousUnit;
+  const nextUnitTitle = nextUnit ? getUnitNavigationLabel(nextUnit, language) : copy.nextUnit;
   const getUnitPriceText = (price?: string | number | null, priceCurrency?: string | null) => {
     const convertedPrice = convertPrice(price, priceCurrency || undefined, currency, currencyRates);
     const formattedPrice = formatPrice(convertedPrice, currency);
