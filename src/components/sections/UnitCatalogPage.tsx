@@ -563,7 +563,7 @@ export function UnitCatalogPage({
   };
   const getUnitTopPriceText = (price?: string | number | null, priceCurrency?: string | null) => {
     const convertedPrice = convertPrice(price, priceCurrency || undefined, currency, currencyRates);
-    return formatPrice(convertedPrice, currency) || copy.priceOnRequest;
+    return formatPrice(convertedPrice, currency) || "----";
   };
 
   const applyQuery = (nextQuery: UnitCatalogQueryState) => {
