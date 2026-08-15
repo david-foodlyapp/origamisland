@@ -1,19 +1,31 @@
 import { FormEvent, InvalidEvent, useEffect, useRef, useState } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import GA4React from "react-ga4";
-import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { translations, type Language, type TranslationKey } from "./i18n";
 import { API_BASE_URL } from "./config";
+import { normalizeApiImageUrl } from "./utils/media";
 
 import { Header } from "./components/sections/Header";
 import { HeroSection } from "./components/sections/HeroSection";
 import { PropertiesPage } from "./components/sections/PropertiesPage";
 import { UnitCatalogPage } from "./components/sections/UnitCatalogPage";
+import { AboutSection } from "./components/sections/AboutSection";
+import { RenderSection } from "./components/sections/RenderSection";
+import { ChooseSection } from "./components/sections/ChooseSection";
+import { BiohackingSection } from "./components/sections/BiohackingSection";
+import { InfrastructureSection } from "./components/sections/InfrastructureSection";
+import { FinanceSection } from "./components/sections/FinanceSection";
+import { OrigamiHoldingSection } from "./components/sections/OrigamiHoldingSection";
+import { CompanyProjectsSection } from "./components/sections/CompanyProjectsSection";
+import { NewsSection } from "./components/sections/NewsSection";
+import { GallerySection } from "./components/sections/GallerySection";
+import { Footer } from "./components/sections/Footer";
+import { FloatingWidget } from "./components/sections/FloatingWidget";
 import {
-  HomeIcon, CalendarIcon, BuildingIcon,
-  FacebookIcon, InstagramIcon, LinkedInIcon, CloseIcon, ChatIcon, CheckIcon,
-  ChevronIcon, WellnessIcon, LongevityIcon, RecoveryIcon, HealthyLivingIcon,
+  CalendarIcon, BuildingIcon,
+  CloseIcon, CheckIcon,
+  WellnessIcon, LongevityIcon, RecoveryIcon, HealthyLivingIcon,
   FitnessIcon, MeditationIcon, SpaIcon, EnergyBalanceIcon, ArrowIcon,
   AudienceOutlineIcon, PriceTagIcon, InstallmentIcon, ResidenceIcon, HotelSuiteIcon, PenthouseIcon
 } from "./components/Icons";
@@ -172,15 +184,6 @@ function formatNewsDate(dateString: string, language: Language) {
 function formatNewsFallbackTitle(slug: string) {
   const normalized = slug.replace(/[-_]+/g, " ").trim();
   return normalized.charAt(0).toUpperCase() + normalized.slice(1);
-}
-
-function normalizeApiImageUrl(image: string) {
-  const markdownMatch = image.match(/\((https?:\/\/[^)]+)\)/);
-  if (markdownMatch?.[1]) {
-    return markdownMatch[1];
-  }
-
-  return image.trim();
 }
 
 function stripHtmlContent(html: string) {
@@ -1361,6 +1364,23 @@ function App() {
   const getBuildingFloorLabel = (floor: ExplorerFloor) =>
     language === "ka" ? `სართული ${floor.number}` : `Floor ${floor.number}`;
 
+  const getBuildingFloorUnitsRoute = (floor: ExplorerFloor) =>
+    `/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
+      page: 1,
+      perPage: 9,
+      floors: [floor.slug],
+      types: [],
+      statuses: [],
+      roomTypes: [],
+      rooms: [],
+      bedrooms: [],
+      bathrooms: [],
+      areaMin: "",
+      areaMax: "",
+      condition: "",
+      sort: "rank",
+      view: "grid"
+    }, language)}`;
   const buildingVisualFloors = apiBuildingVisual?.floors.filter((floor) => (floor.building_map_polygon?.length || 0) >= 3) || [];
   const renderSectionTitle = apiSection3Data?.title || "";
   const renderSectionImage = apiBuildingVisual?.image || apiSection3Data?.background_image || "";
@@ -1940,177 +1960,32 @@ function App() {
         setMobileFilterOpen={setMobileFilterOpen}
         handleSearch={handleSearch}
       />
-        <section id="about-us" className="concept-section">
-          <div className="container">
-            {hasAboutContent ? (
-              <div className="concept-card">
-                <div className="concept-content">
-                  {apiAboutData?.title ? <h2 className="concept-title">{apiAboutData.title}</h2> : null}
-                  {apiAboutData?.body ? (
-                    <div className="concept-desc" dangerouslySetInnerHTML={{ __html: apiAboutData.body }} />
-                  ) : null}
-                </div>
-                {conceptImage ? (
-                  <div className="concept-render">
-                    <img
-                      src={normalizeApiImageUrl(conceptImage)}
-                      alt={apiAboutData?.title || ""}
-                      className="concept-render-image"
-                    />
-                  </div>
-                ) : null}
-              </div>
-            ) : null}
-            {apiAboutInfoItems.length > 0 ? (
-              <div className="origami-info-section reveal-scroll">
-                <div className="origami-info-grid">
-	                  {apiAboutInfoItems.map((item, index) => (
-	                    <article key={item.id} className="origami-info-card">
-	                      <span className="origami-info-icon">
-	                        {item.image ? (
-	                          <img src={item.image} alt="" aria-hidden="true" />
-	                        ) : (
-	                          origamiInfoIcons[index % origamiInfoIcons.length]
-	                        )}
-	                      </span>
-	                      <span className="origami-info-value">{item.title}</span>
-	                      <span className="origami-info-label">{item.subtitle}</span>
-	                    </article>
-                  ))}
-                </div>
-              </div>
-            ) : null}
-          </div>
-        </section>
 
-        <section className="render-section">
-          <div className="container">
-            <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              {renderSectionTitle ? <h2 className="section-title">{renderSectionTitle}</h2> : null}
-            </div>
-            <div className="render-gallery reveal-scroll">
-              <div className="render-main">
-                <div className="building-visual-map">
-                  {isBuildingVisualLoading ? (
-                    <div className="building-visual-skeleton" aria-hidden="true">
-                      <div className="building-visual-skeleton-shimmer" />
-                    </div>
-                  ) : (
-                    renderSectionImage ? (
-                      <div className="building-visual-frame">
-                        <img
-                          src={renderSectionImage}
-                          alt={renderSectionImageAlt}
-                        />
-                        {buildingVisualFloors.length > 0 ? (
-                          <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                            {buildingVisualFloors.map((floor) => (
-                              <g key={floor.id} className="building-floor-hotspot">
-                                <polygon
-                                  points={getFloorPolygonPoints(floor)}
-                                  onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
-                                    page: 1,
-                                    perPage: 9,
-                                    floors: [floor.slug],
-                                    types: [],
-                                    statuses: [],
-                                    roomTypes: [],
-                                    rooms: [],
-                                    bedrooms: [],
-                                    bathrooms: [],
-                                    areaMin: "",
-                                    areaMax: "",
-                                    condition: "",
-                                    sort: "rank",
-                                    view: "grid"
-                                  }, language)}`)}
-                                />
-                              </g>
-                            ))}
-                          </svg>
-                        ) : null}
-                        {buildingVisualFloors.map((floor) => (
-                          floor.building_map_label_position ? (
-                            <button
-                              key={floor.id}
-                              type="button"
-                              className="building-floor-label"
-                              style={{
-                                "--floor-label-x": `${floor.building_map_label_position.x}%`,
-                                "--floor-label-y": `${floor.building_map_label_position.y}%`
-                              } as React.CSSProperties}
-                              onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
-                                page: 1,
-                                perPage: 9,
-                                floors: [floor.slug],
-                                types: [],
-                                statuses: [],
-                                roomTypes: [],
-                                rooms: [],
-                                bedrooms: [],
-                                bathrooms: [],
-                                areaMin: "",
-                                areaMax: "",
-                                condition: "",
-                                sort: "rank",
-                                view: "grid"
-                              }, language)}`)}
-                            >
-                              <span className="building-floor-label-number">{floor.number}</span>
-                              <span className="building-floor-tooltip" role="tooltip">
-                                <span className="building-floor-tooltip-title">{getBuildingFloorLabel(floor)}</span>
-                                <span className="building-floor-tooltip-meta">{getBuildingFloorTooltip(floor)}</span>
-                              </span>
-                            </button>
-                          ) : null
-                        ))}
-                      </div>
-                    ) : null
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <AboutSection
+          data={apiAboutData}
+          infoItems={apiAboutInfoItems}
+          image={conceptImage}
+          hasContent={hasAboutContent}
+          icons={origamiInfoIcons}
+        />
 
-        <section className="directions-section">
-          <div className="container">
-            <h2 className="section-title" style={{ textAlign: "center", marginBottom: "4rem" }}>
-              {apiChooseData?.title || ""}
-            </h2>
-            
-            <div className="directions-grid">
-              {apiChooseData?.items.length ? (
-                apiChooseData.items.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className="direction-card trigger-modal"
-                    onClick={() => openChooseModal(item)}
-                  >
-                    <span className="direction-card-inner">
-                      <span className="direction-card-face direction-card-front">
-                        <span className="direction-card-media">
-                          <img src={normalizeApiImageUrl(item.image)} alt={item.title} />
-                        </span>
-                        <span className="direction-card-copy">
-                          <h3 className="direction-title">{item.title}</h3>
-                        </span>
-                      </span>
-                      <span className="direction-card-face direction-card-back">
-                        <span className="direction-card-back-inner">
-                          <span className="direction-card-back-title">{item.title}</span>
-                          <span className="direction-card-description">{item.description}</span>
-                        </span>
-                      </span>
-                    </span>
-                  </button>
-                ))
-              ) : null}
-            </div>
+        <RenderSection
+          title={renderSectionTitle}
+          image={renderSectionImage}
+          imageAlt={renderSectionImageAlt}
+          floors={buildingVisualFloors}
+          loading={isBuildingVisualLoading}
+          getFloorPolygonPoints={getFloorPolygonPoints}
+          getFloorLabel={getBuildingFloorLabel}
+          getFloorTooltip={getBuildingFloorTooltip}
+          getFloorUnitsRoute={getBuildingFloorUnitsRoute}
+          navigateTo={navigateTo}
+        />
 
-          </div>
-        </section>
+        <ChooseSection
+          data={apiChooseData}
+          openChooseModal={openChooseModal}
+        />
 
         {SHOW_FEATURED_UNITS_SECTION && (
           <section className="planning-units-section">
@@ -2204,511 +2079,83 @@ function App() {
           </section>
         )}
 
-        <section id="biohacking" className="biohacking-section" style={apiBiohackingData?.background_image ? { "--biohacking-bg": `url(${apiBiohackingData.background_image})` } as React.CSSProperties : undefined}>
-          <div className="container">
-            {hasBiohackingContent ? (
-              <div className="biohacking-heading">
-                <h2 className="biohacking-title section-title">
-                  <span className="biohacking-title-highlight">{t("bio_title")}</span>
-                </h2>
-              </div>
-            ) : null}
-            {apiBiohackingData?.description ? (
-              <p className="biohacking-description">{apiBiohackingData.description}</p>
-            ) : null}
+        <BiohackingSection
+          data={apiBiohackingData}
+          hasContent={hasBiohackingContent}
+          t={t}
+          getIcon={getBiohackingIcon}
+        />
 
-            <div className="biohacking-layout reveal-scroll">
-              {apiBiohackingData?.items.length ? (
-                apiBiohackingData.items.map((item) => (
-                  <article key={item.id} className="biohacking-pillar-card">
-                    <span className="biohacking-list-icon">
-                      {item.logo ? <img src={item.logo} alt={item.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} /> : getBiohackingIcon(item.slug)}
-                    </span>
-                    <h4 className="biohacking-pillar-title">{item.title}</h4>
-                  </article>
-                ))
-              ) : null}
-            </div>
-          </div>
-        </section>
+        <InfrastructureSection
+          items={apiInfrastructureItems}
+          hasContent={hasInfrastructureContent}
+          sectionRef={infrastructureSectionRef}
+          t={t}
+        />
 
-        <section id="infrastructure" className="infrastructure-section" ref={infrastructureSectionRef}>
-          <div className="container">
-            {hasInfrastructureContent ? (
-              <div className="infrastructure-header">
-                <h2 className="section-title">{t("infra_title")}</h2>
-                <a
-                  href="#"
-                  className="infrastructure-presentation-btn"
-                  onClick={(event) => event.preventDefault()}
-                >
-                  {t("infra_presentation")}
-                </a>
-              </div>
-            ) : null}
+        <FinanceSection
+          data={apiFinanceData}
+          hasContent={hasFinanceContent}
+        />
 
-            <div className="infrastructure-grid reveal-scroll">
-              {apiInfrastructureItems.length > 0 ? (
-                apiInfrastructureItems.map((item, index) => (
-                  <article
-                    key={item.id}
-                    className="infrastructure-card"
-                    data-speed={(0.95 + (index % 4) * 0.28).toFixed(2)}
-                  >
-                    <div className="infrastructure-media">
-                      <img src={item.image} alt={item.title} />
-                    </div>
+        <OrigamiHoldingSection
+          data={apiOrigamiHoldingData}
+          hasContent={hasOrigamiHoldingContent}
+          getIcon={getOrigamiHoldingIcon}
+          getOrder={getOrigamiHoldingOrder}
+        />
 
-                    <div className="infrastructure-content">
-                      <p className="infrastructure-desc">{item.description}</p>
-                    </div>
-                  </article>
-                ))
-              ) : null}
-            </div>
-          </div>
-        </section>
+        <CompanyProjectsSection
+          data={apiCompanyProjectsData}
+          loading={isCompanyProjectsLoading}
+          openModal={openModal}
+        />
 
-        <section className="finance-section">
-          <div className="container">
-            {hasFinanceContent ? (
-              <div className="biohacking-heading finance-heading">
-                <h2 className="biohacking-title section-title">
-                  <span className="biohacking-title-highlight">{apiFinanceData?.title || ""}</span>
-                </h2>
-              </div>
-            ) : null}
+        <NewsSection
+          items={newsItems}
+          t={t}
+          navigateTo={navigateTo}
+        />
 
-            {apiFinanceData?.description && apiFinanceData.description !== apiFinanceData.title ? (
-              <p className="finance-description">{apiFinanceData.description}</p>
-            ) : null}
-
-            <div className="finance-layout reveal-scroll">
-              {apiFinanceData?.items.map((item, index) => {
-                const image = item.image ? normalizeApiImageUrl(item.image) : "";
-                const description = item.description;
-
-                return (
-                  <article
-                    key={item.id ?? item.title}
-                    className={`finance-row${index % 2 === 1 ? " finance-row-reverse" : ""}`}
-                  >
-                    <div className="finance-row-content">
-                      <h4 className="finance-card-title">{item.title}</h4>
-                      {description ? <p className="finance-row-desc">{description}</p> : null}
-                    </div>
-                    {image ? (
-                      <div className="finance-row-media">
-                        <img src={image} alt={item.title} loading="lazy" />
-                      </div>
-                    ) : null}
-                  </article>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section
-          className="biohacking-section origami-holding-section"
-          style={apiOrigamiHoldingData?.background_image
-            ? { "--biohacking-bg": `url(${apiOrigamiHoldingData.background_image})` } as React.CSSProperties
-            : undefined}
-        >
-          <div className="container">
-            {hasOrigamiHoldingContent ? (
-              <div className="biohacking-heading">
-                <h2 className="biohacking-title section-title">
-                  <span className="biohacking-title-highlight">{apiOrigamiHoldingData?.title || ""}</span>
-                </h2>
-              </div>
-            ) : null}
-
-            <div className="biohacking-layout origami-holding-layout reveal-scroll">
-                {apiOrigamiHoldingData?.items.length ? (
-                  [...apiOrigamiHoldingData.items]
-                    .sort((a, b) => getOrigamiHoldingOrder(a) - getOrigamiHoldingOrder(b))
-                    .map((item) => {
-                      const CardTag = item.link?.trim() ? "a" : "article";
-                      return (
-                        <CardTag
-                          className="biohacking-pillar-card origami-holding-card"
-                          key={item.id}
-                          {...(item.link?.trim()
-                            ? { href: item.link, target: "_blank", rel: "noreferrer" }
-                            : {})}
-                        >
-                          <span className="biohacking-list-icon" aria-hidden="true">
-                            {item.logo ? <img src={item.logo} alt={item.title} style={{ width: "24px", height: "24px", objectFit: "contain" }} /> : getOrigamiHoldingIcon(item.slug)}
-                          </span>
-                          <h4 className="biohacking-pillar-title">{item.title}</h4>
-                        </CardTag>
-                      );
-                    })
-                ) : null}
-            </div>
-          </div>
-        </section>
-
-        <section id="communities">
-          <div className="container">
-            <div style={{ textAlign: "center", marginBottom: "4rem" }}>
-              {isCompanyProjectsLoading ? (
-                <div className="community-title-skeleton" aria-hidden="true" />
-              ) : (
-                apiCompanyProjectsData?.title ? <h2 className="section-title">{apiCompanyProjectsData.title}</h2> : null
-              )}
-            </div>
-
-            <div className="community-slider reveal-scroll">
-              {isCompanyProjectsLoading ? Array.from({ length: 3 }).map((_, index) => (
-                <div key={index} className="community-card community-card-skeleton" aria-hidden="true">
-                  <div className="community-skeleton-overlay">
-                    <div className="community-skeleton-title" />
-                    <div className="community-skeleton-text" />
-                    <div className="community-skeleton-text short" />
-                  </div>
-                </div>
-              )) : apiCompanyProjectsData?.items.map((community) => {
-                const title = community.title;
-                const description = community.description?.trim() || community.subtitle?.trim() || "";
-                const image = community.image;
-                const alt = community.title;
-
-                return (
-                  <button
-                    key={community.id}
-                    type="button"
-                    className="community-card trigger-modal"
-                    onClick={() => openModal()}
-                  >
-                    <img src={image} alt={alt} />
-                    <div className="community-overlay">
-                      <h3 className="comm-title">{title}</h3>
-                      {description ? <p className="comm-desc">{description}</p> : null}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {newsItems.length > 0 ? (
-          <section className="news-section">
-            <div className="container">
-              <div className="news-header">
-                <h2 className="section-title">{t("news_title")}</h2>
-                <a
-                  href="#"
-                  className="news-all-link"
-                  onClick={(event) => event.preventDefault()}
-                >
-                  <span>{t("news_all")}</span>
-                  <span className="news-all-arrow">{">"}</span>
-                </a>
-              </div>
-
-              <div className="news-grid reveal-scroll">
-                {newsItems.map((item) => (
-                  <article className="news-card" key={item.id}>
-                    <div className="news-card-media">
-                      <span className="news-card-badge">{item.category}</span>
-                      <img src={item.image} alt={item.title} />
-                    </div>
-
-                    <div className="news-card-content">
-                      <div className="news-card-meta">
-                        <span>{item.category}</span>
-                        <span className="news-card-divider">|</span>
-                        <span>{item.date}</span>
-                      </div>
-
-                      <h3 className="news-card-title">{item.title}</h3>
-
-                      <a
-                        href={`/news/${item.slug}`}
-                        className="news-card-link"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          navigateTo(`/news/${item.slug}`);
-                        }}
-                      >
-                        <span>{t("news_read_more")}</span>
-                        <span className="news-all-arrow">{">"}</span>
-                      </a>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : null}
-
-        <section className="gallery-section">
-          <div className="container">
-            {isGalleryLoading || resolvedGalleryItems.length > 0 ? (
-              <div className="gallery-header">
-                <div className="gallery-heading-copy">
-                  <h2 className="section-title gallery-title">{t("gallery_title")}</h2>
-                </div>
-              </div>
-            ) : null}
-
-            <div className="gallery-carousel reveal-scroll">
-              <div className="gallery-grid" ref={galleryTrackRef}>
-                {isGalleryLoading ? (
-                  Array.from({ length: 3 }, (_, index) => (
-                    <div
-                      key={`gallery-skeleton-${index}`}
-                      className="gallery-media-card gallery-media-card-skeleton"
-                      aria-hidden="true"
-                    >
-                      <div className="gallery-media-skeleton-shimmer" />
-                      <div className="gallery-media-overlay" />
-                    </div>
-                  ))
-                ) : (
-                  resolvedGalleryItems.map((item) => (
-                    <div key={item.id} className="gallery-media-card">
-                      <div className="gallery-zoom-frame">
-                        <Zoom wrapElement="div">
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="gallery-zoom-image"
-                          />
-                        </Zoom>
-                      </div>
-                      <div className="gallery-media-overlay">
-                        {item.subtitle || item.title || item.description ? (
-                          <div className="gallery-media-copy">
-                            {item.subtitle ? <p className="gallery-media-kicker">{item.subtitle}</p> : null}
-                            {item.title ? <h3 className="gallery-media-title">{item.title}</h3> : null}
-                            {item.description ? <p className="gallery-media-description">{item.description}</p> : null}
-                          </div>
-                        ) : null}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-
-              {!isGalleryLoading && resolvedGalleryItems.length > 0 ? (
-                <div className="gallery-pagination" aria-label="Gallery pages">
-                  {Array.from({ length: galleryPageCount }, (_, index) => (
-                    <button
-                      key={`gallery-page-${index}`}
-                      type="button"
-                      className={`gallery-pagination-dot${index === galleryCurrentPage ? " is-active" : ""}`}
-                      onClick={() => {
-                        const track = galleryTrackRef.current;
-                        if (!track) {
-                          return;
-                        }
-
-                        track.scrollTo({
-                          left: track.clientWidth * index,
-                          behavior: "smooth"
-                        });
-                      }}
-                      aria-label={`Go to gallery page ${index + 1}`}
-                    />
-                  ))}
-                </div>
-              ) : null}
-            </div>
-          </div>
-        </section>
+        <GallerySection
+          items={resolvedGalleryItems}
+          loading={isGalleryLoading}
+          pageCount={galleryPageCount}
+          currentPage={galleryCurrentPage}
+          trackRef={galleryTrackRef}
+          t={t}
+        />
         </>
 
       </main>
 
-      <footer>
-        <div className="container">
-          <div className="footer-top">
-            <div className="footer-brand">
-              <a href="#" className="logo-container" style={{ marginBottom: "1.5rem" }}>
-                <img
-                  src={darkThemeLogoSrc}
-                  alt="ORIGAMI"
-                  className="logo-img logo-dark"
-                />
-                <img
-                  src={lightThemeLogoSrc}
-                  alt="ORIGAMI"
-                  className="logo-img logo-light"
-                />
-              </a>
-              <p>{t("footer_desc")}</p>
-
-              <div className="social-links">
-                {apiSocialNetworks.length > 0 ? (
-                  apiSocialNetworks.map((network) => (
-                    <a key={network.id} href={network.link} target="_blank" rel="noreferrer" aria-label={network.name}>
-                      {network.image_url ? (
-                        <img src={network.image_url} alt={network.name} width={18} height={18} />
-                      ) : network.name.toLowerCase() === "facebook" ? (
-                        <FacebookIcon />
-                      ) : network.name.toLowerCase() === "instagram" ? (
-                        <InstagramIcon />
-                      ) : (
-                        <LinkedInIcon />
-                      )}
-                    </a>
-                  ))
-                ) : null}
-              </div>
-            </div>
-
-            <div className={`footer-column ${openFooterSection === "links" ? "is-open" : ""}`}>
-              <button
-                className="footer-column-toggle"
-                type="button"
-                aria-expanded={openFooterSection === "links"}
-                onClick={() => toggleFooterSection("links")}
-              >
-                <span className="footer-column-title">{t("footer_col_links")}</span>
-                <ChevronIcon direction={openFooterSection === "links" ? "up" : "down"} />
-              </button>
-              <ul>
-                {primaryNavItems.map((item) => (
-                  <li key={item.href}>
-                    <a
-                      href={"isModalAction" in item && item.isModalAction ? "#" : item.href}
-                      onClick={(event) => {
-                        if (!("isModalAction" in item) || !item.isModalAction) {
-                          return;
-                        }
-
-                        event.preventDefault();
-                        openModal();
-                      }}
-                    >
-                      {item.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className={`footer-column ${openFooterSection === "services" ? "is-open" : ""}`}>
-              <button
-                className="footer-column-toggle"
-                type="button"
-                aria-expanded={openFooterSection === "services"}
-                onClick={() => toggleFooterSection("services")}
-              >
-                <span className="footer-column-title">{apiCompanyProjectsData?.title || ""}</span>
-                <ChevronIcon direction={openFooterSection === "services" ? "up" : "down"} />
-              </button>
-              <ul>
-                {apiCompanyProjectsData?.items.map((service) => (
-                  <li key={service.id}>
-                    <a href={service.link || "#0"}>
-                      {service.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className={`footer-column ${openFooterSection === "legal" ? "is-open" : ""}`}>
-              <button
-                className="footer-column-toggle"
-                type="button"
-                aria-expanded={openFooterSection === "legal"}
-                onClick={() => toggleFooterSection("legal")}
-              >
-                <span className="footer-column-title">{t("footer_col_contact")}</span>
-                <ChevronIcon direction={openFooterSection === "legal" ? "up" : "down"} />
-              </button>
-              <ul className="footer-contact-list">
-                {footerContactAddress ? (
-                  <li>
-                    {apiContactSettings?.map_link ? (
-                    <a href={apiContactSettings.map_link} target="_blank" rel="noreferrer">
-                      {footerContactAddress}
-                    </a>
-                    ) : (
-                      footerContactAddress
-                    )}
-                  </li>
-                ) : null}
-                {footerContactEmail ? (
-                  <li>
-                    <a href={`mailto:${footerContactEmail}`}>{footerContactEmail}</a>
-                  </li>
-                ) : null}
-                {footerContactPhone ? (
-                  <li>
-                    <a href={formatTelHref(footerContactPhone)}>{footerContactPhone}</a>
-                  </li>
-                ) : null}
-                {footerContactSecondaryPhone ? (
-                  <li>
-                    <a href={formatTelHref(footerContactSecondaryPhone)}>{footerContactSecondaryPhone}</a>
-                  </li>
-                ) : null}
-              </ul>
-            </div>
-          </div>
-
-          <div className="footer-bottom">
-            <p>{t("footer_copyright")}</p>
-            <div className="footer-legal">
-              {apiFooterLegalItems.map((item) => (
-                <a key={`${item.id}-${item.link || item.title}`} href={item.link || "#0"}>
-                  {item.title}
-                </a>
-              ))}
-            </div>
-            <p>
-              {t("footer_author_label")} :{" "}
-              <a href="https://github.com/david-gakhokia/" target="_blank" rel="noreferrer">
-                {"<D/G>"}
-              </a>
-              .
-            </p>
-          </div>
-        </div>
-      </footer>
-
-      {isWidgetVisible ? (
-        <div className={`floating-widget ${isWidgetOpen ? "is-open" : "is-collapsed"}`}>
-          {isWidgetOpen ? (
-            <div className="floating-widget-card" role="complementary" aria-label="Origami quick enquiry widget">
-              <div className="floating-widget-brand">
-                <div className="floating-widget-badge">
-                  <HomeIcon />
-                </div>
-                <div className="floating-widget-copy">
-                  <span className="floating-widget-kicker">{t("widget_badge")}</span>
-                  <h3>{t("widget_title")}</h3>
-                  <p>{t("widget_desc")}</p>
-                </div>
-              </div>
-
-              <div className="floating-widget-body">
-                <div className="floating-widget-actions">
-                  <button type="button" className="floating-widget-chip floating-widget-chip-accent" onClick={() => openModal()}>
-                    {t("widget_consult")}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : null}
-
-          <button
-            type="button"
-            className="floating-widget-toggle"
-            aria-label={isWidgetOpen ? t("widget_toggle_close") : t("widget_toggle_open")}
-            onClick={() => setIsWidgetOpen((open) => !open)}
-          >
-            {isWidgetOpen ? <CloseIcon /> : <ChatIcon />}
-          </button>
-        </div>
-      ) : null}
+      <Footer
+        darkThemeLogoSrc={darkThemeLogoSrc}
+        lightThemeLogoSrc={lightThemeLogoSrc}
+        socialNetworks={apiSocialNetworks}
+        primaryNavItems={primaryNavItems}
+        companyProjectsData={apiCompanyProjectsData}
+        legalItems={apiFooterLegalItems}
+        contact={{
+          address: footerContactAddress,
+          email: footerContactEmail,
+          phone: footerContactPhone,
+          secondaryPhone: footerContactSecondaryPhone,
+          mapLink: apiContactSettings?.map_link
+        }}
+        openFooterSection={openFooterSection}
+        toggleFooterSection={toggleFooterSection}
+        openModal={openModal}
+        formatTelHref={formatTelHref}
+        t={t}
+      />
+      <FloatingWidget
+        visible={isWidgetVisible}
+        open={isWidgetOpen}
+        setOpen={setIsWidgetOpen}
+        openModal={openModal}
+        t={t}
+      />
 
       <div id="vip-modal" className={`modal ${isModalOpen ? "active" : ""}`}>
         <div id="modal-overlay" className="modal-overlay" onClick={closeModal}></div>
