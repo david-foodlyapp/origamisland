@@ -46,7 +46,16 @@ export function GallerySection({ items, loading, pageCount, currentPage, trackRe
               items.map((item) => (
                 <div key={item.id} className="gallery-media-card">
                   <div className="gallery-zoom-frame">
-                    <Zoom wrapElement="div">
+                    <Zoom
+                      wrapElement="div"
+                      zoomMargin={28}
+                      zoomImg={{
+                        src: getOptimizedImageUrl(item.image, { width: 1920, crop: "limit" }),
+                        srcSet: getResponsiveImageSrcSet(item.image, [960, 1280, 1600, 1920, 2400], { crop: "limit" }),
+                        sizes: "calc(100vw - 56px)",
+                        alt: item.title
+                      }}
+                    >
                       <img
                         src={getOptimizedImageUrl(item.image, { width: 900, height: 620, crop: "fill", gravity: "auto" })}
                         srcSet={getResponsiveImageSrcSet(item.image, [420, 720, 960, 1200], { crop: "limit" })}
