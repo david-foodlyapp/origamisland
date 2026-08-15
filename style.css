@@ -4509,12 +4509,6 @@ html[data-theme="light"] .news-detail-state {
   margin-bottom: 1.3rem;
 }
 
-.currency-modal-title {
-  margin-top: 1.6rem;
-  padding-top: 1.4rem;
-  border-top: 1px solid var(--lg-border);
-}
-
 .language-options {
   display: flex;
   flex-direction: column;

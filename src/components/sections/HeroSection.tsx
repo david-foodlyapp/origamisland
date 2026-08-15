@@ -1,4 +1,4 @@
-import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, ReactNode, SetStateAction, useEffect, useRef, useState } from "react";
 import { TranslationKey } from "../../i18n";
 import { UnitFilterOptions } from "../../types";
 import { LocationIcon, SearchIcon, FilterAdjustIcon, BuildingIcon, CurrencyIcon, CloseIcon } from "../Icons";
@@ -37,6 +37,7 @@ export function HeroSection({
   setMobileFilterOpen,
   handleSearch
 }: HeroSectionProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [openFilter, setOpenFilter] = useState<FilterKey | null>(null);
   const roomTypeOptions = (unitFilters?.room_types || []).map((option) => ({ value: String(option.value), label: option.label }));
   const propertyTypeOptions = (unitFilters?.property_types || []).map((option) => ({ value: String(option.value), label: option.label }));
@@ -44,6 +45,39 @@ export function HeroSection({
   const hasFilterOptions = roomTypeOptions.length > 0 || propertyTypeOptions.length > 0 || conditionOptions.length > 0;
   const selectedRoomLabel = roomTypeOptions.find((option) => option.value === selectedRoomType)?.label || t("filter_room_all");
   const hasActiveFilters = Boolean(selectedRoomType || selectedPropertyType || selectedCondition);
+
+  useEffect(() => {
+    const video = videoRef.current;
+
+    if (!video) {
+      return;
+    }
+
+    const playVideo = () => {
+      video.muted = true;
+      video.defaultMuted = true;
+      void video.play().catch(() => {
+        // Browser autoplay policies can still reject in some profiles.
+      });
+    };
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.load();
+    playVideo();
+
+    video.addEventListener("canplay", playVideo);
+    video.addEventListener("loadeddata", playVideo);
+    document.addEventListener("visibilitychange", playVideo);
+    document.addEventListener("pointerdown", playVideo, { once: true });
+
+    return () => {
+      video.removeEventListener("canplay", playVideo);
+      video.removeEventListener("loadeddata", playVideo);
+      document.removeEventListener("visibilitychange", playVideo);
+      document.removeEventListener("pointerdown", playVideo);
+    };
+  }, []);
 
   useEffect(() => {
     const handlePointerDown = (event: PointerEvent) => {
@@ -81,10 +115,17 @@ export function HeroSection({
   return (
         <section className="hero">
           <div className="hero-bg">
-            <video autoPlay loop muted playsInline poster="/assets/hero_bg_2.png" className="hero-video">
-              <source src="https://origam.ge/Origami-m.mp4" media="(max-width: 650px)" type="video/mp4" />
-              <source src="https://origam.ge/Origami-Holding.mp4" type="video/mp4" />
-            </video>
+            <video
+              ref={videoRef}
+              src="https://origam.ge/video/origami.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              poster="/assets/hero_bg_2.png"
+              className="hero-video"
+            />
           </div>
 
           <div className="hero-content">

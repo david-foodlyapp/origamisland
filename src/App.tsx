@@ -105,12 +105,6 @@ const languageOptions: Array<{ code: Language; label: string; shortLabel: string
   // { code: "pl", label: "Polski", shortLabel: "POL" }
 ];
 
-const currencyOptions: Array<{ code: SupportedCurrency; label: string }> = [
-  { code: "USD", label: "USD — $" },
-  { code: "EUR", label: "EUR — €" },
-  { code: "GEL", label: "GEL — ₾" }
-];
-
 const brandingLogoFallbacks = {
   logo_en_url: "https://res.cloudinary.com/dju7d2yys/image/upload/v1777893298/origami/settings/logos/t58mnagh77bstwwmvpkg.png",
   logo_ka_url: "https://res.cloudinary.com/dju7d2yys/image/upload/v1777893299/origami/settings/logos/t9yu4mfpn9wteurraqqt.png",
@@ -254,7 +248,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
-  const [currency, setCurrency] = useState<SupportedCurrency>("USD");
+  const [currency] = useState<SupportedCurrency>("USD");
   const [currencyRates, setCurrencyRates] = useState<CurrencyRates | null>(null);
   const [newsItems, setNewsItems] = useState<NewsCard[]>([]);
   const [newsDetail, setNewsDetail] = useState<NewsApiItem | null>(null);
@@ -1415,10 +1409,6 @@ function App() {
     setIsCurrencyModalOpen(false);
   };
 
-  const handleCurrencySelect = (nextCurrency: SupportedCurrency) => {
-    setCurrency(nextCurrency);
-  };
-
   const handleUnitsLanguageSelect = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
   };
@@ -1669,12 +1659,9 @@ function App() {
         <UnitsPreferencesModal
           active={isLanguageModalOpen || isCurrencyModalOpen}
           language={language}
-          currency={currency}
           languageOptions={languageOptions}
-          currencyOptions={currencyOptions}
           closeModal={() => { closeLanguageModal(); closeCurrencyModal(); }}
           handleLanguageSelect={handleUnitsLanguageSelect}
-          handleCurrencySelect={handleCurrencySelect}
           t={t}
         />
       </>
