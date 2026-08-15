@@ -61,10 +61,9 @@ import {
   type CompanyProjectsSectionResponse,
   type AboutUsApiItem,
   type AboutUsResponse,
-  type ExplorerFloor,
-  type ExplorerPropertyListResponse,
-  type ExplorerPropertyDetail,
-  type ExplorerPropertyResponse,
+  type BuildingVisual,
+  type BuildingVisualFloor,
+  type BuildingVisualResponse,
   type ExplorerUnit,
   type UnitFilterOptions,
   type SocialNetworkItem,
@@ -264,9 +263,8 @@ function App() {
   const [featuredUnits, setFeaturedUnits] = useState<ExplorerUnit[]>([]);
   const [isFeaturedUnitsLoading, setIsFeaturedUnitsLoading] = useState(true);
   const [featuredUnitsFilter, setFeaturedUnitsFilter] = useState<FeaturedUnitsFilter>("all");
-  const [apiBuildingVisual, setApiBuildingVisual] = useState<ExplorerPropertyDetail | null>(null);
+  const [apiBuildingVisual, setApiBuildingVisual] = useState<BuildingVisual | null>(null);
   const [isBuildingVisualLoading, setIsBuildingVisualLoading] = useState(true);
-  const [availableUnitsByFloorSlug, setAvailableUnitsByFloorSlug] = useState<Record<string, number>>({});
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [isGalleryLoading, setIsGalleryLoading] = useState(true);
   const [apiInfrastructureItems, setApiInfrastructureItems] = useState<InfrastructureApiItem[]>([]);
@@ -828,78 +826,17 @@ function App() {
 
     const loadBuildingVisual = async () => {
       setIsBuildingVisualLoading(true);
-      setAvailableUnitsByFloorSlug({});
-
-      const loadAvailableUnitCounts = async (floors: ExplorerFloor[]) => {
-        const counts = await Promise.all(
-          floors.map(async (floor) => {
-            try {
-              const response = await fetchUnits(
-                DEFAULT_BUILDING_SLUG,
-                {
-                  page: 1,
-                  perPage: 1,
-                  floors: [floor.slug],
-                  types: [],
-                  statuses: ["available"],
-                  roomTypes: [],
-                  rooms: [],
-                  bedrooms: [],
-                  bathrooms: [],
-                  areaMin: "",
-                  areaMax: "",
-                  condition: "",
-                  sort: "rank",
-                  view: "grid"
-                },
-                language
-              );
-              return [floor.slug, response.meta.total] as const;
-            } catch (countError) {
-              console.error(`Failed to load available units count for floor ${floor.slug}:`, countError);
-              return [floor.slug, 0] as const;
-            }
-          })
-        );
-
-        if (!cancelled) {
-          setAvailableUnitsByFloorSlug(Object.fromEntries(counts));
-        }
-      };
 
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/buildings?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/buildings/${DEFAULT_BUILDING_SLUG}/visual?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Building visual request failed: ${response.status}`);
         }
 
-        const payload: ExplorerPropertyListResponse = await response.json();
-        const selectedBuilding = payload.data.find((building) => building.slug.toLowerCase() === DEFAULT_BUILDING_SLUG.toLowerCase()) || payload.data[0];
-        if (!selectedBuilding) {
-          throw new Error("Building visual request returned no buildings");
-        }
-
-        try {
-          const detailResponse = await fetch(`${API_BASE_URL}/buildings/${selectedBuilding.slug}?locale=${locale}`, { signal: controller.signal });
-          if (!detailResponse.ok) {
-            throw new Error(`Building detail request failed: ${detailResponse.status}`);
-          }
-
-          const detailPayload: ExplorerPropertyResponse = await detailResponse.json();
-          if (!cancelled) {
-            setApiBuildingVisual(detailPayload.data);
-          }
-          await loadAvailableUnitCounts(detailPayload.data.floors);
-        } catch (detailError) {
-          if (detailError instanceof DOMException && detailError.name === "AbortError") {
-            return;
-          }
-          console.error("Failed to load building floor details:", detailError);
-          const fallbackBuilding = { ...selectedBuilding, floors: [] };
-          if (!cancelled) {
-            setApiBuildingVisual(fallbackBuilding);
-          }
+        const payload: BuildingVisualResponse = await response.json();
+        if (!cancelled) {
+          setApiBuildingVisual(payload.data);
         }
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") {
@@ -1361,18 +1298,18 @@ function App() {
     ? featuredUnits
     : featuredUnits.filter((unit) => unit.type === featuredUnitsFilter);
 
-  const getFloorPolygonPoints = (floor: ExplorerFloor) =>
-    floor.building_map_polygon?.map((point) => `${point.x},${point.y}`).join(" ") || "";
+  const getFloorPolygonPoints = (floor: BuildingVisualFloor) =>
+    floor.polygon_points || "";
 
-  const getBuildingFloorTooltip = (floor: ExplorerFloor) =>
+  const getBuildingFloorTooltip = (floor: BuildingVisualFloor) =>
     language === "ka"
-      ? `ხელმისაწვდომია ${availableUnitsByFloorSlug[floor.slug] ?? 0} შეთავაზება`
-      : `Available ${availableUnitsByFloorSlug[floor.slug] ?? 0} offers`;
+      ? `ხელმისაწვდომია ${floor.available_units_count ?? 0} შეთავაზება`
+      : `Available ${floor.available_units_count ?? 0} offers`;
 
-  const getBuildingFloorLabel = (floor: ExplorerFloor) =>
+  const getBuildingFloorLabel = (floor: BuildingVisualFloor) =>
     language === "ka" ? `სართული ${floor.number}` : `Floor ${floor.number}`;
 
-  const getBuildingFloorUnitsRoute = (floor: ExplorerFloor) =>
+  const getBuildingFloorUnitsRoute = (floor: BuildingVisualFloor) =>
     `/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
       page: 1,
       perPage: 9,
@@ -1389,7 +1326,7 @@ function App() {
       sort: "rank",
       view: "grid"
     }, language)}`;
-  const buildingVisualFloors = apiBuildingVisual?.floors.filter((floor) => (floor.building_map_polygon?.length || 0) >= 3) || [];
+  const buildingVisualFloors = apiBuildingVisual?.floors.filter((floor) => floor.polygon_points.trim().length > 0) || [];
   const renderSectionTitle = apiSection3Data?.title || "";
   const renderSectionImage = apiBuildingVisual?.image || apiSection3Data?.background_image || "";
   const renderSectionImageAlt = apiBuildingVisual?.title || apiSection3Data?.title || "";
@@ -2049,3 +1986,4 @@ function App() {
   );
 }
 export default App;
+

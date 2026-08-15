@@ -116,6 +116,27 @@ export type ExplorerPropertyDetail = ExplorerProperty & {
   floors: ExplorerFloor[];
 };
 
+export type BuildingVisualFloor = {
+  id: number;
+  slug: string;
+  number: number;
+  polygon_points: string;
+  label_position?: VisualPoint | null;
+  available_units_count: number;
+};
+
+export type BuildingVisual = {
+  id: number;
+  slug: string;
+  title: string;
+  image: string;
+  floors: BuildingVisualFloor[];
+};
+
+export type BuildingVisualResponse = {
+  data: BuildingVisual;
+};
+
 export type ExplorerPropertyListResponse = {
   data: ExplorerProperty[];
 };

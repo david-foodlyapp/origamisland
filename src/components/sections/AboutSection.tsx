@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { AboutUsApiItem, SectionGridCardItem } from "../../types";
-import { normalizeApiImageUrl } from "../../utils/media";
+import { getOptimizedImageUrl, getResponsiveImageSrcSet, normalizeApiImageUrl } from "../../utils/media";
 
 type AboutSectionProps = {
   data: AboutUsApiItem | null;
@@ -56,9 +56,13 @@ export function AboutSection({ data, infoItems, image, hasContent, loading, icon
             {image ? (
               <div className="concept-render">
                 <img
-                  src={normalizeApiImageUrl(image)}
+                  src={getOptimizedImageUrl(image, { width: 900, height: 640, crop: "fill", gravity: "auto" })}
+                  srcSet={getResponsiveImageSrcSet(image, [480, 720, 960, 1200], { crop: "limit" })}
+                  sizes="(max-width: 900px) 100vw, 46vw"
                   alt={data?.title || ""}
                   className="concept-render-image"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             ) : null}
@@ -71,7 +75,7 @@ export function AboutSection({ data, infoItems, image, hasContent, loading, icon
                 <article key={item.id} className="origami-info-card">
                   <span className="origami-info-icon">
                     {item.image ? (
-                      <img src={item.image} alt="" aria-hidden="true" />
+                      <img src={normalizeApiImageUrl(item.image)} alt="" aria-hidden="true" loading="lazy" decoding="async" />
                     ) : (
                       icons[index % icons.length]
                     )}

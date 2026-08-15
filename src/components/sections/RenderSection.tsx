@@ -1,16 +1,17 @@
 import type { CSSProperties } from "react";
-import type { ExplorerFloor } from "../../types";
+import type { BuildingVisualFloor } from "../../types";
+import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
 
 type RenderSectionProps = {
   title: string;
   image: string;
   imageAlt: string;
-  floors: ExplorerFloor[];
+  floors: BuildingVisualFloor[];
   loading: boolean;
-  getFloorPolygonPoints: (floor: ExplorerFloor) => string;
-  getFloorLabel: (floor: ExplorerFloor) => string;
-  getFloorTooltip: (floor: ExplorerFloor) => string;
-  getFloorUnitsRoute: (floor: ExplorerFloor) => string;
+  getFloorPolygonPoints: (floor: BuildingVisualFloor) => string;
+  getFloorLabel: (floor: BuildingVisualFloor) => string;
+  getFloorTooltip: (floor: BuildingVisualFloor) => string;
+  getFloorUnitsRoute: (floor: BuildingVisualFloor) => string;
   navigateTo: (path: string) => void;
 };
 
@@ -46,7 +47,15 @@ export function RenderSection({
               ) : (
                 image ? (
                   <div className="building-visual-frame">
-                    <img src={image} alt={imageAlt} />
+                    <img
+                      src={getOptimizedImageUrl(image, { width: 1100, height: 1320, crop: "fill", gravity: "auto" })}
+                      srcSet={getResponsiveImageSrcSet(image, [720, 980, 1280, 1600], { crop: "limit" })}
+                      sizes="(max-width: 900px) 92vw, min(92vw, 1480px)"
+                      alt={imageAlt}
+                      decoding="async"
+                      loading="eager"
+                      fetchPriority="high"
+                    />
                     {floors.length > 0 ? (
                       <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                         {floors.map((floor) => (
@@ -60,14 +69,14 @@ export function RenderSection({
                       </svg>
                     ) : null}
                     {floors.map((floor) => (
-                      floor.building_map_label_position ? (
+                      floor.label_position ? (
                         <button
                           key={floor.id}
                           type="button"
                           className="building-floor-label"
                           style={{
-                            "--floor-label-x": `${floor.building_map_label_position.x}%`,
-                            "--floor-label-y": `${floor.building_map_label_position.y}%`
+                            "--floor-label-x": `${floor.label_position.x}%`,
+                            "--floor-label-y": `${floor.label_position.y}%`
                           } as CSSProperties}
                           onClick={() => navigateTo(getFloorUnitsRoute(floor))}
                         >

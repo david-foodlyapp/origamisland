@@ -1,5 +1,6 @@
 import type { TranslationKey } from "../../i18n";
 import type { NewsCard } from "../../types";
+import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
 
 type NewsSectionProps = {
   items: NewsCard[];
@@ -32,7 +33,14 @@ export function NewsSection({ items, t, navigateTo }: NewsSectionProps) {
             <article className="news-card" key={item.id}>
               <div className="news-card-media">
                 <span className="news-card-badge">{item.category}</span>
-                <img src={item.image} alt={item.title} />
+                <img
+                  src={getOptimizedImageUrl(item.image, { width: 640, height: 420, crop: "fill", gravity: "auto" })}
+                  srcSet={getResponsiveImageSrcSet(item.image, [360, 520, 720, 900], { crop: "limit" })}
+                  sizes="(max-width: 760px) 92vw, 30vw"
+                  alt={item.title}
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
 
               <div className="news-card-content">

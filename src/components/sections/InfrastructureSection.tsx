@@ -1,6 +1,7 @@
 import type { RefObject } from "react";
 import type { TranslationKey } from "../../i18n";
 import type { InfrastructureApiItem } from "../../types";
+import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
 
 type InfrastructureSectionProps = {
   items: InfrastructureApiItem[];
@@ -39,7 +40,14 @@ export function InfrastructureSection({ items, hasContent, sectionRef, t }: Infr
                 data-speed={(0.95 + (index % 4) * 0.28).toFixed(2)}
               >
                 <div className="infrastructure-media">
-                  <img src={item.image} alt={item.title} />
+                  <img
+                    src={getOptimizedImageUrl(item.image, { width: 640, height: 760, crop: "fill", gravity: "auto" })}
+                    srcSet={getResponsiveImageSrcSet(item.image, [360, 520, 720, 900], { crop: "limit" })}
+                    sizes="(max-width: 760px) 78vw, (max-width: 1100px) 44vw, 22vw"
+                    alt={item.title}
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
 
                 <div className="infrastructure-content">

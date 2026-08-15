@@ -2,6 +2,7 @@ import type { RefObject } from "react";
 import Zoom from "react-medium-image-zoom";
 import type { TranslationKey } from "../../i18n";
 import type { GalleryItem } from "../../types";
+import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
 
 type GallerySectionProps = {
   items: GalleryItem[];
@@ -47,9 +48,13 @@ export function GallerySection({ items, loading, pageCount, currentPage, trackRe
                   <div className="gallery-zoom-frame">
                     <Zoom wrapElement="div">
                       <img
-                        src={item.image}
+                        src={getOptimizedImageUrl(item.image, { width: 900, height: 620, crop: "fill", gravity: "auto" })}
+                        srcSet={getResponsiveImageSrcSet(item.image, [420, 720, 960, 1200], { crop: "limit" })}
+                        sizes="(max-width: 760px) 86vw, 36vw"
                         alt={item.title}
                         className="gallery-zoom-image"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </Zoom>
                   </div>

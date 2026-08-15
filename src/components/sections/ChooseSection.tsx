@@ -1,5 +1,5 @@
 import type { ChooseApiItem } from "../../types";
-import { normalizeApiImageUrl } from "../../utils/media";
+import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
 
 type ChooseSectionProps = {
   data: { title: string; items: ChooseApiItem[] } | null;
@@ -30,7 +30,14 @@ export function ChooseSection({ data, openChooseModal }: ChooseSectionProps) {
                 <span className="direction-card-inner">
                   <span className="direction-card-face direction-card-front">
                     <span className="direction-card-media">
-                      <img src={normalizeApiImageUrl(item.image_preview || item.image || "")} alt={item.title} />
+                      <img
+                        src={getOptimizedImageUrl(item.image_preview || item.image || "", { width: 780, height: 520, crop: "fill", gravity: "auto" })}
+                        srcSet={getResponsiveImageSrcSet(item.image_preview || item.image || "", [420, 640, 860, 1100], { crop: "limit" })}
+                        sizes="(max-width: 767px) 92vw, 44vw"
+                        alt={item.title}
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </span>
                     <span className="direction-card-copy">
                       <h3 className="direction-title">{item.title}</h3>

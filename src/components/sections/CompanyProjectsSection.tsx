@@ -1,4 +1,5 @@
 import type { CompanyProjectApiItem } from "../../types";
+import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
 
 type CompanyProjectsSectionProps = {
   data: { title: string; items: CompanyProjectApiItem[] } | null;
@@ -43,7 +44,14 @@ export function CompanyProjectsSection({ data, loading, openModal }: CompanyProj
                 className="community-card trigger-modal"
                 onClick={() => openModal()}
               >
-                <img src={image} alt={title} />
+                <img
+                  src={getOptimizedImageUrl(image, { width: 760, height: 640, crop: "fill", gravity: "auto" })}
+                  srcSet={getResponsiveImageSrcSet(image, [420, 640, 860, 1100], { crop: "limit" })}
+                  sizes="(max-width: 760px) 84vw, 32vw"
+                  alt={title}
+                  loading="lazy"
+                  decoding="async"
+                />
                 <div className="community-overlay">
                   <h3 className="comm-title">{title}</h3>
                   {description ? <p className="comm-desc">{description}</p> : null}
