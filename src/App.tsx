@@ -1156,7 +1156,7 @@ function App() {
       setIsChooseLoading(true);
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/choose?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/choose/compact?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Choose request failed: ${response.status}`);
         }
@@ -1165,7 +1165,7 @@ function App() {
         setApiChooseData({
           title: payload.data.title,
           items: payload.data.items
-            .filter((item) => item.status)
+            .filter((item) => item.status !== false)
             .sort((a, b) => a.rank - b.rank)
         });
       } catch (error) {
@@ -1425,11 +1425,30 @@ function App() {
     setIsModalOpen(true);
   };
 
-  const openChooseModal = (item: ChooseApiItem) => {
+  const openChooseModal = async (item: ChooseApiItem) => {
     setSelectedChooseItem(item);
     setShowSuccessState(false);
     setSubmitError("");
     setIsModalOpen(true);
+
+    if (!item.description) {
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`${API_BASE_URL}/sections/choose/item/${item.slug}?locale=${locale}`);
+        if (!response.ok) {
+          throw new Error(`Choose item request failed: ${response.status}`);
+        }
+
+        const payload: { data: ChooseApiItem } = await response.json();
+        setSelectedChooseItem((currentItem) => (
+          currentItem?.slug === item.slug
+            ? { ...currentItem, ...payload.data }
+            : currentItem
+        ));
+      } catch (error) {
+        console.error("Failed to load choose item details:", error);
+      }
+    }
   };
 
   const closeModal = () => {

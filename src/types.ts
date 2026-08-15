@@ -348,18 +348,20 @@ export type ChooseApiItem = {
   id: number;
   slug: string;
   title: string;
-  subtitle: string;
-  description: string;
-  image: string;
-  logo: string;
-  link: string;
-  badge: string;
+  subtitle?: string;
+  description?: string;
+  image?: string;
+  image_preview?: string;
+  logo?: string;
+  link?: string;
+  badge?: string;
   rank: number;
-  status: boolean;
+  status?: boolean;
 };
 
 export type ChooseSectionResponse = {
   data: {
+    slug?: string;
     title: string;
     items: ChooseApiItem[];
   };

@@ -47,7 +47,7 @@ export function ChooseSection({ data, loading, openChooseModal }: ChooseSectionP
                 <span className="direction-card-inner">
                   <span className="direction-card-face direction-card-front">
                     <span className="direction-card-media">
-                      <img src={normalizeApiImageUrl(item.image)} alt={item.title} />
+                      <img src={normalizeApiImageUrl(item.image_preview || item.image || "")} alt={item.title} />
                     </span>
                     <span className="direction-card-copy">
                       <h3 className="direction-title">{item.title}</h3>
@@ -56,7 +56,7 @@ export function ChooseSection({ data, loading, openChooseModal }: ChooseSectionP
                   <span className="direction-card-face direction-card-back">
                     <span className="direction-card-back-inner">
                       <span className="direction-card-back-title">{item.title}</span>
-                      <span className="direction-card-description">{item.description}</span>
+                      {item.description ? <span className="direction-card-description">{item.description}</span> : null}
                     </span>
                   </span>
                 </span>
