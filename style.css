@@ -1320,6 +1320,68 @@ section {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
+.concept-card-skeleton {
+  min-height: 500px;
+}
+
+.concept-content-skeleton {
+  gap: 1rem;
+}
+
+.concept-title-skeleton,
+.concept-line-skeleton,
+.concept-render-skeleton,
+.origami-info-icon-skeleton,
+.origami-info-value-skeleton,
+.origami-info-label-skeleton {
+  overflow: hidden;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.06) 100%);
+  background-size: 220% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+
+.concept-title-skeleton {
+  width: min(420px, 78%);
+  height: 2.75rem;
+  margin-bottom: 1rem;
+  border-radius: 999px;
+}
+
+.concept-line-skeleton {
+  width: 82%;
+  height: 1.25rem;
+  border-radius: 999px;
+}
+
+.concept-line-skeleton.wide {
+  width: 92%;
+}
+
+.concept-line-skeleton.medium {
+  width: 74%;
+}
+
+.concept-line-skeleton.short {
+  width: 56%;
+}
+
+.concept-render-skeleton {
+  min-height: 500px;
+}
+
+.concept-render-skeleton::after {
+  display: none;
+}
+
+.concept-render-skeleton-shimmer {
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.16) 50%, rgba(255, 255, 255, 0.04) 100%);
+  background-size: 220% 100%;
+  animation: gallerySkeletonShimmer 1.8s ease-in-out infinite;
+}
+
 .concept-content {
   padding: 4rem;
   display: flex;
@@ -1418,6 +1480,11 @@ html[data-theme="light"] .concept-render {
     height: 280px;
   }
 
+  .concept-card-skeleton,
+  .concept-render-skeleton {
+    min-height: 280px;
+  }
+
   html[data-theme="light"] .concept-render {
     border-top: 1px solid rgba(184, 153, 118, 0.14);
   }
@@ -1473,6 +1540,33 @@ html[data-theme="light"] .concept-render {
 
 .origami-info-card:hover::before {
   opacity: 1;
+}
+
+.origami-info-card-skeleton,
+.origami-info-card-skeleton:hover {
+  cursor: default;
+  transform: none;
+  border-color: var(--lg-border);
+  box-shadow: var(--lg-shadow);
+}
+
+.origami-info-icon-skeleton {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  margin-bottom: 0.25rem;
+}
+
+.origami-info-value-skeleton {
+  width: min(190px, 72%);
+  height: 1.8rem;
+  border-radius: 999px;
+}
+
+.origami-info-label-skeleton {
+  width: min(150px, 58%);
+  height: 1rem;
+  border-radius: 999px;
 }
 
 .origami-info-value {
@@ -2017,16 +2111,6 @@ html[data-theme="light"] .origami-info-label {
   padding: 2rem 0;
 }
 
-.directions-title-skeleton {
-  width: min(320px, 70vw);
-  height: 3.2rem;
-  margin: 0 auto 4rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.06) 100%);
-  background-size: 220% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
-}
-
 .directions-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -2102,64 +2186,6 @@ html[data-theme="light"] .origami-info-label {
   background: var(--lg-bg-hover);
   transform: translateY(-8px);
   box-shadow: 0 24px 54px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(197, 168, 128, 0.18) inset;
-}
-
-.direction-card-skeleton,
-.direction-card-skeleton:hover {
-  cursor: default;
-  transform: none;
-  border-color: var(--lg-border);
-  background: var(--lg-bg);
-  box-shadow: var(--lg-shadow);
-}
-
-.direction-card-skeleton {
-  display: flex;
-  flex-direction: column;
-  gap: 1.15rem;
-  padding: 0.85rem;
-}
-
-.direction-card-skeleton-media,
-.direction-card-skeleton-title,
-.direction-card-skeleton-text {
-  overflow: hidden;
-  border-radius: calc(var(--radius-lg) - 10px);
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.direction-card-skeleton-media {
-  position: relative;
-  flex: 1;
-  min-height: 300px;
-}
-
-.direction-card-skeleton-shimmer {
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.18) 50%, rgba(255, 255, 255, 0.04) 100%);
-  background-size: 220% 100%;
-  animation: gallerySkeletonShimmer 1.8s ease-in-out infinite;
-}
-
-.direction-card-skeleton-copy {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0 1rem 1.1rem;
-}
-
-.direction-card-skeleton-title {
-  width: min(260px, 72%);
-  height: 1.85rem;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
-}
-
-.direction-card-skeleton-text {
-  width: min(180px, 54%);
-  height: 1rem;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
 
 .direction-card-inner {
