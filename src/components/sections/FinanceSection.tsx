@@ -7,6 +7,10 @@ type FinanceSectionProps = {
 };
 
 export function FinanceSection({ data, hasContent }: FinanceSectionProps) {
+  if (!hasContent) {
+    return null;
+  }
+
   return (
     <section className="finance-section">
       <div className="container">

@@ -7,6 +7,10 @@ type ChooseSectionProps = {
 };
 
 export function ChooseSection({ data, openChooseModal }: ChooseSectionProps) {
+  if (!data?.title && !data?.items.length) {
+    return null;
+  }
+
   return (
     <section className="directions-section">
       <div className="container">

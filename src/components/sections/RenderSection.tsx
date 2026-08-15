@@ -26,6 +26,10 @@ export function RenderSection({
   getFloorUnitsRoute,
   navigateTo
 }: RenderSectionProps) {
+  if (!loading && !title && !image) {
+    return null;
+  }
+
   return (
     <section className="render-section">
       <div className="container">

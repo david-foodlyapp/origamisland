@@ -337,14 +337,7 @@ function App() {
       apartments: "Apartments",
       all: "All"
     };
-  const primaryNavItems = (apiFooterMenuItems.length > 0
-    ? apiFooterMenuItems
-    : [
-      { id: 1, slug: "about-us", title: t("nav_about"), subtitle: "", description: "", image: "", logo: "", link: "about-us", badge: "", rank: 1, status: true },
-      { id: 2, slug: "biohacking", title: t("nav_biohacking"), subtitle: "", description: "", image: "", logo: "", link: "biohacking", badge: "", rank: 2, status: true },
-      { id: 3, slug: "consultation", title: t("utility_schedule"), subtitle: "", description: "", image: "", logo: "", link: "consultation", badge: "", rank: 3, status: true }
-    ] satisfies FooterMenuApiItem[]
-  ).map((item) => {
+  const primaryNavItems = apiFooterMenuItems.map((item) => {
     const rawTarget = item.link || item.slug;
     const anchor = rawTarget.replace(/^#+/, "");
     return {

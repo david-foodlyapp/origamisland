@@ -9,6 +9,10 @@ type OrigamiHoldingSectionProps = {
 };
 
 export function OrigamiHoldingSection({ data, hasContent, getIcon, getOrder }: OrigamiHoldingSectionProps) {
+  if (!hasContent) {
+    return null;
+  }
+
   return (
     <section
       className="biohacking-section origami-holding-section"

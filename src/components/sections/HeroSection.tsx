@@ -33,6 +33,7 @@ export function HeroSection({
   const roomTypeOptions = (unitFilters?.room_types || []).map((option) => ({ value: String(option.value), label: option.label }));
   const propertyTypeOptions = (unitFilters?.property_types || []).map((option) => ({ value: String(option.value), label: option.label }));
   const conditionOptions = (unitFilters?.conditions || []).map((option) => ({ value: String(option.value), label: option.label }));
+  const hasFilterOptions = roomTypeOptions.length > 0 || propertyTypeOptions.length > 0 || conditionOptions.length > 0;
   const selectedRoomLabel = roomTypeOptions.find((option) => option.value === selectedRoomType)?.label || t("filter_room_all");
   const hasActiveFilters = Boolean(selectedRoomType || selectedPropertyType || selectedCondition);
 
@@ -41,6 +42,10 @@ export function HeroSection({
     setSelectedPropertyType("");
     setSelectedCondition("");
   };
+
+  if (!hasFilterOptions) {
+    return null;
+  }
 
   return (
         <section className="hero">

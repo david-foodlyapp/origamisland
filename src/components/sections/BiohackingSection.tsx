@@ -10,6 +10,10 @@ type BiohackingSectionProps = {
 };
 
 export function BiohackingSection({ data, hasContent, t, getIcon }: BiohackingSectionProps) {
+  if (!hasContent) {
+    return null;
+  }
+
   return (
     <section
       id="biohacking"

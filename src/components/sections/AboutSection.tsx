@@ -11,6 +11,10 @@ type AboutSectionProps = {
 };
 
 export function AboutSection({ data, infoItems, image, hasContent, icons }: AboutSectionProps) {
+  if (!hasContent) {
+    return null;
+  }
+
   return (
     <section id="about-us" className="concept-section">
       <div className="container">

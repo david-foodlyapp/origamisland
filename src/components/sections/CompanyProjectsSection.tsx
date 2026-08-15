@@ -7,6 +7,10 @@ type CompanyProjectsSectionProps = {
 };
 
 export function CompanyProjectsSection({ data, loading, openModal }: CompanyProjectsSectionProps) {
+  if (!loading && !data?.title && !data?.items.length) {
+    return null;
+  }
+
   return (
     <section id="communities">
       <div className="container">

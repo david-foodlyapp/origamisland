@@ -37,6 +37,9 @@ export function Footer({
   formatTelHref,
   t
 }: FooterProps) {
+  const hasContact = Boolean(contact.address || contact.email || contact.phone || contact.secondaryPhone);
+  const hasCompanyProjects = Boolean(companyProjectsData?.title || companyProjectsData?.items.length);
+
   return (
     <footer>
       <div className="container">
@@ -75,97 +78,103 @@ export function Footer({
             </div>
           </div>
 
-          <div className={`footer-column ${openFooterSection === "links" ? "is-open" : ""}`}>
-            <button
-              className="footer-column-toggle"
-              type="button"
-              aria-expanded={openFooterSection === "links"}
-              onClick={() => toggleFooterSection("links")}
-            >
-              <span className="footer-column-title">{t("footer_col_links")}</span>
-              <ChevronIcon direction={openFooterSection === "links" ? "up" : "down"} />
-            </button>
-            <ul>
-              {primaryNavItems.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.isModalAction ? "#" : item.href}
-                    onClick={(event) => {
-                      if (!item.isModalAction) {
-                        return;
-                      }
+          {primaryNavItems.length ? (
+            <div className={`footer-column ${openFooterSection === "links" ? "is-open" : ""}`}>
+              <button
+                className="footer-column-toggle"
+                type="button"
+                aria-expanded={openFooterSection === "links"}
+                onClick={() => toggleFooterSection("links")}
+              >
+                <span className="footer-column-title">{t("footer_col_links")}</span>
+                <ChevronIcon direction={openFooterSection === "links" ? "up" : "down"} />
+              </button>
+              <ul>
+                {primaryNavItems.map((item) => (
+                  <li key={item.href}>
+                    <a
+                      href={item.isModalAction ? "#" : item.href}
+                      onClick={(event) => {
+                        if (!item.isModalAction) {
+                          return;
+                        }
 
-                      event.preventDefault();
-                      openModal();
-                    }}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className={`footer-column ${openFooterSection === "services" ? "is-open" : ""}`}>
-            <button
-              className="footer-column-toggle"
-              type="button"
-              aria-expanded={openFooterSection === "services"}
-              onClick={() => toggleFooterSection("services")}
-            >
-              <span className="footer-column-title">{companyProjectsData?.title || ""}</span>
-              <ChevronIcon direction={openFooterSection === "services" ? "up" : "down"} />
-            </button>
-            <ul>
-              {companyProjectsData?.items.map((service) => (
-                <li key={service.id}>
-                  <a href={service.link || "#0"}>
-                    {service.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className={`footer-column ${openFooterSection === "legal" ? "is-open" : ""}`}>
-            <button
-              className="footer-column-toggle"
-              type="button"
-              aria-expanded={openFooterSection === "legal"}
-              onClick={() => toggleFooterSection("legal")}
-            >
-              <span className="footer-column-title">{t("footer_col_contact")}</span>
-              <ChevronIcon direction={openFooterSection === "legal" ? "up" : "down"} />
-            </button>
-            <ul className="footer-contact-list">
-              {contact.address ? (
-                <li>
-                  {contact.mapLink ? (
-                    <a href={contact.mapLink} target="_blank" rel="noreferrer">
-                      {contact.address}
+                        event.preventDefault();
+                        openModal();
+                      }}
+                    >
+                      {item.label}
                     </a>
-                  ) : (
-                    contact.address
-                  )}
-                </li>
-              ) : null}
-              {contact.email ? (
-                <li>
-                  <a href={`mailto:${contact.email}`}>{contact.email}</a>
-                </li>
-              ) : null}
-              {contact.phone ? (
-                <li>
-                  <a href={formatTelHref(contact.phone)}>{contact.phone}</a>
-                </li>
-              ) : null}
-              {contact.secondaryPhone ? (
-                <li>
-                  <a href={formatTelHref(contact.secondaryPhone)}>{contact.secondaryPhone}</a>
-                </li>
-              ) : null}
-            </ul>
-          </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {hasCompanyProjects ? (
+            <div className={`footer-column ${openFooterSection === "services" ? "is-open" : ""}`}>
+              <button
+                className="footer-column-toggle"
+                type="button"
+                aria-expanded={openFooterSection === "services"}
+                onClick={() => toggleFooterSection("services")}
+              >
+                <span className="footer-column-title">{companyProjectsData?.title || ""}</span>
+                <ChevronIcon direction={openFooterSection === "services" ? "up" : "down"} />
+              </button>
+              <ul>
+                {companyProjectsData?.items.map((service) => (
+                  <li key={service.id}>
+                    <a href={service.link || "#0"}>
+                      {service.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {hasContact ? (
+            <div className={`footer-column ${openFooterSection === "legal" ? "is-open" : ""}`}>
+              <button
+                className="footer-column-toggle"
+                type="button"
+                aria-expanded={openFooterSection === "legal"}
+                onClick={() => toggleFooterSection("legal")}
+              >
+                <span className="footer-column-title">{t("footer_col_contact")}</span>
+                <ChevronIcon direction={openFooterSection === "legal" ? "up" : "down"} />
+              </button>
+              <ul className="footer-contact-list">
+                {contact.address ? (
+                  <li>
+                    {contact.mapLink ? (
+                      <a href={contact.mapLink} target="_blank" rel="noreferrer">
+                        {contact.address}
+                      </a>
+                    ) : (
+                      contact.address
+                    )}
+                  </li>
+                ) : null}
+                {contact.email ? (
+                  <li>
+                    <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                  </li>
+                ) : null}
+                {contact.phone ? (
+                  <li>
+                    <a href={formatTelHref(contact.phone)}>{contact.phone}</a>
+                  </li>
+                ) : null}
+                {contact.secondaryPhone ? (
+                  <li>
+                    <a href={formatTelHref(contact.secondaryPhone)}>{contact.secondaryPhone}</a>
+                  </li>
+                ) : null}
+              </ul>
+            </div>
+          ) : null}
         </div>
 
         <div className="footer-bottom">

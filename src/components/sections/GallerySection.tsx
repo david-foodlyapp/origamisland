@@ -13,6 +13,10 @@ type GallerySectionProps = {
 };
 
 export function GallerySection({ items, loading, pageCount, currentPage, trackRef, t }: GallerySectionProps) {
+  if (!loading && !items.length) {
+    return null;
+  }
+
   return (
     <section className="gallery-section">
       <div className="container">

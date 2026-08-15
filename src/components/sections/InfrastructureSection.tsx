@@ -10,6 +10,10 @@ type InfrastructureSectionProps = {
 };
 
 export function InfrastructureSection({ items, hasContent, sectionRef, t }: InfrastructureSectionProps) {
+  if (!hasContent) {
+    return null;
+  }
+
   return (
     <section id="infrastructure" className="infrastructure-section" ref={sectionRef}>
       <div className="container">
