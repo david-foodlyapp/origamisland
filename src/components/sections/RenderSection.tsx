@@ -54,7 +54,6 @@ export function RenderSection({
                       alt={imageAlt}
                       decoding="async"
                       loading="eager"
-                      fetchPriority="high"
                     />
                     {floors.length > 0 ? (
                       <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">

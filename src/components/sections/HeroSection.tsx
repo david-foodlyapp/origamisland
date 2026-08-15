@@ -117,7 +117,7 @@ export function HeroSection({
           <div className="hero-bg">
             <video
               ref={videoRef}
-              src="https://origam.ge/video/origami.mp4"
+              src="https://origam.ge/video/origami.mp4?v=20260815"
               autoPlay
               loop
               muted
