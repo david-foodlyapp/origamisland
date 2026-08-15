@@ -8,10 +8,9 @@ import {
   type UnitListResponse
 } from "./types";
 import type { Language } from "./i18n";
+import { API_BASE_URL } from "./config";
 
 export const DEFAULT_BUILDING_SLUG = "Origami-Island";
-
-const API_BASE_URL = "https://admin.origamiholding.com/api";
 
 export type UnitViewMode = "grid" | "table";
 

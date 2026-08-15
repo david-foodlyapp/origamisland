@@ -4,6 +4,7 @@ import GA4React from "react-ga4";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
 import { translations, type Language, type TranslationKey } from "./i18n";
+import { API_BASE_URL } from "./config";
 
 import { Header } from "./components/sections/Header";
 import { HeroSection } from "./components/sections/HeroSection";
@@ -12,8 +13,7 @@ import { UnitCatalogPage } from "./components/sections/UnitCatalogPage";
 import {
   HomeIcon, CalendarIcon, BuildingIcon,
   FacebookIcon, InstagramIcon, LinkedInIcon, CloseIcon, ChatIcon, CheckIcon,
-  ChevronIcon, LifestyleIcon, WellnessIcon, ParkingIcon, RestaurantsIcon, RetailIcon,
-  WaterfrontIcon, LoungeIcon, FamilyIcon, LongevityIcon, RecoveryIcon, HealthyLivingIcon,
+  ChevronIcon, WellnessIcon, LongevityIcon, RecoveryIcon, HealthyLivingIcon,
   FitnessIcon, MeditationIcon, SpaIcon, EnergyBalanceIcon, ArrowIcon,
   AudienceOutlineIcon, PriceTagIcon, InstallmentIcon, ResidenceIcon, HotelSuiteIcon, PenthouseIcon
 } from "./components/Icons";
@@ -47,7 +47,6 @@ import {
   type CompanyProjectsSectionResponse,
   type AboutUsApiItem,
   type AboutUsResponse,
-  type Community,
   type ExplorerFloor,
   type ExplorerPropertyListResponse,
   type ExplorerPropertyDetail,
@@ -76,36 +75,6 @@ import {
   type SupportedCurrency
 } from "./unitCatalog";
 import { getExplorerRoute, type ExplorerRoute } from "./propertyExplorer";
-
-const communities: Community[] = [
-  {
-    area: "Origami Lagoons",
-    image: "/assets/property_lagoons.png",
-    alt: "Crystal blue beaches at Origami Lagoons",
-    titleKey: "comm_lagoons_title",
-    descKey: "comm_lagoons_desc"
-  },
-  {
-    area: "Origami Hills",
-    image: "/assets/property_paramount.png",
-    alt: "Luxury golf residential towers at Origami Hills",
-    titleKey: "comm_hills_title",
-    descKey: "comm_hills_desc"
-  },
-  {
-    area: "Dubai Marina",
-    image: "/assets/property_cavalli.png",
-    alt: "High-rise modern towers at Dubai Marina Heights",
-    titleKey: "comm_marina_title",
-    descKey: "comm_marina_desc"
-  }
-];
-
-const serviceLinks = [
-  "VIP Private Viewings",
-  "Investment Advisory",
-  "Property Valuation"
-];
 
 const origamiInfoIcons = [
   <PriceTagIcon />,
@@ -363,94 +332,6 @@ function App() {
       apartments: "Apartments",
       all: "All"
     };
-  const infrastructureItems = [
-    {
-      title: t("infra_lifestyle"),
-      description: t("infra_lifestyle_desc"),
-      image: "/assets/property_cavalli.png",
-      alt: "Lifestyle spaces",
-      mediaType: "Render",
-      icon: <LifestyleIcon />
-    },
-    {
-      title: t("infra_wellness"),
-      description: t("infra_wellness_desc"),
-      image: "/assets/3d/1.png",
-      alt: "Wellness studio render",
-      mediaType: "Render",
-      icon: <WellnessIcon />
-    },
-    {
-      title: t("infra_parking"),
-      description: t("infra_parking_desc"),
-      image: "/assets/hero_bg_2.png",
-      alt: "Parking arrival zone",
-      mediaType: "Render",
-      icon: <ParkingIcon />
-    },
-    {
-      title: t("infra_restaurants"),
-      description: t("infra_restaurants_desc"),
-      image: "/assets/property_paramount.png",
-      alt: "Restaurants and dining",
-      mediaType: "Render",
-      icon: <RestaurantsIcon />
-    },
-    {
-      title: t("infra_retail"),
-      description: t("infra_retail_desc"),
-      image: "/assets/property_lagoons.png",
-      alt: "Retail promenade",
-      mediaType: "Render",
-      icon: <RetailIcon />
-    },
-    {
-      title: t("infra_waterfront"),
-      description: t("infra_waterfront_desc"),
-      image: "/assets/hero_bg.png",
-      alt: "Waterfront walkway",
-      mediaType: "Render",
-      icon: <WaterfrontIcon />
-    },
-    {
-      title: t("infra_lounge"),
-      description: t("infra_lounge_desc"),
-      image: "/assets/3d/2.png",
-      alt: "Lounge spaces",
-      mediaType: "Render",
-      icon: <LoungeIcon />
-    },
-    {
-      title: t("infra_family"),
-      description: t("infra_family_desc"),
-      image: "/assets/property_lagoons.png",
-      alt: "Family activity area",
-      mediaType: "Render",
-      icon: <FamilyIcon />
-    }
-  ];
-  const biohackingPillars = [
-    { label: t("bio_pillar_wellness"), icon: <WellnessIcon /> },
-    { label: t("bio_pillar_longevity"), icon: <LongevityIcon /> },
-    { label: t("bio_pillar_recovery"), icon: <RecoveryIcon /> },
-    { label: t("bio_pillar_healthy"), icon: <HealthyLivingIcon /> },
-    { label: t("bio_pillar_fitness"), icon: <FitnessIcon /> },
-    { label: t("bio_pillar_meditation"), icon: <MeditationIcon /> },
-    { label: t("bio_pillar_spa"), icon: <SpaIcon /> },
-    { label: t("bio_pillar_energy"), icon: <EnergyBalanceIcon /> }
-  ];
-  const aboutHoldingStats: Array<{ value: string; label: string; icon: JSX.Element }> = [
-    { value: t("about_stat1_value"), label: t("about_stat1_label"), icon: <CalendarIcon /> },
-    { value: t("about_stat3_value"), label: t("about_stat3_label"), icon: <AudienceOutlineIcon /> },
-    { value: t("about_stat2_value"), label: t("about_stat2_label"), icon: <BuildingIcon /> },
-    { value: t("about_stat4_value"), label: t("about_stat4_label"), icon: <HotelSuiteIcon /> }
-  ];
-  const financeHighlights: Array<{ title: string; description?: string; image?: string; id?: number }> = [
-    { title: t("finance_why_batumi") },
-    { title: t("finance_island_investment") },
-    { title: t("finance_tourism") },
-    { title: t("finance_rental_model") }
-  ];
   const primaryNavItems = (apiFooterMenuItems.length > 0
     ? apiFooterMenuItems
     : [
@@ -626,7 +507,7 @@ function App() {
 
     const loadBranding = async () => {
       try {
-        const response = await fetch("https://admin.origamiholding.com/api/settings/branding", {
+        const response = await fetch(`${API_BASE_URL}/settings/branding`, {
           signal: controller.signal
         });
 
@@ -804,7 +685,7 @@ function App() {
     const loadFooterMenu = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/menu?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/menu?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Footer menu request failed: ${response.status}`);
         }
@@ -834,7 +715,7 @@ function App() {
     const loadFooterLegalMenu = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/footer-menu?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/footer-menu?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Footer legal menu request failed: ${response.status}`);
         }
@@ -863,7 +744,7 @@ function App() {
 
     const loadContactSettings = async () => {
       try {
-        const response = await fetch("https://admin.origamiholding.com/api/settings/contact", { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/settings/contact`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Contact settings request failed: ${response.status}`);
         }
@@ -888,7 +769,7 @@ function App() {
 
     const loadSocialNetworks = async () => {
       try {
-        const response = await fetch("https://admin.origamiholding.com/api/social-networks", { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/social-networks`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Social networks request failed: ${response.status}`);
         }
@@ -918,7 +799,7 @@ function App() {
     const loadSection3 = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/section-3?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/section-3?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Section 3 request failed: ${response.status}`);
         }
@@ -988,7 +869,7 @@ function App() {
 
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/buildings?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/buildings?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Building visual request failed: ${response.status}`);
         }
@@ -1000,7 +881,7 @@ function App() {
         }
 
         try {
-          const detailResponse = await fetch(`https://admin.origamiholding.com/api/buildings/${selectedBuilding.slug}?locale=${locale}`, { signal: controller.signal });
+          const detailResponse = await fetch(`${API_BASE_URL}/buildings/${selectedBuilding.slug}?locale=${locale}`, { signal: controller.signal });
           if (!detailResponse.ok) {
             throw new Error(`Building detail request failed: ${detailResponse.status}`);
           }
@@ -1049,7 +930,7 @@ function App() {
       setIsGalleryLoading(true);
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/gallery?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/gallery?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Gallery request failed: ${response.status}`);
         }
@@ -1106,7 +987,7 @@ function App() {
     const loadNews = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/news?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/news?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`News request failed: ${response.status}`);
         }
@@ -1153,7 +1034,7 @@ function App() {
 
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/news/${routeState.slug}?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/news/${routeState.slug}?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`News detail request failed: ${response.status}`);
         }
@@ -1184,7 +1065,7 @@ function App() {
     const loadInfrastructure = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/infrastructure?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/infrastructure?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Infrastructure request failed: ${response.status}`);
         }
@@ -1213,7 +1094,7 @@ function App() {
     const loadBiohacking = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/biohacking?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/biohacking?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Biohacking request failed: ${response.status}`);
         }
@@ -1244,7 +1125,7 @@ function App() {
     const loadOrigamiHolding = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/origami-holding?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/origami-holding?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Origami Holding request failed: ${response.status}`);
         }
@@ -1275,7 +1156,7 @@ function App() {
     const loadChoose = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/choose?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/choose?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Choose request failed: ${response.status}`);
         }
@@ -1305,7 +1186,7 @@ function App() {
     const loadFinance = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/finances?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/finances?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Finance request failed: ${response.status}`);
         }
@@ -1337,7 +1218,7 @@ function App() {
       setIsCompanyProjectsLoading(true);
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/projects?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/projects?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`Company projects request failed: ${response.status}`);
         }
@@ -1369,7 +1250,7 @@ function App() {
     const loadAboutUs = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/about-us?locale=${locale}&platform=origamisland`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/about-us?locale=${locale}&platform=origamisland`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`About us request failed: ${response.status}`);
         }
@@ -1399,7 +1280,7 @@ function App() {
     const loadAboutInfoItems = async () => {
       try {
         const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/sections/about?locale=${locale}`, { signal: controller.signal });
+        const response = await fetch(`${API_BASE_URL}/sections/about?locale=${locale}`, { signal: controller.signal });
         if (!response.ok) {
           throw new Error(`About section request failed: ${response.status}`);
         }
@@ -1481,14 +1362,19 @@ function App() {
     language === "ka" ? `სართული ${floor.number}` : `Floor ${floor.number}`;
 
   const buildingVisualFloors = apiBuildingVisual?.floors.filter((floor) => (floor.building_map_polygon?.length || 0) >= 3) || [];
-  const renderSectionTitle = apiSection3Data?.title || t("render_title");
-  const renderSectionImage = apiBuildingVisual?.image || apiSection3Data?.background_image || "/assets/3d/1.png";
-  const renderSectionImageAlt = apiBuildingVisual?.title || apiSection3Data?.title || "Origami Island building visual";
-  const conceptImage = apiAboutData?.image || apiSection3Data?.background_image || "/assets/3d/4.png";
+  const renderSectionTitle = apiSection3Data?.title || "";
+  const renderSectionImage = apiBuildingVisual?.image || apiSection3Data?.background_image || "";
+  const renderSectionImageAlt = apiBuildingVisual?.title || apiSection3Data?.title || "";
+  const conceptImage = apiAboutData?.image || "";
+  const hasAboutContent = Boolean(apiAboutData?.title || apiAboutData?.body || conceptImage || apiAboutInfoItems.length);
+  const hasBiohackingContent = Boolean(apiBiohackingData?.description || apiBiohackingData?.background_image || apiBiohackingData?.items.length);
+  const hasInfrastructureContent = apiInfrastructureItems.length > 0;
+  const hasFinanceContent = Boolean(apiFinanceData?.title || apiFinanceData?.description || apiFinanceData?.items.length);
+  const hasOrigamiHoldingContent = Boolean(apiOrigamiHoldingData?.title || apiOrigamiHoldingData?.background_image || apiOrigamiHoldingData?.items.length);
 
-  const footerContactAddress = apiContactSettings?.address || t("footer_contact_address");
-  const footerContactEmail = apiContactSettings?.email || t("footer_contact_email");
-  const footerContactPhone = apiContactSettings?.phone || t("footer_contact_phone");
+  const footerContactAddress = apiContactSettings?.address?.trim() || "";
+  const footerContactEmail = apiContactSettings?.email?.trim() || "";
+  const footerContactPhone = apiContactSettings?.phone?.trim() || "";
   const footerContactSecondaryPhone = apiContactSettings?.secondary_phone;
   const formatTelHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
 
@@ -1635,7 +1521,7 @@ function App() {
     const fullPhoneNumber = `${formCountryCode} ${formPhone}`.trim();
 
     try {
-      const response = await fetch("https://admin.origamiholding.com/api/contact-messages", {
+      const response = await fetch(`${API_BASE_URL}/contact-messages`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -2056,23 +1942,25 @@ function App() {
       />
         <section id="about-us" className="concept-section">
           <div className="container">
-            <div className="concept-card">
-              <div className="concept-content">
-                <h2 className="concept-title">{apiAboutData?.title || t("concept_title")}</h2>
-                {apiAboutData?.body ? (
-                  <div className="concept-desc" dangerouslySetInnerHTML={{ __html: apiAboutData.body }} />
-                ) : (
-                  <p className="concept-desc">{t("concept_desc")}</p>
-                )}
+            {hasAboutContent ? (
+              <div className="concept-card">
+                <div className="concept-content">
+                  {apiAboutData?.title ? <h2 className="concept-title">{apiAboutData.title}</h2> : null}
+                  {apiAboutData?.body ? (
+                    <div className="concept-desc" dangerouslySetInnerHTML={{ __html: apiAboutData.body }} />
+                  ) : null}
+                </div>
+                {conceptImage ? (
+                  <div className="concept-render">
+                    <img
+                      src={normalizeApiImageUrl(conceptImage)}
+                      alt={apiAboutData?.title || ""}
+                      className="concept-render-image"
+                    />
+                  </div>
+                ) : null}
               </div>
-              <div className="concept-render">
-                <img
-                  src={normalizeApiImageUrl(conceptImage)}
-                  alt={apiAboutData?.title || "Origami Island render"}
-                  className="concept-render-image"
-                />
-              </div>
-            </div>
+            ) : null}
             {apiAboutInfoItems.length > 0 ? (
               <div className="origami-info-section reveal-scroll">
                 <div className="origami-info-grid">
@@ -2098,7 +1986,7 @@ function App() {
         <section className="render-section">
           <div className="container">
             <div style={{ textAlign: "center", marginBottom: "3rem" }}>
-              <h2 className="section-title">{renderSectionTitle}</h2>
+              {renderSectionTitle ? <h2 className="section-title">{renderSectionTitle}</h2> : null}
             </div>
             <div className="render-gallery reveal-scroll">
               <div className="render-main">
@@ -2108,74 +1996,76 @@ function App() {
                       <div className="building-visual-skeleton-shimmer" />
                     </div>
                   ) : (
-                    <div className="building-visual-frame">
-                      <img
-                        src={renderSectionImage}
-                        alt={renderSectionImageAlt}
-                      />
-                      {buildingVisualFloors.length > 0 ? (
-                        <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                          {buildingVisualFloors.map((floor) => (
-                            <g key={floor.id} className="building-floor-hotspot">
-                              <polygon
-                                points={getFloorPolygonPoints(floor)}
-                                onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
-                                  page: 1,
-                                  perPage: 9,
-                                  floors: [floor.slug],
-                                  types: [],
-                                  statuses: [],
-                                  roomTypes: [],
-                                  rooms: [],
-                                  bedrooms: [],
-                                  bathrooms: [],
-                                  areaMin: "",
-                                  areaMax: "",
-                                  condition: "",
-                                  sort: "rank",
-                                  view: "grid"
-                                }, language)}`)}
-                              />
-                            </g>
-                          ))}
-                        </svg>
-                      ) : null}
-                      {buildingVisualFloors.map((floor) => (
-                        floor.building_map_label_position ? (
-                          <button
-                            key={floor.id}
-                            type="button"
-                            className="building-floor-label"
-                            style={{
-                              "--floor-label-x": `${floor.building_map_label_position.x}%`,
-                              "--floor-label-y": `${floor.building_map_label_position.y}%`
-                            } as React.CSSProperties}
-                            onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
-                              page: 1,
-                              perPage: 9,
-                              floors: [floor.slug],
-                              types: [],
-                              statuses: [],
-                              roomTypes: [],
-                              rooms: [],
-                              bedrooms: [],
-                              bathrooms: [],
-                              areaMin: "",
-                              areaMax: "",
-                              condition: "",
-                              sort: "rank",
-                              view: "grid"
-                            }, language)}`)}
-                          >
-                            <span className="building-floor-label-number">{floor.number}</span>
-                            <span className="building-floor-tooltip" role="tooltip">
-                              <span className="building-floor-tooltip-title">{getBuildingFloorLabel(floor)}</span>
-                              <span className="building-floor-tooltip-meta">{getBuildingFloorTooltip(floor)}</span>
-                            </span>
-                          </button>
-                        ) : null
-                      ))}
-                    </div>
+                    renderSectionImage ? (
+                      <div className="building-visual-frame">
+                        <img
+                          src={renderSectionImage}
+                          alt={renderSectionImageAlt}
+                        />
+                        {buildingVisualFloors.length > 0 ? (
+                          <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                            {buildingVisualFloors.map((floor) => (
+                              <g key={floor.id} className="building-floor-hotspot">
+                                <polygon
+                                  points={getFloorPolygonPoints(floor)}
+                                  onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
+                                    page: 1,
+                                    perPage: 9,
+                                    floors: [floor.slug],
+                                    types: [],
+                                    statuses: [],
+                                    roomTypes: [],
+                                    rooms: [],
+                                    bedrooms: [],
+                                    bathrooms: [],
+                                    areaMin: "",
+                                    areaMax: "",
+                                    condition: "",
+                                    sort: "rank",
+                                    view: "grid"
+                                  }, language)}`)}
+                                />
+                              </g>
+                            ))}
+                          </svg>
+                        ) : null}
+                        {buildingVisualFloors.map((floor) => (
+                          floor.building_map_label_position ? (
+                            <button
+                              key={floor.id}
+                              type="button"
+                              className="building-floor-label"
+                              style={{
+                                "--floor-label-x": `${floor.building_map_label_position.x}%`,
+                                "--floor-label-y": `${floor.building_map_label_position.y}%`
+                              } as React.CSSProperties}
+                              onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
+                                page: 1,
+                                perPage: 9,
+                                floors: [floor.slug],
+                                types: [],
+                                statuses: [],
+                                roomTypes: [],
+                                rooms: [],
+                                bedrooms: [],
+                                bathrooms: [],
+                                areaMin: "",
+                                areaMax: "",
+                                condition: "",
+                                sort: "rank",
+                                view: "grid"
+                              }, language)}`)}
+                            >
+                              <span className="building-floor-label-number">{floor.number}</span>
+                              <span className="building-floor-tooltip" role="tooltip">
+                                <span className="building-floor-tooltip-title">{getBuildingFloorLabel(floor)}</span>
+                                <span className="building-floor-tooltip-meta">{getBuildingFloorTooltip(floor)}</span>
+                              </span>
+                            </button>
+                          ) : null
+                        ))}
+                      </div>
+                    ) : null
                   )}
                 </div>
               </div>
@@ -2186,11 +2076,11 @@ function App() {
         <section className="directions-section">
           <div className="container">
             <h2 className="section-title" style={{ textAlign: "center", marginBottom: "4rem" }}>
-              {apiChooseData?.title || t("directions_title")}
+              {apiChooseData?.title || ""}
             </h2>
             
             <div className="directions-grid">
-              {apiChooseData && apiChooseData.items.length > 0 ? (
+              {apiChooseData?.items.length ? (
                 apiChooseData.items.map((item) => (
                   <button
                     key={item.id}
@@ -2216,26 +2106,7 @@ function App() {
                     </span>
                   </button>
                 ))
-              ) : (
-                <>
-                  <div className="direction-card">
-                    <div className="direction-card-media">
-                      <img src="/assets/property_cavalli.png" alt="სასტუმროს ნომრები" />
-                    </div>
-                    <div className="direction-card-copy">
-                      <h3 className="direction-title">{t("directions_hotel")}</h3>
-                    </div>
-                  </div>
-                  <div className="direction-card">
-                    <div className="direction-card-media">
-                      <img src="/assets/3d/5.png" alt="ბრენდული რეზიდენციები" />
-                    </div>
-                    <div className="direction-card-copy">
-                      <h3 className="direction-title">{t("directions_investment")}</h3>
-                    </div>
-                  </div>
-                </>
-              )}
+              ) : null}
             </div>
 
           </div>
@@ -2335,17 +2206,19 @@ function App() {
 
         <section id="biohacking" className="biohacking-section" style={apiBiohackingData?.background_image ? { "--biohacking-bg": `url(${apiBiohackingData.background_image})` } as React.CSSProperties : undefined}>
           <div className="container">
-            <div className="biohacking-heading">
-              <h2 className="biohacking-title section-title">
-                <span className="biohacking-title-highlight">{t("bio_title")}</span>
-              </h2>
-            </div>
+            {hasBiohackingContent ? (
+              <div className="biohacking-heading">
+                <h2 className="biohacking-title section-title">
+                  <span className="biohacking-title-highlight">{t("bio_title")}</span>
+                </h2>
+              </div>
+            ) : null}
             {apiBiohackingData?.description ? (
               <p className="biohacking-description">{apiBiohackingData.description}</p>
             ) : null}
 
             <div className="biohacking-layout reveal-scroll">
-              {apiBiohackingData && apiBiohackingData.items.length > 0 ? (
+              {apiBiohackingData?.items.length ? (
                 apiBiohackingData.items.map((item) => (
                   <article key={item.id} className="biohacking-pillar-card">
                     <span className="biohacking-list-icon">
@@ -2354,30 +2227,25 @@ function App() {
                     <h4 className="biohacking-pillar-title">{item.title}</h4>
                   </article>
                 ))
-              ) : (
-                biohackingPillars.map((item) => (
-                  <article key={item.label} className="biohacking-pillar-card">
-                    <span className="biohacking-list-icon">{item.icon}</span>
-                    <h4 className="biohacking-pillar-title">{item.label}</h4>
-                  </article>
-                ))
-              )}
+              ) : null}
             </div>
           </div>
         </section>
 
         <section id="infrastructure" className="infrastructure-section" ref={infrastructureSectionRef}>
           <div className="container">
-            <div className="infrastructure-header">
-              <h2 className="section-title">{t("infra_title")}</h2>
-              <a
-                href="#"
-                className="infrastructure-presentation-btn"
-                onClick={(event) => event.preventDefault()}
-              >
-                {t("infra_presentation")}
-              </a>
-            </div>
+            {hasInfrastructureContent ? (
+              <div className="infrastructure-header">
+                <h2 className="section-title">{t("infra_title")}</h2>
+                <a
+                  href="#"
+                  className="infrastructure-presentation-btn"
+                  onClick={(event) => event.preventDefault()}
+                >
+                  {t("infra_presentation")}
+                </a>
+              </div>
+            ) : null}
 
             <div className="infrastructure-grid reveal-scroll">
               {apiInfrastructureItems.length > 0 ? (
@@ -2396,41 +2264,27 @@ function App() {
                     </div>
                   </article>
                 ))
-              ) : (
-                infrastructureItems.map((item, index) => (
-                  <article
-                    key={item.title}
-                    className="infrastructure-card"
-                    data-speed={(0.95 + (index % 4) * 0.28).toFixed(2)}
-                  >
-                    <div className="infrastructure-media">
-                      <img src={item.image} alt={item.alt} />
-                    </div>
-
-                    <div className="infrastructure-content">
-                      <p className="infrastructure-desc">{item.description}</p>
-                    </div>
-                  </article>
-                ))
-              )}
+              ) : null}
             </div>
           </div>
         </section>
 
         <section className="finance-section">
           <div className="container">
-            <div className="biohacking-heading finance-heading">
-              <h2 className="biohacking-title section-title">
-                <span className="biohacking-title-highlight">{t("finance_title")}</span>
-              </h2>
-            </div>
+            {hasFinanceContent ? (
+              <div className="biohacking-heading finance-heading">
+                <h2 className="biohacking-title section-title">
+                  <span className="biohacking-title-highlight">{apiFinanceData?.title || ""}</span>
+                </h2>
+              </div>
+            ) : null}
 
             {apiFinanceData?.description && apiFinanceData.description !== apiFinanceData.title ? (
               <p className="finance-description">{apiFinanceData.description}</p>
             ) : null}
 
             <div className="finance-layout reveal-scroll">
-              {(apiFinanceData?.items.length ? apiFinanceData.items : financeHighlights).map((item, index) => {
+              {apiFinanceData?.items.map((item, index) => {
                 const image = item.image ? normalizeApiImageUrl(item.image) : "";
                 const description = item.description;
 
@@ -2462,14 +2316,16 @@ function App() {
             : undefined}
         >
           <div className="container">
-            <div className="biohacking-heading">
-              <h2 className="biohacking-title section-title">
-                <span className="biohacking-title-highlight">{apiOrigamiHoldingData?.title || t("about_holding_title")}</span>
-              </h2>
-            </div>
+            {hasOrigamiHoldingContent ? (
+              <div className="biohacking-heading">
+                <h2 className="biohacking-title section-title">
+                  <span className="biohacking-title-highlight">{apiOrigamiHoldingData?.title || ""}</span>
+                </h2>
+              </div>
+            ) : null}
 
             <div className="biohacking-layout origami-holding-layout reveal-scroll">
-                {apiOrigamiHoldingData && apiOrigamiHoldingData.items.length > 0 ? (
+                {apiOrigamiHoldingData?.items.length ? (
                   [...apiOrigamiHoldingData.items]
                     .sort((a, b) => getOrigamiHoldingOrder(a) - getOrigamiHoldingOrder(b))
                     .map((item) => {
@@ -2489,16 +2345,7 @@ function App() {
                         </CardTag>
                       );
                     })
-                ) : (
-                  aboutHoldingStats.map((item) => (
-                    <article className="biohacking-pillar-card origami-holding-card" key={item.label}>
-                      <span className="biohacking-list-icon" aria-hidden="true">
-                        {item.icon}
-                      </span>
-                      <h4 className="biohacking-pillar-title">{item.label}</h4>
-                    </article>
-                  ))
-                )}
+                ) : null}
             </div>
           </div>
         </section>
@@ -2509,7 +2356,7 @@ function App() {
               {isCompanyProjectsLoading ? (
                 <div className="community-title-skeleton" aria-hidden="true" />
               ) : (
-                <h2 className="section-title">{apiCompanyProjectsData?.title || t("comm_title")}</h2>
+                apiCompanyProjectsData?.title ? <h2 className="section-title">{apiCompanyProjectsData.title}</h2> : null
               )}
             </div>
 
@@ -2522,17 +2369,15 @@ function App() {
                     <div className="community-skeleton-text short" />
                   </div>
                 </div>
-              )) : (apiCompanyProjectsData?.items.length ? apiCompanyProjectsData.items : communities).map((community) => {
-                const title = "title" in community ? community.title : t(community.titleKey);
-                const description = "title" in community
-                  ? community.description?.trim() || community.subtitle?.trim() || ""
-                  : t(community.descKey);
-                const image = "title" in community ? community.image : community.image;
-                const alt = "title" in community ? community.title : community.alt;
+              )) : apiCompanyProjectsData?.items.map((community) => {
+                const title = community.title;
+                const description = community.description?.trim() || community.subtitle?.trim() || "";
+                const image = community.image;
+                const alt = community.title;
 
                 return (
                   <button
-                    key={"id" in community ? community.id : community.area}
+                    key={community.id}
                     type="button"
                     className="community-card trigger-modal"
                     onClick={() => openModal()}
@@ -2602,11 +2447,13 @@ function App() {
 
         <section className="gallery-section">
           <div className="container">
-            <div className="gallery-header">
-              <div className="gallery-heading-copy">
-                <h2 className="section-title gallery-title">{t("gallery_title")}</h2>
+            {isGalleryLoading || resolvedGalleryItems.length > 0 ? (
+              <div className="gallery-header">
+                <div className="gallery-heading-copy">
+                  <h2 className="section-title gallery-title">{t("gallery_title")}</h2>
+                </div>
               </div>
-            </div>
+            ) : null}
 
             <div className="gallery-carousel reveal-scroll">
               <div className="gallery-grid" ref={galleryTrackRef}>
@@ -2710,19 +2557,7 @@ function App() {
                       )}
                     </a>
                   ))
-                ) : (
-                  <>
-                    <a href="#" aria-label="Facebook Page">
-                      <FacebookIcon />
-                    </a>
-                    <a href="#" aria-label="Instagram Profile">
-                      <InstagramIcon />
-                    </a>
-                    <a href="#" aria-label="LinkedIn Company Page">
-                      <LinkedInIcon />
-                    </a>
-                  </>
-                )}
+                ) : null}
               </div>
             </div>
 
@@ -2764,17 +2599,14 @@ function App() {
                 aria-expanded={openFooterSection === "services"}
                 onClick={() => toggleFooterSection("services")}
               >
-                <span className="footer-column-title">{apiCompanyProjectsData?.title || t("footer_col_services")}</span>
+                <span className="footer-column-title">{apiCompanyProjectsData?.title || ""}</span>
                 <ChevronIcon direction={openFooterSection === "services" ? "up" : "down"} />
               </button>
               <ul>
-                {(apiCompanyProjectsData?.items.length
-                  ? apiCompanyProjectsData.items.map((item) => ({ label: item.title, link: item.link || "#0" }))
-                  : serviceLinks.map((service) => ({ label: service, link: "#0" }))
-                ).map((service) => (
-                  <li key={service.label}>
-                    <a href={service.link}>
-                      {service.label}
+                {apiCompanyProjectsData?.items.map((service) => (
+                  <li key={service.id}>
+                    <a href={service.link || "#0"}>
+                      {service.title}
                     </a>
                   </li>
                 ))}
@@ -2792,21 +2624,27 @@ function App() {
                 <ChevronIcon direction={openFooterSection === "legal" ? "up" : "down"} />
               </button>
               <ul className="footer-contact-list">
-                <li>
-                  {apiContactSettings?.map_link ? (
+                {footerContactAddress ? (
+                  <li>
+                    {apiContactSettings?.map_link ? (
                     <a href={apiContactSettings.map_link} target="_blank" rel="noreferrer">
                       {footerContactAddress}
                     </a>
-                  ) : (
-                    footerContactAddress
-                  )}
-                </li>
-                <li>
-                  <a href={`mailto:${footerContactEmail}`}>{footerContactEmail}</a>
-                </li>
-                <li>
-                  <a href={formatTelHref(footerContactPhone)}>{footerContactPhone}</a>
-                </li>
+                    ) : (
+                      footerContactAddress
+                    )}
+                  </li>
+                ) : null}
+                {footerContactEmail ? (
+                  <li>
+                    <a href={`mailto:${footerContactEmail}`}>{footerContactEmail}</a>
+                  </li>
+                ) : null}
+                {footerContactPhone ? (
+                  <li>
+                    <a href={formatTelHref(footerContactPhone)}>{footerContactPhone}</a>
+                  </li>
+                ) : null}
                 {footerContactSecondaryPhone ? (
                   <li>
                     <a href={formatTelHref(footerContactSecondaryPhone)}>{footerContactSecondaryPhone}</a>
@@ -2819,16 +2657,9 @@ function App() {
           <div className="footer-bottom">
             <p>{t("footer_copyright")}</p>
             <div className="footer-legal">
-              {(apiFooterLegalItems.length > 0
-                ? apiFooterLegalItems.map((item) => ({ label: item.title, link: item.link || "#0" }))
-                : [
-                    { label: t("footer_privacy"), link: "#0" },
-                    { label: t("footer_terms"), link: "#0" },
-                    { label: t("footer_cookies"), link: "#0" }
-                  ]
-              ).map((item) => (
-                <a key={`${item.label}-${item.link}`} href={item.link}>
-                  {item.label}
+              {apiFooterLegalItems.map((item) => (
+                <a key={`${item.id}-${item.link || item.title}`} href={item.link || "#0"}>
+                  {item.title}
                 </a>
               ))}
             </div>

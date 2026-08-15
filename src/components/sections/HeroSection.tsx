@@ -30,20 +30,9 @@ export function HeroSection({
   setMobileFilterOpen,
   handleSearch
 }: HeroSectionProps) {
-  const roomTypeOptions = (unitFilters?.room_types || [
-    { value: 0, label: t("filter_room_1") },
-    { value: 1, label: t("filter_room_2") },
-    { value: 2, label: t("filter_room_3") }
-  ]).map((option) => ({ value: String(option.value), label: option.label }));
-  const propertyTypeOptions = (unitFilters?.property_types || [
-    { value: "hotel_room", label: t("filter_kind_hotel") },
-    { value: "apartment", label: t("filter_kind_investment") }
-  ]).map((option) => ({ value: String(option.value), label: option.label }));
-  const conditionOptions = (unitFilters?.conditions || [
-    { value: "white", label: t("filter_condition_white") },
-    { value: "full", label: t("filter_condition_full") },
-    { value: "turnkey", label: t("filter_condition_turnkey") }
-  ]).map((option) => ({ value: String(option.value), label: option.label }));
+  const roomTypeOptions = (unitFilters?.room_types || []).map((option) => ({ value: String(option.value), label: option.label }));
+  const propertyTypeOptions = (unitFilters?.property_types || []).map((option) => ({ value: String(option.value), label: option.label }));
+  const conditionOptions = (unitFilters?.conditions || []).map((option) => ({ value: String(option.value), label: option.label }));
   const selectedRoomLabel = roomTypeOptions.find((option) => option.value === selectedRoomType)?.label || t("filter_room_all");
   const hasActiveFilters = Boolean(selectedRoomType || selectedPropertyType || selectedCondition);
 

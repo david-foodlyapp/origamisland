@@ -15,8 +15,7 @@ import {
   type RoomFilter,
   type SearchPropertyTypeFilter
 } from "./types";
-
-const API_BASE_URL = "https://admin.origamiholding.com/api";
+import { API_BASE_URL } from "./config";
 
 function buildApiUrl(path: string) {
   return `${API_BASE_URL}${path}`;
