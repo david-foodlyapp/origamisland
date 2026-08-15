@@ -22,9 +22,11 @@ import { NewsSection } from "./components/sections/NewsSection";
 import { GallerySection } from "./components/sections/GallerySection";
 import { Footer } from "./components/sections/Footer";
 import { FloatingWidget } from "./components/sections/FloatingWidget";
+import { ConsultationModal } from "./components/sections/ConsultationModal";
+import { LanguageModal } from "./components/sections/LanguageModal";
+import { UnitsPreferencesModal } from "./components/sections/UnitsPreferencesModal";
 import {
   CalendarIcon, BuildingIcon,
-  CloseIcon, CheckIcon,
   WellnessIcon, LongevityIcon, RecoveryIcon, HealthyLivingIcon,
   FitnessIcon, MeditationIcon, SpaIcon, EnergyBalanceIcon, ArrowIcon,
   AudienceOutlineIcon, PriceTagIcon, InstallmentIcon, ResidenceIcon, HotelSuiteIcon, PenthouseIcon
@@ -1680,193 +1682,39 @@ function App() {
           currency={currency}
           currencyRates={currencyRates}
         />
-
-        <div id="vip-modal" className={`modal ${isModalOpen ? "active" : ""}`}>
-          <div id="modal-overlay" className="modal-overlay" onClick={closeModal}></div>
-
-          <div className="modal-content">
-            <button id="close-modal-btn" className="modal-close" aria-label="Close modal window" type="button" onClick={closeModal}>
-              <CloseIcon />
-            </button>
-
-            <h3 className="modal-title">{selectedChooseItem?.title || t("modal_title")}</h3>
-
-            {selectedChooseItem ? (
-              <p className="modal-desc modal-desc-detail">{selectedChooseItem.description}</p>
-            ) : !showSuccessState ? (
-              <form id="vip-consultation-form" className="luxury-form" onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <input
-                    type="text"
-                    id="form-name"
-                    required
-                    placeholder=" "
-                    autoComplete="name"
-                    value={formName}
-                    onChange={(event) => setFormName(event.target.value)}
-                    onInvalid={handleFieldInvalid("name")}
-                    onInput={clearFieldValidity}
-                  />
-                  <label id="form-name-label" htmlFor="form-name">
-                    {t("form_name")}
-                  </label>
-                </div>
-
-                <div className="form-group">
-                  <input
-                    type="email"
-                    id="form-email"
-                    required
-                    placeholder=" "
-                    autoComplete="email"
-                    value={formEmail}
-                    onChange={(event) => setFormEmail(event.target.value)}
-                    onInvalid={handleFieldInvalid("email")}
-                    onInput={clearFieldValidity}
-                  />
-                  <label id="form-email-label" htmlFor="form-email">
-                    {t("form_email")}
-                  </label>
-                </div>
-
-                <div className="form-row form-row-phone">
-                  <div className="form-group select-group country-code-group">
-                    <select
-                      id="form-country-code"
-                      value={formCountryCode}
-                      onChange={(event) => setFormCountryCode(event.target.value)}
-                      aria-label="Country code"
-                      required
-                    >
-                      {countryCodeOptions.map((option) => (
-                        <option key={`${option.code}-${option.dialCode}`} value={option.dialCode}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="form-group phone-number-group">
-                    <input
-                      type="tel"
-                      id="form-phone"
-                      required
-                      placeholder=" "
-                      autoComplete="tel-national"
-                      value={formPhone}
-                      onChange={(event) => setFormPhone(event.target.value)}
-                      onInvalid={handleFieldInvalid("phone")}
-                      onInput={clearFieldValidity}
-                    />
-                    <label id="form-phone-label" htmlFor="form-phone">
-                      {t("form_phone")}
-                    </label>
-                  </div>
-                </div>
-
-                <button type="submit" className="gold-button" style={{ width: "100%", marginTop: "1.5rem" }} disabled={isSubmitting}>
-                  {isSubmitting ? (language === "en" ? "Securing Access..." : "წვდომა მუშავდება...") : t("form_send")}
-                </button>
-                {submitError ? (
-                  <p
-                    role="alert"
-                    style={{
-                      marginTop: "1rem",
-                      color: "#b42318",
-                      fontSize: "0.95rem",
-                      lineHeight: 1.5,
-                      textAlign: "center"
-                    }}
-                  >
-                    {submitError}
-                  </p>
-                ) : null}
-              </form>
-            ) : (
-              <div
-                id="form-success-state"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
-                  gap: "1.5rem",
-                  animation: "reveal-up 0.5s ease-out"
-                }}
-              >
-                <div
-                  style={{
-                    width: "70px",
-                    height: "70px",
-                    borderRadius: "50%",
-                    border: "2px solid var(--primary-gold)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: "var(--primary-gold)",
-                    marginBottom: "1rem"
-                  }}
-                >
-                  <CheckIcon />
-                </div>
-                <h4 className="modal-title" style={{ marginBottom: 0 }}>
-                  {t("form_success_title")}
-                </h4>
-                <p className="modal-desc" style={{ maxWidth: "380px", marginBottom: "1.5rem" }}>
-                  {t("form_success_desc")}
-                </p>
-                <button id="success-close-btn" className="outline-button" style={{ width: "100%" }} type="button" onClick={closeModal}>
-                  {t("form_success_close")}
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className={`modal ${isLanguageModalOpen || isCurrencyModalOpen ? "active" : ""}`}>
-          <div className="modal-overlay" onClick={() => { closeLanguageModal(); closeCurrencyModal(); }}></div>
-
-          <div className="modal-content language-modal-content">
-            <button
-              className="modal-close"
-              aria-label="Close language and currency modal"
-              type="button"
-              onClick={() => { closeLanguageModal(); closeCurrencyModal(); }}
-            >
-              <CloseIcon />
-            </button>
-
-            <h3 className="modal-title language-modal-title">{t("language_modal_title")}</h3>
-            <div className="language-options" role="list">
-              {languageOptions.map((option) => (
-                <button
-                  key={option.code}
-                  type="button"
-                  className={`language-option ${language === option.code ? "is-active" : ""}`}
-                  onClick={() => handleUnitsLanguageSelect(option.code)}
-                >
-                  <span>{option.label}</span>
-                  {language === option.code ? <span className="language-option-check">•</span> : null}
-                </button>
-              ))}
-            </div>
-
-            <h3 className="modal-title language-modal-title currency-modal-title">{language === "ka" ? "აირჩიეთ ვალუტა" : "Choose currency"}</h3>
-            <div className="language-options" role="list">
-              {currencyOptions.map((option) => (
-                <button
-                  key={option.code}
-                  type="button"
-                  className={`language-option ${currency === option.code ? "is-active" : ""}`}
-                  onClick={() => handleCurrencySelect(option.code)}
-                >
-                  <span>{option.label}</span>
-                  {currency === option.code ? <span className="language-option-check">•</span> : null}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <ConsultationModal
+          active={isModalOpen}
+          selectedChooseItem={selectedChooseItem}
+          showSuccessState={showSuccessState}
+          isSubmitting={isSubmitting}
+          submitError={submitError}
+          formName={formName}
+          formEmail={formEmail}
+          formCountryCode={formCountryCode}
+          formPhone={formPhone}
+          countryCodeOptions={countryCodeOptions}
+          language={language}
+          closeModal={closeModal}
+          handleSubmit={handleSubmit}
+          handleFieldInvalid={handleFieldInvalid}
+          clearFieldValidity={clearFieldValidity}
+          setFormName={setFormName}
+          setFormEmail={setFormEmail}
+          setFormCountryCode={setFormCountryCode}
+          setFormPhone={setFormPhone}
+          t={t}
+        />
+        <UnitsPreferencesModal
+          active={isLanguageModalOpen || isCurrencyModalOpen}
+          language={language}
+          currency={currency}
+          languageOptions={languageOptions}
+          currencyOptions={currencyOptions}
+          closeModal={() => { closeLanguageModal(); closeCurrencyModal(); }}
+          handleLanguageSelect={handleUnitsLanguageSelect}
+          handleCurrencySelect={handleCurrencySelect}
+          t={t}
+        />
       </>
     );
   }
@@ -1896,31 +1744,14 @@ function App() {
           propertySlug={routeState.name === "property" || routeState.name === "floor" ? routeState.propertySlug : undefined}
           floorSlug={routeState.name === "floor" ? routeState.floorSlug : undefined}
         />
-
-        <div className={`modal ${isLanguageModalOpen ? "active" : ""}`}>
-          <div className="modal-overlay" onClick={closeLanguageModal}></div>
-
-          <div className="modal-content language-modal-content">
-            <button className="modal-close" aria-label="Close language modal" type="button" onClick={closeLanguageModal}>
-              <CloseIcon />
-            </button>
-
-            <h3 className="modal-title language-modal-title">{t("language_modal_title")}</h3>
-            <div className="language-options" role="list">
-              {languageOptions.map((option) => (
-                <button
-                  key={option.code}
-                  type="button"
-                  className={`language-option ${language === option.code ? "is-active" : ""}`}
-                  onClick={() => handleLanguageSelect(option.code)}
-                >
-                  <span>{option.label}</span>
-                  {language === option.code ? <span className="language-option-check">•</span> : null}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <LanguageModal
+          active={isLanguageModalOpen}
+          language={language}
+          languageOptions={languageOptions}
+          closeModal={closeLanguageModal}
+          handleLanguageSelect={handleLanguageSelect}
+          t={t}
+        />
       </>
     );
   }
@@ -2157,173 +1988,36 @@ function App() {
         t={t}
       />
 
-      <div id="vip-modal" className={`modal ${isModalOpen ? "active" : ""}`}>
-        <div id="modal-overlay" className="modal-overlay" onClick={closeModal}></div>
-
-        <div className="modal-content">
-          <button id="close-modal-btn" className="modal-close" aria-label="Close modal window" type="button" onClick={closeModal}>
-            <CloseIcon />
-          </button>
-
-          <h3 className="modal-title">{selectedChooseItem?.title || t("modal_title")}</h3>
-
-          {selectedChooseItem ? (
-            <p className="modal-desc modal-desc-detail">{selectedChooseItem.description}</p>
-          ) : !showSuccessState ? (
-            <form id="vip-consultation-form" className="luxury-form" onSubmit={handleSubmit}>
-              <div className="form-group">
-                <input
-                  type="text"
-                  id="form-name"
-                  required
-                  placeholder=" "
-                  autoComplete="name"
-                  value={formName}
-                  onChange={(event) => setFormName(event.target.value)}
-                  onInvalid={handleFieldInvalid("name")}
-                  onInput={clearFieldValidity}
-                />
-                <label id="form-name-label" htmlFor="form-name">
-                  {t("form_name")}
-                </label>
-              </div>
-
-              <div className="form-group">
-                <input
-                  type="email"
-                  id="form-email"
-                  required
-                  placeholder=" "
-                  autoComplete="email"
-                  value={formEmail}
-                  onChange={(event) => setFormEmail(event.target.value)}
-                  onInvalid={handleFieldInvalid("email")}
-                  onInput={clearFieldValidity}
-                />
-                <label id="form-email-label" htmlFor="form-email">
-                  {t("form_email")}
-                </label>
-              </div>
-
-              <div className="form-row form-row-phone">
-                <div className="form-group select-group country-code-group">
-                  <select
-                    id="form-country-code"
-                    value={formCountryCode}
-                    onChange={(event) => setFormCountryCode(event.target.value)}
-                    aria-label="Country code"
-                    required
-                  >
-                    {countryCodeOptions.map((option) => (
-                      <option key={`${option.code}-${option.dialCode}`} value={option.dialCode}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                  </div>
-
-                <div className="form-group phone-number-group">
-                  <input
-                    type="tel"
-                    id="form-phone"
-                    required
-                    placeholder=" "
-                    autoComplete="tel-national"
-                    value={formPhone}
-                    onChange={(event) => setFormPhone(event.target.value)}
-                    onInvalid={handleFieldInvalid("phone")}
-                    onInput={clearFieldValidity}
-                  />
-                  <label id="form-phone-label" htmlFor="form-phone">
-                    {t("form_phone")}
-                  </label>
-                </div>
-              </div>
-
-              <button type="submit" className="gold-button" style={{ width: "100%", marginTop: "1.5rem" }} disabled={isSubmitting}>
-                {isSubmitting ? (language === "en" ? "Securing Access..." : "წვდომა მუშავდება...") : t("form_send")}
-              </button>
-              {submitError ? (
-                <p
-                  role="alert"
-                  style={{
-                    marginTop: "1rem",
-                    color: "#b42318",
-                    fontSize: "0.95rem",
-                    lineHeight: 1.5,
-                    textAlign: "center"
-                  }}
-                >
-                  {submitError}
-                </p>
-              ) : null}
-            </form>
-          ) : (
-            <div
-              id="form-success-state"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                textAlign: "center",
-                gap: "1.5rem",
-                animation: "reveal-up 0.5s ease-out"
-              }}
-            >
-              <div
-                style={{
-                  width: "70px",
-                  height: "70px",
-                  borderRadius: "50%",
-                  border: "2px solid var(--primary-gold)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--primary-gold)",
-                  marginBottom: "1rem"
-                }}
-              >
-                <CheckIcon />
-              </div>
-              <h4 className="modal-title" style={{ marginBottom: 0 }}>
-                {t("form_success_title")}
-              </h4>
-              <p className="modal-desc" style={{ maxWidth: "380px", marginBottom: "1.5rem" }}>
-                {t("form_success_desc")}
-              </p>
-              <button id="success-close-btn" className="outline-button" style={{ width: "100%" }} type="button" onClick={closeModal}>
-                {t("form_success_close")}
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className={`modal ${isLanguageModalOpen ? "active" : ""}`}>
-        <div className="modal-overlay" onClick={closeLanguageModal}></div>
-
-        <div className="modal-content language-modal-content">
-          <button className="modal-close" aria-label="Close language modal" type="button" onClick={closeLanguageModal}>
-            <CloseIcon />
-          </button>
-
-          <h3 className="modal-title language-modal-title">{t("language_modal_title")}</h3>
-          <div className="language-options" role="list">
-            {languageOptions.map((option) => (
-              <button
-                key={option.code}
-                type="button"
-                className={`language-option ${language === option.code ? "is-active" : ""}`}
-                onClick={() => handleLanguageSelect(option.code)}
-              >
-                <span>{option.label}</span>
-                {language === option.code ? <span className="language-option-check">•</span> : null}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
+      <ConsultationModal
+          active={isModalOpen}
+          selectedChooseItem={selectedChooseItem}
+          showSuccessState={showSuccessState}
+          isSubmitting={isSubmitting}
+          submitError={submitError}
+          formName={formName}
+          formEmail={formEmail}
+          formCountryCode={formCountryCode}
+          formPhone={formPhone}
+          countryCodeOptions={countryCodeOptions}
+          language={language}
+          closeModal={closeModal}
+          handleSubmit={handleSubmit}
+          handleFieldInvalid={handleFieldInvalid}
+          clearFieldValidity={clearFieldValidity}
+          setFormName={setFormName}
+          setFormEmail={setFormEmail}
+          setFormCountryCode={setFormCountryCode}
+          setFormPhone={setFormPhone}
+          t={t}
+        />
+        <LanguageModal
+        active={isLanguageModalOpen}
+        language={language}
+        languageOptions={languageOptions}
+        closeModal={closeLanguageModal}
+        handleLanguageSelect={handleLanguageSelect}
+        t={t}
+      />
       <Analytics />
     </>
   );
