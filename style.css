@@ -42,6 +42,7 @@
   
   --font-serif: 'Dachi the Lynx', serif;
   --font-sans: 'Outfit', sans-serif;
+  --font-georgian: 'FiraGO', sans-serif;
   
   --transition-smooth: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
   --transition-quick: all 0.2s ease-out;
@@ -1320,6 +1321,34 @@ section {
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
+html[lang="ka"] {
+  --font-sans: var(--font-georgian);
+}
+
+html[lang="ka"] body,
+html[lang="ka"] button,
+html[lang="ka"] input,
+html[lang="ka"] select,
+html[lang="ka"] textarea {
+  font-family: var(--font-georgian);
+}
+
+html[lang="ka"] .section-title,
+html[lang="ka"] .concept-title,
+html[lang="ka"] .direction-title,
+html[lang="ka"] .direction-card-back-title,
+html[lang="ka"] .biohacking-title,
+html[lang="ka"] .comm-title,
+html[lang="ka"] .gallery-title,
+html[lang="ka"] .news-card-title,
+html[lang="ka"] .footer-column-title,
+html[lang="ka"] .modal-title,
+html[lang="ka"] .units-title,
+html[lang="ka"] .property-detail-title {
+  font-family: var(--font-georgian);
+  letter-spacing: 0;
+}
+
 .concept-card-skeleton {
   min-height: 500px;
 }
@@ -2505,31 +2534,6 @@ html[data-theme="dark"] .direction-card-description {
   margin-bottom: 0;
 }
 
-.infrastructure-presentation-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 11rem;
-  padding: 0.8rem 1.6rem;
-  border-radius: 999px;
-  border: 1px solid rgba(197, 168, 128, 0.45);
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--text-dark);
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-decoration: none;
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.08);
-  transition: var(--transition-smooth);
-}
-
-.infrastructure-presentation-btn:hover {
-  transform: translateY(-2px);
-  border-color: rgba(197, 168, 128, 0.75);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.12);
-}
-
 .infrastructure-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -2537,7 +2541,6 @@ html[data-theme="dark"] .direction-card-description {
 }
 
 .infrastructure-card {
-  --infra-parallax: 0px;
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-lg);
@@ -2545,12 +2548,11 @@ html[data-theme="dark"] .direction-card-description {
   background: var(--card-bg);
   border: 1px solid var(--lg-border);
   box-shadow: var(--lg-shadow);
-  transform: translate3d(0, var(--infra-parallax), 0);
   transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 .infrastructure-card:hover {
-  transform: translate3d(0, calc(var(--infra-parallax) - 18px), 0) scale(1.025);
+  transform: translateY(-10px) scale(1.018);
   border-color: var(--lg-border-gold);
   box-shadow: 0 24px 56px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(197, 168, 128, 0.15) inset;
 }
@@ -2572,13 +2574,13 @@ html[data-theme="dark"] .direction-card-description {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transform: scale(1.08) translate3d(0, calc(var(--infra-parallax) * -0.12), 0);
+  transform: scale(1.08);
   transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
 }
 
 .infrastructure-card:hover .infrastructure-media img {
-  transform: scale(1.16) translate3d(0, calc(var(--infra-parallax) * -0.16), 0);
+  transform: scale(1.16);
 }
 
 .infrastructure-media-badge {
@@ -2730,9 +2732,9 @@ html[data-theme="dark"] .direction-card-description {
   position: relative;
   overflow: hidden;
   min-height: 90vh;
-  padding: 5rem 0;
+  padding: 4.5rem 0 5rem;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   background:
     linear-gradient(180deg, rgba(250, 248, 244, 0.82) 0%, rgba(250, 248, 244, 0.5) 42%, rgba(250, 248, 244, 0.86) 100%),
     var(--biohacking-bg, url("/assets/3d/7.jpg"));
@@ -2745,13 +2747,14 @@ html[data-theme="dark"] .direction-card-description {
   position: relative;
   z-index: 1;
   width: 100%;
+  padding-top: clamp(1rem, 6vh, 5rem);
 }
 
 .biohacking-heading {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: clamp(3rem, 9vh, 7rem);
 }
 
 .biohacking-title {

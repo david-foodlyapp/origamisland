@@ -21,23 +21,15 @@ export function InfrastructureSection({ items, hasContent, sectionRef, t }: Infr
         {hasContent ? (
           <div className="infrastructure-header">
             <h2 className="section-title">{t("infra_title")}</h2>
-            <a
-              href="#"
-              className="infrastructure-presentation-btn"
-              onClick={(event) => event.preventDefault()}
-            >
-              {t("infra_presentation")}
-            </a>
           </div>
         ) : null}
 
         <div className="infrastructure-grid reveal-scroll">
           {items.length > 0 ? (
-            items.map((item, index) => (
+            items.map((item) => (
               <article
                 key={item.id}
                 className="infrastructure-card"
-                data-speed={(0.95 + (index % 4) * 0.28).toFixed(2)}
               >
                 <div className="infrastructure-media">
                   <img

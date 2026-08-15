@@ -21,7 +21,10 @@
         const savedTheme = localStorage.getItem("origami_theme");
         const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
         const theme = savedTheme || (prefersLight ? "light" : "dark");
+        const savedLanguage = localStorage.getItem("origami_language");
+        const language = ["ka", "en"].includes(savedLanguage) ? savedLanguage : "ka";
         document.documentElement.setAttribute("data-theme", theme);
+        document.documentElement.lang = language;
       }
     </script>
   </head>
