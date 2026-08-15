@@ -1366,6 +1366,36 @@ function App() {
   useEffect(() => {
     const controller = new AbortController();
 
+    const loadAboutUs = async () => {
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`https://admin.origamiholding.com/api/about-us?locale=${locale}&platform=origamisland`, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`About us request failed: ${response.status}`);
+        }
+
+        const payload: AboutUsResponse = await response.json();
+        const aboutItem = payload.data
+          .filter((item) => item.status && item.platform_identifier === "origamisland")
+          .sort((a, b) => a.rank - b.rank)[0] || null;
+
+        setApiAboutData(aboutItem);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load about us data:", error);
+        setApiAboutData(null);
+      }
+    };
+
+    loadAboutUs();
+    return () => controller.abort();
+  }, [language]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
     const loadAboutInfoItems = async () => {
       try {
         const locale = getNewsLocale(language);
@@ -1390,35 +1420,6 @@ function App() {
     };
 
     loadAboutInfoItems();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadAboutUs = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`https://admin.origamiholding.com/api/about-us?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`About us request failed: ${response.status}`);
-        }
-
-        const payload: AboutUsResponse = await response.json();
-        const aboutItem = payload.data
-          .filter((item) => item.status && item.type === "origamisland")
-          .sort((a, b) => a.rank - b.rank)[0] || null;
-
-        setApiAboutData(aboutItem);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load about us data:", error);
-      }
-    };
-
-    loadAboutUs();
     return () => controller.abort();
   }, [language]);
 
@@ -1483,6 +1484,7 @@ function App() {
   const renderSectionTitle = apiSection3Data?.title || t("render_title");
   const renderSectionImage = apiBuildingVisual?.image || apiSection3Data?.background_image || "/assets/3d/1.png";
   const renderSectionImageAlt = apiBuildingVisual?.title || apiSection3Data?.title || "Origami Island building visual";
+  const conceptImage = apiAboutData?.image || apiSection3Data?.background_image || "/assets/3d/4.png";
 
   const footerContactAddress = apiContactSettings?.address || t("footer_contact_address");
   const footerContactEmail = apiContactSettings?.email || t("footer_contact_email");
@@ -2065,7 +2067,7 @@ function App() {
               </div>
               <div className="concept-render">
                 <img
-                  src={apiAboutData?.image || "/assets/3d/4.png"}
+                  src={normalizeApiImageUrl(conceptImage)}
                   alt={apiAboutData?.title || "Origami Island render"}
                   className="concept-render-image"
                 />

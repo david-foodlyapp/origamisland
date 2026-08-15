@@ -520,6 +520,7 @@ export type WebsiteSectionResponse = {
 
 export type AboutUsApiItem = {
   id: number;
+  platform_identifier: string;
   type: string;
   title: string;
   body: string;
@@ -531,6 +532,9 @@ export type AboutUsApiItem = {
 
 export type AboutUsResponse = {
   data: AboutUsApiItem[];
+  filters?: {
+    platform_identifier?: string;
+  };
 };
 
 export type Community = {
