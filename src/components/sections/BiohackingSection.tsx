@@ -28,7 +28,6 @@ export function BiohackingSection({ data, hasContent, t, getIcon }: BiohackingSe
             </h2>
           </div>
         ) : null}
-        {data?.description ? <p className="biohacking-description">{data.description}</p> : null}
 
         <div className="biohacking-layout reveal-scroll">
           {data?.items.length ? (

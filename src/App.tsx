@@ -273,6 +273,7 @@ function App() {
   const [apiBiohackingData, setApiBiohackingData] = useState<{ description: string; background_image: string; items: BiohackingApiItem[] } | null>(null);
   const [apiOrigamiHoldingData, setApiOrigamiHoldingData] = useState<{ title: string; background_image: string; items: OrigamiHoldingApiItem[] } | null>(null);
   const [apiChooseData, setApiChooseData] = useState<{ title: string; items: ChooseApiItem[] } | null>(null);
+  const [isChooseLoading, setIsChooseLoading] = useState(true);
   const [apiFinanceData, setApiFinanceData] = useState<{ title: string; description: string; items: FinanceApiItem[] } | null>(null);
   const [apiCompanyProjectsData, setApiCompanyProjectsData] = useState<{ title: string; items: CompanyProjectApiItem[] } | null>(null);
   const [apiSection3Data, setApiSection3Data] = useState<{ title: string; background_image: string } | null>(null);
@@ -1152,6 +1153,7 @@ function App() {
     const controller = new AbortController();
 
     const loadChoose = async () => {
+      setIsChooseLoading(true);
       try {
         const locale = getNewsLocale(language);
         const response = await fetch(`${API_BASE_URL}/sections/choose?locale=${locale}`, { signal: controller.signal });
@@ -1171,6 +1173,11 @@ function App() {
           return;
         }
         console.error("Failed to load choose data:", error);
+        setApiChooseData(null);
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsChooseLoading(false);
+        }
       }
     };
 
@@ -1808,6 +1815,7 @@ function App() {
 
         <ChooseSection
           data={apiChooseData}
+          loading={isChooseLoading}
           openChooseModal={openChooseModal}
         />
 

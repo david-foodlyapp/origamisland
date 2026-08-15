@@ -40,7 +40,6 @@ export function Header({
   theme,
   handleThemeToggle
 }: HeaderProps) {
-  const hasConsultationMenuItem = primaryNavItems.some((item) => item.isModalAction);
   const isUnitsVariant = variant === "units";
   const isSurfaceVariant = variant === "surface";
 
@@ -112,18 +111,6 @@ export function Header({
                   </button>
                 ))}
               </div>
-              {!hasConsultationMenuItem ? (
-                <button
-                  className="nav-cta-btn"
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    openModal();
-                  }}
-                >
-                  {t("utility_schedule")}
-                </button>
-              ) : null}
             </nav>
             <button
               className={`mobile-menu-overlay ${mobileMenuOpen ? "active" : ""}`}
