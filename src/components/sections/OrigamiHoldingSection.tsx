@@ -31,6 +31,7 @@ export function OrigamiHoldingSection({ data, hasContent, getIcon, getOrder }: O
           {data?.items.length ? (
             [...data.items]
               .sort((a, b) => getOrder(a) - getOrder(b))
+              .slice(0, 4)
               .map((item) => {
                 const content = (
                   <>

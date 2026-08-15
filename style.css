@@ -2785,6 +2785,17 @@ html[data-theme="dark"] .direction-card-description {
   align-items: stretch;
 }
 
+.origami-holding-section .origami-holding-layout {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 1080px;
+  margin: 0 auto;
+  gap: 1.35rem;
+}
+
+.origami-holding-section .origami-holding-card {
+  min-height: 190px;
+}
+
 .biohacking-pillar-card {
   min-height: 188px;
   padding: 1.5rem;
@@ -4418,12 +4429,6 @@ html[data-theme="light"] .news-detail-state {
   border-color: var(--primary-gold);
   background: rgba(197, 168, 128, 0.12);
   box-shadow: 0 0 0 2px rgba(197, 168, 128, 0.16);
-}
-
-.language-option-check {
-  color: var(--primary-gold);
-  font-size: 1.5rem;
-  line-height: 1;
 }
 
 .luxury-form {

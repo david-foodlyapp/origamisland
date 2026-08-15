@@ -36,7 +36,6 @@ export function LanguageModal({ active, language, languageOptions, closeModal, h
               onClick={() => handleLanguageSelect(option.code)}
             >
               <span>{option.label}</span>
-              {language === option.code ? <span className="language-option-check">â€¢</span> : null}
             </button>
           ))}
         </div>

@@ -60,7 +60,6 @@ export function UnitsPreferencesModal({
               onClick={() => handleLanguageSelect(option.code)}
             >
               <span>{option.label}</span>
-              {language === option.code ? <span className="language-option-check">â€¢</span> : null}
             </button>
           ))}
         </div>
@@ -75,7 +74,6 @@ export function UnitsPreferencesModal({
               onClick={() => handleCurrencySelect(option.code)}
             >
               <span>{option.label}</span>
-              {currency === option.code ? <span className="language-option-check">â€¢</span> : null}
             </button>
           ))}
         </div>
