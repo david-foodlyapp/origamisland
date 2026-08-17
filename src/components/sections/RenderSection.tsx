@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import type { BuildingVisualFloor } from "../../types";
 import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
 
@@ -27,6 +27,8 @@ export function RenderSection({
   getFloorUnitsRoute,
   navigateTo
 }: RenderSectionProps) {
+  const [activeFloorId, setActiveFloorId] = useState<number | null>(null);
+
   if (!loading && !title && !image) {
     return null;
   }
@@ -56,27 +58,56 @@ export function RenderSection({
                       loading="eager"
                     />
                     {floors.length > 0 ? (
-                      <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                        {floors.map((floor) => (
-                          <g key={floor.id} className="building-floor-hotspot">
-                            <polygon
-                              points={getFloorPolygonPoints(floor)}
-                              onClick={() => navigateTo(getFloorUnitsRoute(floor))}
-                            />
-                          </g>
-                        ))}
+                      <svg className="building-visual-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" role="group" aria-label={title}>
+                        {floors.map((floor) => {
+                          const isActive = activeFloorId === floor.id;
+                          const floorRoute = getFloorUnitsRoute(floor);
+
+                          return (
+                            <g key={floor.id} className="building-floor-hotspot">
+                              <polygon
+                                points={getFloorPolygonPoints(floor)}
+                                className={isActive ? "is-active" : ""}
+                                role="link"
+                                tabIndex={0}
+                                aria-label={`${getFloorLabel(floor)} ${getFloorTooltip(floor)}`}
+                                onMouseEnter={() => setActiveFloorId(floor.id)}
+                                onMouseLeave={() => setActiveFloorId(null)}
+                                onFocus={() => setActiveFloorId(floor.id)}
+                                onBlur={() => setActiveFloorId(null)}
+                                onClick={() => navigateTo(floorRoute)}
+                                onKeyDown={(event) => {
+                                  if (event.key === "Enter" || event.key === " ") {
+                                    event.preventDefault();
+                                    navigateTo(floorRoute);
+                                  }
+                                }}
+                              />
+                            </g>
+                          );
+                        })}
                       </svg>
                     ) : null}
-                    {floors.map((floor) => (
-                      floor.label_position ? (
+                    {floors.map((floor) => {
+                      if (!floor.label_position) {
+                        return null;
+                      }
+
+                      const isActive = activeFloorId === floor.id;
+
+                      return (
                         <button
                           key={floor.id}
                           type="button"
-                          className="building-floor-label"
+                          className={`building-floor-label${isActive ? " is-active" : ""}`}
                           style={{
                             "--floor-label-x": `${floor.label_position.x}%`,
                             "--floor-label-y": `${floor.label_position.y}%`
                           } as CSSProperties}
+                          onMouseEnter={() => setActiveFloorId(floor.id)}
+                          onMouseLeave={() => setActiveFloorId(null)}
+                          onFocus={() => setActiveFloorId(floor.id)}
+                          onBlur={() => setActiveFloorId(null)}
                           onClick={() => navigateTo(getFloorUnitsRoute(floor))}
                         >
                           <span className="building-floor-label-number">{floor.number}</span>
@@ -85,8 +116,8 @@ export function RenderSection({
                             <span className="building-floor-tooltip-meta">{getFloorTooltip(floor)}</span>
                           </span>
                         </button>
-                      ) : null
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : null
               )}
