@@ -414,6 +414,7 @@ export function UnitCatalogPage({
   const [searchTerm, setSearchTerm] = useState("");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [mobileSortOpen, setMobileSortOpen] = useState(false);
+  const [activeFloorPlanUnitId, setActiveFloorPlanUnitId] = useState<number | null>(null);
   const roomTypeOptions = useMemo(() => getRoomTypeOptions(filters, copy), [filters, copy]);
   const typeOptions = useMemo(() => getPropertyTypeOptions(filters, copy), [filters, copy]);
   const conditionOptions = useMemo(() => getConditionFilterOptions(filters, copy), [filters, copy]);
@@ -1135,19 +1136,36 @@ export function UnitCatalogPage({
                       <div className="floor-plan-media">
                         <div className="floor-plan-image-map">
                           <img src={selectedFloorPlanImage} alt={selectedFloorTitle || copy.floorPlanTitle} />
-                          <svg className="floor-plan-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                          <svg className="floor-plan-overlay" viewBox="0 0 100 100" preserveAspectRatio="none" role="group" aria-label={copy.floorPlanTitle}>
                             {filteredFloorPlanUnits.map((item) => {
                               const points = (item.plan_polygon || []).map(normalizePlanPoint);
                               if (!points.length) {
                                 return null;
                               }
 
+                              const isActive = activeFloorPlanUnitId === item.id;
+                              const unitPath = `/properties/${propertySlug}/units/${item.slug}`;
+                              const unitLabel = `${getUnitDisplayTitle(item, language)} ${formatArea(item.area)} ${mapUnitStatusLabel(item.status, language)}`;
+
                               return (
                                 <polygon
                                   key={item.id}
                                   points={points.map((point) => `${point.x},${point.y}`).join(" ")}
-                                  className={`floor-plan-unit-shape floor-plan-unit-shape--${item.status}`}
-                                  onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}
+                                  className={`floor-plan-unit-shape floor-plan-unit-shape--${item.status}${isActive ? " is-active" : ""}`}
+                                  role="link"
+                                  tabIndex={0}
+                                  aria-label={unitLabel}
+                                  onMouseEnter={() => setActiveFloorPlanUnitId(item.id)}
+                                  onMouseLeave={() => setActiveFloorPlanUnitId(null)}
+                                  onFocus={() => setActiveFloorPlanUnitId(item.id)}
+                                  onBlur={() => setActiveFloorPlanUnitId(null)}
+                                  onClick={() => navigateTo(unitPath)}
+                                  onKeyDown={(event) => {
+                                    if (event.key === "Enter" || event.key === " ") {
+                                      event.preventDefault();
+                                      navigateTo(unitPath);
+                                    }
+                                  }}
                                 />
                               );
                             })}
@@ -1162,13 +1180,18 @@ export function UnitCatalogPage({
                             const labelPoint = item.plan_label_position
                               ? normalizePlanPoint(item.plan_label_position)
                               : getPolygonCentroid(points);
+                            const isActive = activeFloorPlanUnitId === item.id;
 
                             return (
                               <button
                                 key={`label-${item.id}`}
                                 type="button"
-                                className={`floor-plan-unit-label floor-plan-unit-label--${item.status}`}
+                                className={`floor-plan-unit-label floor-plan-unit-label--${item.status}${isActive ? " is-active" : ""}`}
                                 style={{ left: `${labelPoint.x}%`, top: `${labelPoint.y}%` }}
+                                onMouseEnter={() => setActiveFloorPlanUnitId(item.id)}
+                                onMouseLeave={() => setActiveFloorPlanUnitId(null)}
+                                onFocus={() => setActiveFloorPlanUnitId(item.id)}
+                                onBlur={() => setActiveFloorPlanUnitId(null)}
                                 onClick={() => navigateTo(`/properties/${propertySlug}/units/${item.slug}`)}
                               >
                                 <span>{item.unit_number ? `#${item.unit_number}` : getUnitDisplayTitle(item, language)}</span>
