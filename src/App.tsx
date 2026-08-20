@@ -1572,8 +1572,12 @@ function App() {
               <>
                 <div className="news-detail-hero">
                   <div className="news-detail-copy">
-                    <div className="news-detail-meta">
-                      <div className="news-detail-meta-info">
+                    <div className="news-detail-kicker">
+                      <button className="news-detail-back" type="button" onClick={() => navigateTo("/")}>
+                        <ArrowIcon direction="left" />
+                        <span>{language === "ka" ? "უკან" : "Back"}</span>
+                      </button>
+                      <div className="news-detail-meta">
                         <span className="news-detail-category">{detailCategory}</span>
                         {detailDate ? (
                           <span className="news-detail-meta-item">
@@ -1581,17 +1585,7 @@ function App() {
                             <span>{detailDate}</span>
                           </span>
                         ) : null}
-                        {newsDetail?.author?.name ? (
-                          <span className="news-detail-meta-item">
-                            <span className="news-detail-meta-label">{language === "ka" ? "ავტორი" : "Author"}</span>
-                            <span>{newsDetail.author.name}</span>
-                          </span>
-                        ) : null}
                       </div>
-                      <button className="news-detail-back" type="button" onClick={() => navigateTo("/")}>
-                        <ArrowIcon direction="left" />
-                        <span>{language === "ka" ? "უკან" : "Back"}</span>
-                      </button>
                     </div>
                     <h1>{detailTitle}</h1>
                     {newsDetail?.excerpt ? <p className="news-detail-excerpt">{newsDetail.excerpt}</p> : null}
