@@ -210,7 +210,7 @@ export type SupportedCurrency = "USD" | "EUR" | "GEL";
 
 export type CurrencyRates = Record<SupportedCurrency, number>;
 
-const NBG_RATES_URL = "https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/en/json";
+const NBG_RATES_URL = "https://nbg.gov.ge/gw/api/ct/monetarypolicy/currencies/ka/json";
 
 export async function fetchCurrencyRates(): Promise<CurrencyRates> {
   const response = await fetch(NBG_RATES_URL);

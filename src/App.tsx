@@ -166,6 +166,11 @@ function getInitialLanguage(): Language {
   return languageOptions.some((option) => option.code === savedLanguage) ? (savedLanguage as Language) : "ka";
 }
 
+function getInitialCurrency(): SupportedCurrency {
+  const savedCurrency = localStorage.getItem("origami_currency");
+  return savedCurrency === "GEL" || savedCurrency === "USD" || savedCurrency === "EUR" ? savedCurrency : "USD";
+}
+
 function getNewsLocale(language: Language) {
   return language === "ka" ? "ka" : "en";
 }
@@ -250,7 +255,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
-  const [currency] = useState<SupportedCurrency>("USD");
+  const [currency, setCurrency] = useState<SupportedCurrency>(getInitialCurrency);
   const [currencyRates, setCurrencyRates] = useState<CurrencyRates | null>(null);
   const [newsItems, setNewsItems] = useState<NewsCard[]>([]);
   const [newsDetail, setNewsDetail] = useState<NewsApiItem | null>(null);
@@ -372,6 +377,10 @@ function App() {
     localStorage.setItem("origami_language", language);
     document.documentElement.lang = language;
   }, [language]);
+
+  useEffect(() => {
+    localStorage.setItem("origami_currency", currency);
+  }, [currency]);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -1433,6 +1442,11 @@ function App() {
     setLanguage(nextLanguage);
   };
 
+  const handleCurrencySelect = (nextCurrency: SupportedCurrency) => {
+    setCurrency(nextCurrency);
+    setIsCurrencyModalOpen(false);
+  };
+
   const handleSearch = () => {
     setMobileFilterOpen(false);
     navigateTo(
@@ -1674,8 +1688,11 @@ function App() {
           active={isLanguageModalOpen || isCurrencyModalOpen}
           language={language}
           languageOptions={languageOptions}
+          currency={currency}
+          currencyRates={currencyRates}
           closeModal={() => { closeLanguageModal(); closeCurrencyModal(); }}
           handleLanguageSelect={handleUnitsLanguageSelect}
+          handleCurrencySelect={handleCurrencySelect}
           t={t}
         />
       </>
@@ -1711,8 +1728,11 @@ function App() {
           active={isLanguageModalOpen}
           language={language}
           languageOptions={languageOptions}
+          currency={currency}
+          currencyRates={currencyRates}
           closeModal={closeLanguageModal}
           handleLanguageSelect={handleLanguageSelect}
+          handleCurrencySelect={handleCurrencySelect}
           t={t}
         />
       </>
@@ -1970,8 +1990,11 @@ function App() {
         active={isLanguageModalOpen}
         language={language}
         languageOptions={languageOptions}
+        currency={currency}
+        currencyRates={currencyRates}
         closeModal={closeLanguageModal}
         handleLanguageSelect={handleLanguageSelect}
+        handleCurrencySelect={handleCurrencySelect}
         t={t}
       />
       <Analytics />
