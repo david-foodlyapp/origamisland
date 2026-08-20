@@ -927,7 +927,6 @@ function App() {
         const nextNews = payload.data
           .filter((item) => item.image_url && item.status !== "inactive")
           .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
-          .slice(0, 3)
           .map((item) => ({
             id: item.id,
             slug: item.slug,
@@ -1973,4 +1972,3 @@ function App() {
   );
 }
 export default App;
-
