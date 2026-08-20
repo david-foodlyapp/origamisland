@@ -21,7 +21,6 @@ import { CompanyProjectsSection } from "./components/sections/CompanyProjectsSec
 import { NewsSection } from "./components/sections/NewsSection";
 import { GallerySection } from "./components/sections/GallerySection";
 import { Footer } from "./components/sections/Footer";
-import { FloatingWidget } from "./components/sections/FloatingWidget";
 import { ConsultationModal } from "./components/sections/ConsultationModal";
 import { LanguageModal } from "./components/sections/LanguageModal";
 import { UnitsPreferencesModal } from "./components/sections/UnitsPreferencesModal";
@@ -111,6 +110,11 @@ const brandingLogoFallbacks = {
   logo_dark_en_url: "https://res.cloudinary.com/dju7d2yys/image/upload/v1777893359/origami/settings/logos/uhlwllbfg89wynhjgcul.png",
   logo_dark_ka_url: "https://res.cloudinary.com/dju7d2yys/image/upload/v1777893360/origami/settings/logos/ia00pcubsclzataowqsu.png"
 } as const;
+
+const bitrixSiteButtonLoaders: Record<"ka" | "en", string> = {
+  ka: "https://cdn.bitrix24.com/b38005393/crm/site_button/loader_1_xzpdqz.js",
+  en: "https://cdn.bitrix24.com/b38005393/crm/site_button/loader_3_jjn8zy.js"
+};
 
 type PhoneCountryCodeOption = {
   code: string;
@@ -238,8 +242,6 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [openFooterSection, setOpenFooterSection] = useState<FooterSection | null>(null);
-  const [isWidgetVisible, setIsWidgetVisible] = useState(false);
-  const [isWidgetOpen, setIsWidgetOpen] = useState(false);
   const [headerShrunk, setHeaderShrunk] = useState(false);
   const [heroUnitFilters, setHeroUnitFilters] = useState<UnitFilterOptions | null>(null);
   const [selectedRoomType, setSelectedRoomType] = useState("");
@@ -282,15 +284,6 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessState, setShowSuccessState] = useState(false);
 
-  useEffect(() => {
-    const widgetTimer = window.setTimeout(() => {
-      setIsWidgetVisible(true);
-    }, 8000);
-
-    return () => {
-      window.clearTimeout(widgetTimer);
-    };
-  }, []);
   const [submitError, setSubmitError] = useState("");
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
@@ -378,6 +371,21 @@ function App() {
   useEffect(() => {
     localStorage.setItem("origami_language", language);
     document.documentElement.lang = language;
+  }, [language]);
+
+  useEffect(() => {
+    const loaderUrl = language === "en" ? bitrixSiteButtonLoaders.en : bitrixSiteButtonLoaders.ka;
+    const script = document.createElement("script");
+    script.id = "origami-bitrix-site-button";
+    script.async = true;
+    script.src = `${loaderUrl}?${Date.now() / 60000 | 0}`;
+
+    const firstScript = document.getElementsByTagName("script")[0];
+    firstScript?.parentNode?.insertBefore(script, firstScript);
+
+    if (!firstScript?.parentNode) {
+      document.body.appendChild(script);
+    }
   }, [language]);
 
   useEffect(() => {
@@ -1923,14 +1931,6 @@ function App() {
         formatTelHref={formatTelHref}
         t={t}
       />
-      <FloatingWidget
-        visible={isWidgetVisible}
-        open={isWidgetOpen}
-        setOpen={setIsWidgetOpen}
-        openModal={openModal}
-        t={t}
-      />
-
       <ConsultationModal
           active={isModalOpen}
           selectedChooseItem={selectedChooseItem}
