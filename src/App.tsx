@@ -374,6 +374,19 @@ function App() {
   }, [language]);
 
   useEffect(() => {
+    const script = document.createElement("script");
+    script.async = true;
+    script.src = `https://cdn.bitrix24.com/b38005393/crm/tag/call.tracker.js?${Date.now() / 60000 | 0}`;
+
+    const firstScript = document.getElementsByTagName("script")[0];
+    firstScript?.parentNode?.insertBefore(script, firstScript);
+
+    if (!firstScript?.parentNode) {
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  useEffect(() => {
     const loaderUrl = language === "en" ? bitrixSiteButtonLoaders.en : bitrixSiteButtonLoaders.ka;
     const script = document.createElement("script");
     script.id = "origami-bitrix-site-button";
