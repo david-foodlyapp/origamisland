@@ -90,7 +90,7 @@ export function navigateTo(path: string) {
 }
 
 export function getApiLocale(language: Language) {
-  return language === "ka" ? "ka" : "en";
+  return language;
 }
 
 export function readUnitCatalogQuery(): UnitCatalogQueryState {

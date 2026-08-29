@@ -1,4 +1,4 @@
-export type Language = "en" | "ka" | "ru" | "pl";
+export type Language = "en" | "ka" | "ru" | "zh" | "he" | "it" | "de" | "ar";
 
 export type TranslationKey =
   | "nav_about"

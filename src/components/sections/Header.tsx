@@ -16,7 +16,7 @@ type HeaderProps = {
   isLanguageModalOpen: boolean;
   setIsLanguageModalOpen: Dispatch<SetStateAction<boolean>>;
   language: Language;
-  languageOptions: Array<{ code: Language; label: string; shortLabel: string }>;
+  languageOptions: Array<{ code: Language; label: string; shortLabel: string; flag?: string }>;
   handleLanguageSelect: (nextLanguage: Language) => void;
   theme: Theme;
   handleThemeToggle: () => void;

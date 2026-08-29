@@ -97,11 +97,15 @@ const origamiInfoIcons = [
   <PenthouseIcon />
 ];
 
-const languageOptions: Array<{ code: Language; label: string; shortLabel: string }> = [
-  { code: "ka", label: "ქართული", shortLabel: "KA" },
-  { code: "en", label: "English", shortLabel: "EN" },
-  // { code: "ru", label: "Русский", shortLabel: "RUS" },
-  // { code: "pl", label: "Polski", shortLabel: "POL" }
+const languageOptions: Array<{ code: Language; label: string; shortLabel: string; flag: string }> = [
+  { code: "en", label: "English", shortLabel: "EN", flag: "🇺🇸" },
+  { code: "ka", label: "ქართული", shortLabel: "KA", flag: "🇬🇪" },
+  { code: "ru", label: "Русский", shortLabel: "RU", flag: "🇷🇺" },
+  { code: "zh", label: "中文", shortLabel: "ZH", flag: "🇨🇳" },
+  { code: "he", label: "עברית", shortLabel: "HE", flag: "🇮🇱" },
+  { code: "it", label: "Italiano", shortLabel: "IT", flag: "🇮🇹" },
+  { code: "de", label: "Deutsch", shortLabel: "DE", flag: "🇩🇪" },
+  { code: "ar", label: "العربية", shortLabel: "AR", flag: "🇸🇦" }
 ];
 
 const brandingLogoFallbacks = {
@@ -172,11 +176,21 @@ function getInitialCurrency(): SupportedCurrency {
 }
 
 function getNewsLocale(language: Language) {
-  return language === "ka" ? "ka" : "en";
+  return language;
 }
 
 function formatNewsDate(dateString: string, language: Language) {
-  const formatted = new Intl.DateTimeFormat(language === "ka" ? "ka-GE" : language === "ru" ? "ru-RU" : language === "pl" ? "pl-PL" : "en-US", {
+  const dateLocales: Record<Language, string> = {
+    en: "en-US",
+    ka: "ka-GE",
+    ru: "ru-RU",
+    zh: "zh-CN",
+    he: "he-IL",
+    it: "it-IT",
+    de: "de-DE",
+    ar: "ar-SA"
+  };
+  const formatted = new Intl.DateTimeFormat(dateLocales[language], {
     month: "long",
     day: "numeric",
     year: "numeric"
@@ -376,6 +390,7 @@ function App() {
   useEffect(() => {
     localStorage.setItem("origami_language", language);
     document.documentElement.lang = language;
+    document.documentElement.dir = language === "ar" || language === "he" ? "rtl" : "ltr";
   }, [language]);
 
   useEffect(() => {
@@ -396,7 +411,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const loaderUrl = language === "en" ? bitrixSiteButtonLoaders.en : bitrixSiteButtonLoaders.ka;
+    const loaderUrl = language === "ka" ? bitrixSiteButtonLoaders.ka : bitrixSiteButtonLoaders.en;
     const script = document.createElement("script");
     script.id = "origami-bitrix-site-button";
     script.async = true;

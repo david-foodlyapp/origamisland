@@ -6,6 +6,7 @@ type LanguageOption = {
   code: Language;
   label: string;
   shortLabel: string;
+  flag?: string;
 };
 
 type LanguageModalProps = {
@@ -64,7 +65,10 @@ export function LanguageModal({
               className={`language-option ${language === option.code ? "is-active" : ""}`}
               onClick={() => handleLanguageSelect(option.code)}
             >
-              <span>{option.label}</span>
+              <span className="language-option-label">
+                {option.flag ? <span className="language-option-flag" aria-hidden="true">{option.flag}</span> : null}
+                <span>{option.label}</span>
+              </span>
             </button>
           ))}
         </div>

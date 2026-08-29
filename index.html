@@ -22,9 +22,11 @@
         const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
         const theme = savedTheme || (prefersLight ? "light" : "dark");
         const savedLanguage = localStorage.getItem("origami_language");
-        const language = ["ka", "en"].includes(savedLanguage) ? savedLanguage : "ka";
+        const supportedLanguages = ["en", "ka", "ru", "zh", "he", "it", "de", "ar"];
+        const language = supportedLanguages.includes(savedLanguage) ? savedLanguage : "ka";
         document.documentElement.setAttribute("data-theme", theme);
         document.documentElement.lang = language;
+        document.documentElement.dir = language === "ar" || language === "he" ? "rtl" : "ltr";
       }
     </script>
   </head>
