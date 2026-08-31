@@ -6,6 +6,7 @@ type FooterProps = {
   darkThemeLogoSrc: string;
   lightThemeLogoSrc: string;
   socialNetworks: SocialNetworkItem[];
+  footerDescription: string;
   primaryNavItems: Array<{ href: string; label: string; isModalAction?: boolean }>;
   companyProjectsData: { title: string; items: CompanyProjectApiItem[] } | null;
   legalItems: SectionGridCardItem[];
@@ -27,6 +28,7 @@ export function Footer({
   darkThemeLogoSrc,
   lightThemeLogoSrc,
   socialNetworks,
+  footerDescription,
   primaryNavItems,
   companyProjectsData,
   legalItems,
@@ -57,7 +59,7 @@ export function Footer({
                 className="logo-img logo-light"
               />
             </a>
-            <p>{t("footer_desc")}</p>
+            <p>{footerDescription}</p>
 
             <div className="social-links">
               {socialNetworks.length > 0 ? (

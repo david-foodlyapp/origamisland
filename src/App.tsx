@@ -289,6 +289,7 @@ function App() {
   const [apiFinanceData, setApiFinanceData] = useState<{ title: string; description: string; items: FinanceApiItem[] } | null>(null);
   const [apiCompanyProjectsData, setApiCompanyProjectsData] = useState<{ title: string; items: CompanyProjectApiItem[] } | null>(null);
   const [apiSection3Data, setApiSection3Data] = useState<{ title: string; background_image: string } | null>(null);
+  const [apiFooterDescription, setApiFooterDescription] = useState("");
   const [apiFooterMenuItems, setApiFooterMenuItems] = useState<FooterMenuApiItem[]>([]);
   const [apiFooterLegalItems, setApiFooterLegalItems] = useState<SectionGridCardItem[]>([]);
   const [apiContactSettings, setApiContactSettings] = useState<ContactSettings | null>(null);
@@ -715,6 +716,38 @@ function App() {
       window.removeEventListener("resize", requestUpdate);
     };
   }, [apiInfrastructureItems.length]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadFooterContent = async () => {
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`${API_BASE_URL}/sections/footer?locale=${locale}`, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Footer content request failed: ${response.status}`);
+        }
+
+        const payload: WebsiteSectionResponse = await response.json();
+        const footerItem = payload.data.items
+          .filter((item) => item.status)
+          .sort((a, b) => a.rank - b.rank)[0];
+        const title = footerItem?.title?.trim() || "";
+        const subtitle = footerItem?.subtitle?.trim() || "";
+        const description = title && subtitle && title !== subtitle ? `${title}- ${subtitle}` : title || subtitle;
+        setApiFooterDescription(description);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load footer content:", error);
+        setApiFooterDescription("");
+      }
+    };
+
+    loadFooterContent();
+    return () => controller.abort();
+  }, [language]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1963,6 +1996,7 @@ function App() {
         darkThemeLogoSrc={darkThemeLogoSrc}
         lightThemeLogoSrc={lightThemeLogoSrc}
         socialNetworks={apiSocialNetworks}
+        footerDescription={apiFooterDescription || t("footer_desc")}
         primaryNavItems={primaryNavItems}
         companyProjectsData={apiCompanyProjectsData}
         legalItems={apiFooterLegalItems}
