@@ -56,6 +56,63 @@ type UnitCatalogPageProps = {
 
 type PaginationItem = number | "ellipsis";
 type UnitMediaMode = "2d" | "3d" | "floorPlan" | "view";
+type UnitMediaLabels = {
+  image2d: string;
+  image3d: string;
+  floorPlan: string;
+  view: string;
+};
+
+const unitMediaLabels: Record<Language, UnitMediaLabels> = {
+  en: {
+    image2d: "2D",
+    image3d: "3D",
+    floorPlan: "Floor Plan",
+    view: "View"
+  },
+  ka: {
+    image2d: "2D",
+    image3d: "3D",
+    floorPlan: "სართულის გეგმა",
+    view: "ხედი"
+  },
+  ru: {
+    image2d: "2D",
+    image3d: "3D",
+    floorPlan: "План этажа",
+    view: "Вид"
+  },
+  zh: {
+    image2d: "2D",
+    image3d: "3D",
+    floorPlan: "平面图",
+    view: "景观"
+  },
+  he: {
+    image2d: "2D",
+    image3d: "3D",
+    floorPlan: "תוכנית קומה",
+    view: "נוף"
+  },
+  it: {
+    image2d: "2D",
+    image3d: "3D",
+    floorPlan: "Planimetria",
+    view: "Vista"
+  },
+  de: {
+    image2d: "2D",
+    image3d: "3D",
+    floorPlan: "Grundriss",
+    view: "Ausblick"
+  },
+  ar: {
+    image2d: "2D",
+    image3d: "3D",
+    floorPlan: "مخطط الطابق",
+    view: "الإطلالة"
+  }
+};
 
 const copyKa = {
   listingTitle: "ბინების არჩევა",
@@ -197,6 +254,10 @@ const copyEn: typeof copyKa = {
 
 function getCopy(language: Language) {
   return language === "ka" ? copyKa : copyEn;
+}
+
+function getUnitMediaLabels(language: Language) {
+  return unitMediaLabels[language];
 }
 
 function sanitizeCatalogQueryState(state: UnitCatalogQueryState): UnitCatalogQueryState {
@@ -400,6 +461,7 @@ export function UnitCatalogPage({
   currencyRates
 }: UnitCatalogPageProps) {
   const copy = getCopy(language);
+  const mediaCopy = getUnitMediaLabels(language);
   const initialQuery = useMemo(() => sanitizeCatalogQueryState(readUnitCatalogQuery()), []);
   const [query, setQuery] = useState<UnitCatalogQueryState>(initialQuery);
   const [draftQuery, setDraftQuery] = useState<UnitCatalogQueryState>(initialQuery);
@@ -740,7 +802,7 @@ export function UnitCatalogPage({
                         onClick={() => setMediaMode("2d")}
                         disabled={!unitImage2d}
                       >
-                        {copy.image2d}
+                        {mediaCopy.image2d}
                       </button>
                       <button
                         type="button"
@@ -748,7 +810,7 @@ export function UnitCatalogPage({
                         onClick={() => setMediaMode("3d")}
                         disabled={!unitImage3d}
                       >
-                        3D
+                        {mediaCopy.image3d}
                       </button>
                       <button
                         type="button"
@@ -756,7 +818,7 @@ export function UnitCatalogPage({
                         onClick={() => setMediaMode("floorPlan")}
                         disabled={!unitFloorPlanImage}
                       >
-                        {copy.floorPlan}
+                        {mediaCopy.floorPlan}
                       </button>
                       <button
                         type="button"
@@ -764,7 +826,7 @@ export function UnitCatalogPage({
                         onClick={() => setMediaMode("view")}
                         disabled={!unitViewImage}
                       >
-                        {copy.view}
+                        {mediaCopy.view}
                       </button>
                     </div>
 
@@ -827,13 +889,13 @@ export function UnitCatalogPage({
                 <div className="unit-detail-visual">
                   <div className="unit-image-stage">
                     {mediaMode === "view" ? (
-                      unitViewImage ? <img src={unitViewImage} alt={`${getUnitDisplayTitle(unit, language)} view`} /> : <div className="units-image-placeholder" />
+                      unitViewImage ? <img src={unitViewImage} alt={`${getUnitDisplayTitle(unit, language)} ${mediaCopy.view}`} /> : <div className="units-image-placeholder" />
                     ) : mediaMode === "floorPlan" ? (
-                      unitFloorPlanImage ? <img src={unitFloorPlanImage} alt={`${getUnitDisplayTitle(unit, language)} floor plan`} /> : <div className="units-image-placeholder" />
+                      unitFloorPlanImage ? <img src={unitFloorPlanImage} alt={`${getUnitDisplayTitle(unit, language)} ${mediaCopy.floorPlan}`} /> : <div className="units-image-placeholder" />
                     ) : mediaMode === "3d" ? (
-                      unitImage3d ? <img src={unitImage3d} alt={`${getUnitDisplayTitle(unit, language)} 3D render`} /> : <div className="units-image-placeholder" />
+                      unitImage3d ? <img src={unitImage3d} alt={`${getUnitDisplayTitle(unit, language)} ${mediaCopy.image3d}`} /> : <div className="units-image-placeholder" />
                     ) : (
-                      unitImage2d ? <img src={unitImage2d} alt={`${getUnitDisplayTitle(unit, language)} plan`} /> : <div className="units-image-placeholder" />
+                      unitImage2d ? <img src={unitImage2d} alt={`${getUnitDisplayTitle(unit, language)} ${mediaCopy.image2d}`} /> : <div className="units-image-placeholder" />
                     )}
                   </div>
                 </div>
