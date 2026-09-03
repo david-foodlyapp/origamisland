@@ -6283,6 +6283,16 @@ html[data-theme="dark"] .modal-content {
   color: #f2f4ef;
 }
 
+.unit-mode-switch button:disabled {
+  cursor: not-allowed;
+  opacity: 0.36;
+}
+
+.unit-mode-switch button:disabled.active {
+  background: transparent;
+  color: #7f948b;
+}
+
 .units-view-toggle-mobile {
   display: none;
 }
