@@ -7,6 +7,14 @@ type CountdownValue = {
   seconds: number;
 };
 
+type ContactField = "name" | "email" | "phone";
+type ContactFieldErrors = Partial<Record<ContactField, string>>;
+
+type ContactApiError = {
+  message?: string;
+  errors?: Partial<Record<ContactField, string[]>>;
+};
+
 // Official reveal: September 8, 2026 at 18:00 in Tbilisi (UTC+4).
 const LAUNCH_DATE = new Date("2026-09-08T18:00:00+04:00");
 
@@ -69,7 +77,8 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
   const [countryCode, setCountryCode] = useState("+995");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<ContactFieldErrors>({});
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -82,7 +91,8 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
-    setError(false);
+    setSubmitError("");
+    setFieldErrors({});
     const fullPhoneNumber = `${countryCode} ${phone}`.trim();
 
     try {
@@ -102,8 +112,20 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`Request failed: ${response.status}`);
+      const result = await response.json().catch(() => ({} as ContactApiError)) as ContactApiError;
+
+      if (response.status === 422 && result.errors) {
+        setFieldErrors({
+          name: result.errors.name?.[0],
+          email: result.errors.email?.[0],
+          phone: result.errors.phone?.[0],
+        });
+        setSubmitError(result.message || copy.error);
+        return;
+      }
+
+      if (response.status !== 201) {
+        throw new Error(result.message || `Request failed: ${response.status}`);
       }
 
       setSubmitted(true);
@@ -112,7 +134,7 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
       setCountryCode("+995");
       setPhone("");
     } catch {
-      setError(true);
+      setSubmitError(copy.error);
     } finally {
       setIsSubmitting(false);
     }
@@ -185,9 +207,16 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
                       className="cs-input"
                       placeholder={copy.name}
                       required
+                      maxLength={255}
+                      aria-invalid={Boolean(fieldErrors.name)}
+                      aria-describedby={fieldErrors.name ? "cs-name-error" : undefined}
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e) => {
+                        setName(e.target.value);
+                        setFieldErrors((current) => ({ ...current, name: undefined }));
+                      }}
                     />
+                    {fieldErrors.name && <p id="cs-name-error" className="cs-field-error">{fieldErrors.name}</p>}
                   </div>
                   <div className="cs-form-group">
                     <input
@@ -198,9 +227,16 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
                       className="cs-input"
                       placeholder={copy.email}
                       required
+                      maxLength={255}
+                      aria-invalid={Boolean(fieldErrors.email)}
+                      aria-describedby={fieldErrors.email ? "cs-email-error" : undefined}
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setFieldErrors((current) => ({ ...current, email: undefined }));
+                      }}
                     />
+                    {fieldErrors.email && <p id="cs-email-error" className="cs-field-error">{fieldErrors.email}</p>}
                   </div>
                 </div>
                 <div className="cs-phone-row">
@@ -218,17 +254,26 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
                       </option>
                     ))}
                   </select>
-                  <input
-                    type="tel"
-                    id="cs-phone"
-                    aria-label={copy.phone}
-                    autoComplete="tel-national"
-                    className="cs-input"
-                    placeholder={copy.phone}
-                    required
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                  />
+                  <div className="cs-form-group">
+                    <input
+                      type="tel"
+                      id="cs-phone"
+                      aria-label={copy.phone}
+                      autoComplete="tel-national"
+                      className="cs-input"
+                      placeholder={copy.phone}
+                      required
+                      maxLength={255}
+                      aria-invalid={Boolean(fieldErrors.phone)}
+                      aria-describedby={fieldErrors.phone ? "cs-phone-error" : undefined}
+                      value={phone}
+                      onChange={(e) => {
+                        setPhone(e.target.value);
+                        setFieldErrors((current) => ({ ...current, phone: undefined }));
+                      }}
+                    />
+                    {fieldErrors.phone && <p id="cs-phone-error" className="cs-field-error">{fieldErrors.phone}</p>}
+                  </div>
                 </div>
                 <button
                   type="submit"
@@ -247,8 +292,8 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
                     </>
                   )}
                 </button>
-                {error && (
-                  <p className="cs-form-error" role="alert">{copy.error}</p>
+                {submitError && (
+                  <p className="cs-form-error" role="alert">{submitError}</p>
                 )}
               </form>
             </>
