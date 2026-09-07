@@ -24,6 +24,7 @@ import { Footer } from "./components/sections/Footer";
 import { ConsultationModal } from "./components/sections/ConsultationModal";
 import { LanguageModal } from "./components/sections/LanguageModal";
 import { UnitsPreferencesModal } from "./components/sections/UnitsPreferencesModal";
+import { ComingSoonPage } from "./components/sections/ComingSoonPage";
 import {
   CalendarIcon, BuildingIcon,
   WellnessIcon, LongevityIcon, RecoveryIcon, HealthyLivingIcon,
@@ -115,6 +116,8 @@ const brandingLogoFallbacks = {
   logo_dark_ka_url: "https://res.cloudinary.com/dju7d2yys/image/upload/v1777893360/origami/settings/logos/ia00pcubsclzataowqsu.png"
 } as const;
 
+const BITRIX_WIDGET_ENABLED = false;
+
 const bitrixSiteButtonLoaders: Record<"ka" | "en", string> = {
   ka: "https://cdn.bitrix24.com/b38005393/crm/site_button/loader_1_xzpdqz.js",
   en: "https://cdn.bitrix24.com/b38005393/crm/site_button/loader_3_jjn8zy.js"
@@ -152,7 +155,8 @@ const phoneCountryCodeFallbackOptions: PhoneCountryCodeOption[] = [
 const defaultPhoneCountryCode = phoneCountryCodeFallbackOptions[0].dialCode;
 
 type NewsDetailRoute = { name: "newsDetail"; slug: string };
-type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute | NewsDetailRoute;
+type ComingSoonRoute = { name: "comingSoon" };
+type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute | NewsDetailRoute | ComingSoonRoute;
 type FeaturedUnitsFilter = "all" | "hotel_room" | "apartment";
 const SHOW_FEATURED_UNITS_SECTION = false;
 
@@ -233,14 +237,19 @@ function resolveBrandingLogo(
 }
 
 function getAppRoute(): AppRouteState {
+  const path = window.location.pathname;
+  const normalized = path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path;
+
+  if (normalized === "/coming-soon") {
+    return { name: "comingSoon" };
+  }
+
   const unitRoute = getUnitCatalogRoute();
 
   if (unitRoute.name === "home" || unitRoute.name === "unitList" || unitRoute.name === "unitDetail") {
     return unitRoute;
   }
 
-  const path = window.location.pathname;
-  const normalized = path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path;
   const newsMatch = normalized.match(/^\/news\/([^/]+)$/);
   if (newsMatch) {
     return { name: "newsDetail", slug: decodeURIComponent(newsMatch[1]) };
@@ -348,7 +357,7 @@ function App() {
     const rawTarget = item.link || item.slug;
     const anchor = rawTarget.replace(/^#+/, "");
     return {
-      href: `#${anchor}`,
+      href: `${routeState.name === "comingSoon" ? "/" : ""}#${anchor}`,
       label: item.title,
       isModalAction: anchor === "consultation"
     };
@@ -412,6 +421,8 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!BITRIX_WIDGET_ENABLED) return;
+
     const loaderUrl = language === "ka" ? bitrixSiteButtonLoaders.ka : bitrixSiteButtonLoaders.en;
     const script = document.createElement("script");
     script.id = "origami-bitrix-site-button";
@@ -1789,7 +1800,8 @@ function App() {
 
   return (
     <>
-      <Header
+      {routeState.name !== "comingSoon" && <Header
+        variant="default"
         headerShrunk={headerShrunk}
         darkThemeLogoSrc={darkThemeLogoSrc}
         lightThemeLogoSrc={lightThemeLogoSrc}
@@ -1805,10 +1817,10 @@ function App() {
         handleLanguageSelect={handleLanguageSelect}
         theme={theme}
         handleThemeToggle={handleThemeToggle}
-      />
+      />}
 
       <main>
-        <>
+        {routeState.name === "comingSoon" ? <ComingSoonPage language={language === "ka" ? "ka" : "en"} onLanguageChange={handleLanguageSelect} darkThemeLogoSrc={resolveBrandingLogo(branding, "en", "dark")} lightThemeLogoSrc={resolveBrandingLogo(branding, "en", "default")} countryCodeOptions={countryCodeOptions} /> : <>
       <HeroSection
         t={t}
         unitFilters={heroUnitFilters}
@@ -1988,11 +2000,11 @@ function App() {
           trackRef={galleryTrackRef}
           t={t}
         />
-        </>
+        </>}
 
       </main>
 
-      <Footer
+      {routeState.name !== "comingSoon" && <Footer
         darkThemeLogoSrc={darkThemeLogoSrc}
         lightThemeLogoSrc={lightThemeLogoSrc}
         socialNetworks={apiSocialNetworks}
@@ -2012,7 +2024,7 @@ function App() {
         openModal={openModal}
         formatTelHref={formatTelHref}
         t={t}
-      />
+      />}
       <ConsultationModal
           active={isModalOpen}
           selectedChooseItem={selectedChooseItem}
