@@ -240,6 +240,20 @@ function getAppRoute(): AppRouteState {
   const path = window.location.pathname;
   const normalized = path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path;
 
+  const comingSoonVisitKey = "origami_coming_soon_seen";
+  try {
+    if (sessionStorage.getItem(comingSoonVisitKey) !== "true") {
+      sessionStorage.setItem(comingSoonVisitKey, "true");
+
+      if (normalized !== "/coming-soon") {
+        window.history.replaceState(null, "", "/coming-soon");
+        return { name: "comingSoon" };
+      }
+    }
+  } catch {
+    // Keep normal routing available when session storage is unavailable.
+  }
+
   if (normalized === "/coming-soon") {
     return { name: "comingSoon" };
   }
