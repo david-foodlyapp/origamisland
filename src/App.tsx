@@ -115,11 +115,10 @@ const brandingLogoFallbacks = {
   logo_dark_ka_url: "https://res.cloudinary.com/dju7d2yys/image/upload/v1777893360/origami/settings/logos/ia00pcubsclzataowqsu.png"
 } as const;
 
-const BITRIX_WIDGET_ENABLED = false;
-
-const bitrixSiteButtonLoaders: Record<"ka" | "en", string> = {
+const bitrixSiteButtonLoaders: Record<"ka" | "en" | "ru", string> = {
   ka: "https://cdn.bitrix24.com/b38005393/crm/site_button/loader_1_xzpdqz.js",
-  en: "https://cdn.bitrix24.com/b38005393/crm/site_button/loader_3_jjn8zy.js"
+  en: "https://cdn.bitrix24.com/b38005393/crm/site_button/loader_3_jjn8zy.js",
+  ru: "https://cdn.bitrix24.com/b38005393/crm/site_button/loader_5_gcualk.js"
 };
 
 type PhoneCountryCodeOption = {
@@ -419,9 +418,11 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!BITRIX_WIDGET_ENABLED) return;
-
-    const loaderUrl = language === "ka" ? bitrixSiteButtonLoaders.ka : bitrixSiteButtonLoaders.en;
+    const loaderUrl = language === "ka"
+      ? bitrixSiteButtonLoaders.ka
+      : language === "ru"
+        ? bitrixSiteButtonLoaders.ru
+        : bitrixSiteButtonLoaders.en;
     const script = document.createElement("script");
     script.id = "origami-bitrix-site-button";
     script.async = true;
