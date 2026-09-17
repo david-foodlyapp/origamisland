@@ -10,7 +10,6 @@ import { Header } from "./components/sections/Header";
 import { HeroSection } from "./components/sections/HeroSection";
 import { PropertiesPage } from "./components/sections/PropertiesPage";
 import { UnitCatalogPage } from "./components/sections/UnitCatalogPage";
-import { AboutSection } from "./components/sections/AboutSection";
 import { RenderSection } from "./components/sections/RenderSection";
 import { ChooseSection } from "./components/sections/ChooseSection";
 import { BiohackingSection } from "./components/sections/BiohackingSection";
@@ -19,7 +18,6 @@ import { FinanceSection } from "./components/sections/FinanceSection";
 import { OrigamiHoldingSection } from "./components/sections/OrigamiHoldingSection";
 import { CompanyProjectsSection } from "./components/sections/CompanyProjectsSection";
 import { NewsSection } from "./components/sections/NewsSection";
-import { GallerySection } from "./components/sections/GallerySection";
 import { Footer } from "./components/sections/Footer";
 import { ConsultationModal } from "./components/sections/ConsultationModal";
 import { LanguageModal } from "./components/sections/LanguageModal";
@@ -88,14 +86,7 @@ import {
 } from "./unitCatalog";
 import { getExplorerRoute, type ExplorerRoute } from "./propertyExplorer";
 
-const origamiInfoIcons = [
-  <PriceTagIcon />,
-  <CalendarIcon />,
-  <InstallmentIcon />,
-  <ResidenceIcon />,
-  <HotelSuiteIcon />,
-  <PenthouseIcon />
-];
+
 
 const languageOptions: Array<{ code: Language; label: string; shortLabel: string; flag: string }> = [
   { code: "en", label: "English", shortLabel: "EN", flag: "🇺🇸" },
@@ -287,7 +278,7 @@ function App() {
   const [apiBuildingVisual, setApiBuildingVisual] = useState<BuildingVisual | null>(null);
   const [isBuildingVisualLoading, setIsBuildingVisualLoading] = useState(true);
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
-  const [isGalleryLoading, setIsGalleryLoading] = useState(true);
+  const [, setIsGalleryLoading] = useState(true);
   const [apiInfrastructureItems, setApiInfrastructureItems] = useState<InfrastructureApiItem[]>([]);
   const [apiBiohackingData, setApiBiohackingData] = useState<{ description: string; background_image: string; items: BiohackingApiItem[] } | null>(null);
   const [apiOrigamiHoldingData, setApiOrigamiHoldingData] = useState<{ title: string; background_image: string; items: OrigamiHoldingApiItem[] } | null>(null);
@@ -305,8 +296,8 @@ function App() {
   const [isCompanyProjectsLoading, setIsCompanyProjectsLoading] = useState(true);
   const [apiAboutData, setApiAboutData] = useState<AboutUsApiItem | null>(null);
   const [apiAboutInfoItems, setApiAboutInfoItems] = useState<SectionGridCardItem[]>([]);
-  const [isAboutLoading, setIsAboutLoading] = useState(true);
-  const [isAboutInfoLoading, setIsAboutInfoLoading] = useState(true);
+  const [, setIsAboutLoading] = useState(true);
+  const [, setIsAboutInfoLoading] = useState(true);
   const [selectedChooseItem, setSelectedChooseItem] = useState<ChooseApiItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessState, setShowSuccessState] = useState(false);
@@ -319,8 +310,8 @@ function App() {
   const [formPhone, setFormPhone] = useState("");
   const [formPreferredLanguage, setFormPreferredLanguage] = useState<string>("ka");
   const [formPreferredChannel, setFormPreferredChannel] = useState<string>("Phone Call");
-  const [galleryPageCount, setGalleryPageCount] = useState(1);
-  const [galleryCurrentPage, setGalleryCurrentPage] = useState(0);
+  const [, setGalleryPageCount] = useState(1);
+  const [, setGalleryCurrentPage] = useState(0);
   const galleryTrackRef = useRef<HTMLDivElement | null>(null);
   const infrastructureSectionRef = useRef<HTMLElement | null>(null);
   const t = (key: TranslationKey) => translations[language][key];
@@ -1462,8 +1453,6 @@ function App() {
   const renderSectionTitle = apiSection3Data?.title || "";
   const renderSectionImage = apiBuildingVisual?.image || apiSection3Data?.background_image || "";
   const renderSectionImageAlt = apiBuildingVisual?.title || apiSection3Data?.title || "";
-  const conceptImage = apiAboutData?.image || "";
-  const hasAboutContent = Boolean(apiAboutData?.title || apiAboutData?.body || conceptImage || apiAboutInfoItems.length);
   const hasBiohackingContent = Boolean(apiBiohackingData?.description || apiBiohackingData?.background_image || apiBiohackingData?.items.length);
   const hasInfrastructureContent = apiInfrastructureItems.length > 0;
   const hasFinanceContent = Boolean(apiFinanceData?.title || apiFinanceData?.description || apiFinanceData?.items.length);
@@ -1947,14 +1936,6 @@ function App() {
         handleSearch={handleSearch}
       />
 
-        <AboutSection
-          data={apiAboutData}
-          infoItems={apiAboutInfoItems}
-          image={conceptImage}
-          hasContent={hasAboutContent}
-          loading={isAboutLoading || isAboutInfoLoading}
-          icons={origamiInfoIcons}
-        />
 
         <RenderSection
           title={renderSectionTitle}
@@ -2104,14 +2085,7 @@ function App() {
           navigateTo={navigateTo}
         />
 
-        <GallerySection
-          items={resolvedGalleryItems}
-          loading={isGalleryLoading}
-          pageCount={galleryPageCount}
-          currentPage={galleryCurrentPage}
-          trackRef={galleryTrackRef}
-          t={t}
-        />
+
       </main>
 
       <Footer

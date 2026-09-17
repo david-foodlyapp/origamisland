@@ -1584,6 +1584,49 @@ section {
   margin-bottom: 0;
 }
 
+.about-text-action {
+  margin-top: 0.85rem;
+  display: flex;
+}
+
+.about-see-more-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.35rem;
+  background: rgba(197, 168, 128, 0.08);
+  border: 1px solid var(--lg-border-gold);
+  border-radius: var(--radius-pill);
+  color: var(--primary-gold);
+  font-family: var(--font-georgian);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-quick);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.about-see-more-btn:hover {
+  background: var(--gold-gradient);
+  color: #0b0b0c;
+  border-color: transparent;
+  box-shadow: 0 6px 20px rgba(197, 168, 128, 0.35);
+  transform: translateY(-2px);
+}
+
+.about-see-more-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.about-see-more-btn:hover svg {
+  transform: translateX(3px);
+}
+
+html[data-theme="light"] .about-see-more-btn {
+  background: rgba(197, 168, 128, 0.14);
+  color: #1c1c1e;
+}
+
 .about-grid-right .origami-info-section {
   margin-top: 0;
 }
