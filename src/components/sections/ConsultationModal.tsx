@@ -12,6 +12,7 @@ type PhoneCountryCodeOption = {
 type ConsultationModalProps = {
   active: boolean;
   selectedChooseItem: ChooseApiItem | null;
+  modalDescription?: string;
   showSuccessState: boolean;
   isSubmitting: boolean;
   submitError: string;
@@ -35,6 +36,7 @@ type ConsultationModalProps = {
 export function ConsultationModal({
   active,
   selectedChooseItem,
+  modalDescription,
   showSuccessState,
   isSubmitting,
   submitError,
@@ -54,6 +56,8 @@ export function ConsultationModal({
   setFormPhone,
   t
 }: ConsultationModalProps) {
+  const descriptionText = selectedChooseItem?.description || modalDescription;
+
   return (
     <div id="vip-modal" className={`modal ${active ? "active" : ""}`}>
       <div id="modal-overlay" className="modal-overlay" onClick={closeModal}></div>
@@ -65,10 +69,14 @@ export function ConsultationModal({
 
         <h3 className="modal-title">{selectedChooseItem?.title || t("modal_title")}</h3>
 
-        {selectedChooseItem ? (
-          <p className="modal-desc modal-desc-detail">{selectedChooseItem.description}</p>
-        ) : !showSuccessState ? (
-          <form id="vip-consultation-form" className="luxury-form" onSubmit={handleSubmit}>
+        {!showSuccessState ? (
+          <>
+            {descriptionText ? (
+              <p className="modal-desc" style={{ marginTop: "0.5rem", marginBottom: "1.5rem", textAlign: "center" }}>
+                {descriptionText}
+              </p>
+            ) : null}
+            <form id="vip-consultation-form" className="luxury-form" onSubmit={handleSubmit}>
             <div className="form-group">
               <input
                 type="text"
@@ -156,6 +164,7 @@ export function ConsultationModal({
               </p>
             ) : null}
           </form>
+        </>
         ) : (
           <div
             id="form-success-state"

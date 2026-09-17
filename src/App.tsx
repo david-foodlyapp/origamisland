@@ -297,6 +297,7 @@ function App() {
   const [apiSection3Data, setApiSection3Data] = useState<{ title: string; background_image: string } | null>(null);
   const [apiFooterDescription, setApiFooterDescription] = useState("");
   const [apiFooterMenuItems, setApiFooterMenuItems] = useState<FooterMenuApiItem[]>([]);
+  const [requestCallDescription, setRequestCallDescription] = useState("");
   const [apiFooterLegalItems, setApiFooterLegalItems] = useState<SectionGridCardItem[]>([]);
   const [apiContactSettings, setApiContactSettings] = useState<ContactSettings | null>(null);
   const [apiSocialNetworks, setApiSocialNetworks] = useState<SocialNetworkItem[]>([]);
@@ -353,12 +354,33 @@ function App() {
   const primaryNavItems = apiFooterMenuItems.map((item) => {
     const rawTarget = item.link || item.slug;
     const anchor = rawTarget.replace(/^#+/, "");
+    const normalizedAnchor = anchor.toLowerCase();
+    const normalizedSlug = (item.slug || "").toLowerCase();
+    const isModalAction =
+      normalizedAnchor === "consultation" ||
+      normalizedAnchor === "request-a-call" ||
+      normalizedAnchor === "request-call" ||
+      normalizedAnchor === "call-request" ||
+      normalizedAnchor === "zaris-motkhovna" ||
+      normalizedSlug === "consultation" ||
+      normalizedSlug === "request-a-call" ||
+      normalizedSlug === "request-call" ||
+      normalizedSlug === "call-request" ||
+      normalizedSlug === "zaris-motkhovna";
     return {
       href: `#${anchor}`,
       label: item.title,
-      isModalAction: anchor === "consultation"
+      isModalAction
     };
   });
+  const requestCallItem = apiFooterMenuItems.find(
+    (item) => item.slug === "request-a-call" || item.slug === "request-call"
+  );
+  const modalDescription =
+    selectedChooseItem?.description ||
+    requestCallDescription ||
+    requestCallItem?.description ||
+    "";
   const resolvedGalleryItems: GalleryItem[] = apiGalleryItems.map((item, index) => ({
     id: item.id,
     title: item.title?.trim() || "",
@@ -786,6 +808,33 @@ function App() {
     };
 
     loadFooterMenu();
+    return () => controller.abort();
+  }, [language]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadRequestCallItem = async () => {
+      try {
+        const locale = getNewsLocale(language);
+        const response = await fetch(`${API_BASE_URL}/sections/menu/item/request-a-call?locale=${locale}`, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`Request a call menu item request failed: ${response.status}`);
+        }
+
+        const payload: { data: { description?: string } } = await response.json();
+        if (payload?.data?.description) {
+          setRequestCallDescription(payload.data.description);
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        console.error("Failed to load request-a-call menu item data:", error);
+      }
+    };
+
+    loadRequestCallItem();
     return () => controller.abort();
   }, [language]);
 
@@ -1699,6 +1748,29 @@ function App() {
             )}
           </article>
         </main>
+        <ConsultationModal
+          active={isModalOpen}
+          selectedChooseItem={selectedChooseItem}
+          modalDescription={modalDescription}
+          showSuccessState={showSuccessState}
+          isSubmitting={isSubmitting}
+          submitError={submitError}
+          formName={formName}
+          formEmail={formEmail}
+          formCountryCode={formCountryCode}
+          formPhone={formPhone}
+          countryCodeOptions={countryCodeOptions}
+          language={language}
+          closeModal={closeModal}
+          handleSubmit={handleSubmit}
+          handleFieldInvalid={handleFieldInvalid}
+          clearFieldValidity={clearFieldValidity}
+          setFormName={setFormName}
+          setFormEmail={setFormEmail}
+          setFormCountryCode={setFormCountryCode}
+          setFormPhone={setFormPhone}
+          t={t}
+        />
       </>
     );
   }
@@ -1723,6 +1795,7 @@ function App() {
         <ConsultationModal
           active={isModalOpen}
           selectedChooseItem={selectedChooseItem}
+          modalDescription={modalDescription}
           showSuccessState={showSuccessState}
           isSubmitting={isSubmitting}
           submitError={submitError}
@@ -1791,6 +1864,29 @@ function App() {
           closeModal={closeLanguageModal}
           handleLanguageSelect={handleLanguageSelect}
           handleCurrencySelect={handleCurrencySelect}
+          t={t}
+        />
+        <ConsultationModal
+          active={isModalOpen}
+          selectedChooseItem={selectedChooseItem}
+          modalDescription={modalDescription}
+          showSuccessState={showSuccessState}
+          isSubmitting={isSubmitting}
+          submitError={submitError}
+          formName={formName}
+          formEmail={formEmail}
+          formCountryCode={formCountryCode}
+          formPhone={formPhone}
+          countryCodeOptions={countryCodeOptions}
+          language={language}
+          closeModal={closeModal}
+          handleSubmit={handleSubmit}
+          handleFieldInvalid={handleFieldInvalid}
+          clearFieldValidity={clearFieldValidity}
+          setFormName={setFormName}
+          setFormEmail={setFormEmail}
+          setFormCountryCode={setFormCountryCode}
+          setFormPhone={setFormPhone}
           t={t}
         />
       </>
@@ -2024,6 +2120,7 @@ function App() {
       <ConsultationModal
           active={isModalOpen}
           selectedChooseItem={selectedChooseItem}
+          modalDescription={modalDescription}
           showSuccessState={showSuccessState}
           isSubmitting={isSubmitting}
           submitError={submitError}
