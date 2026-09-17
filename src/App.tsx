@@ -10,6 +10,7 @@ import { Header } from "./components/sections/Header";
 import { HeroSection } from "./components/sections/HeroSection";
 import { PropertiesPage } from "./components/sections/PropertiesPage";
 import { UnitCatalogPage } from "./components/sections/UnitCatalogPage";
+import { AboutSection } from "./components/sections/AboutSection";
 import { RenderSection } from "./components/sections/RenderSection";
 import { ChooseSection } from "./components/sections/ChooseSection";
 import { BiohackingSection } from "./components/sections/BiohackingSection";
@@ -84,9 +85,14 @@ import {
   type CurrencyRates,
   type SupportedCurrency
 } from "./unitCatalog";
-import { getExplorerRoute, type ExplorerRoute } from "./propertyExplorer";
-
-
+const origamiInfoIcons = [
+  <PriceTagIcon />,
+  <CalendarIcon />,
+  <InstallmentIcon />,
+  <ResidenceIcon />,
+  <HotelSuiteIcon />,
+  <PenthouseIcon />
+];
 
 const languageOptions: Array<{ code: Language; label: string; shortLabel: string; flag: string }> = [
   { code: "en", label: "English", shortLabel: "EN", flag: "🇺🇸" },
@@ -296,8 +302,8 @@ function App() {
   const [isCompanyProjectsLoading, setIsCompanyProjectsLoading] = useState(true);
   const [apiAboutData, setApiAboutData] = useState<AboutUsApiItem | null>(null);
   const [apiAboutInfoItems, setApiAboutInfoItems] = useState<SectionGridCardItem[]>([]);
-  const [, setIsAboutLoading] = useState(true);
-  const [, setIsAboutInfoLoading] = useState(true);
+  const [isAboutLoading, setIsAboutLoading] = useState(true);
+  const [isAboutInfoLoading, setIsAboutInfoLoading] = useState(true);
   const [selectedChooseItem, setSelectedChooseItem] = useState<ChooseApiItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessState, setShowSuccessState] = useState(false);
@@ -1453,6 +1459,8 @@ function App() {
   const renderSectionTitle = apiSection3Data?.title || "";
   const renderSectionImage = apiBuildingVisual?.image || apiSection3Data?.background_image || "";
   const renderSectionImageAlt = apiBuildingVisual?.title || apiSection3Data?.title || "";
+  const conceptImage = apiAboutData?.image || "";
+  const hasAboutContent = Boolean(apiAboutData?.title || apiAboutData?.body || conceptImage || apiAboutInfoItems.length);
   const hasBiohackingContent = Boolean(apiBiohackingData?.description || apiBiohackingData?.background_image || apiBiohackingData?.items.length);
   const hasInfrastructureContent = apiInfrastructureItems.length > 0;
   const hasFinanceContent = Boolean(apiFinanceData?.title || apiFinanceData?.description || apiFinanceData?.items.length);
@@ -1935,7 +1943,16 @@ function App() {
         setMobileFilterOpen={setMobileFilterOpen}
         handleSearch={handleSearch}
       />
-
+        <AboutSection
+          data={apiAboutData}
+          infoItems={apiAboutInfoItems}
+          image={conceptImage}
+          hasContent={hasAboutContent}
+          loading={isAboutLoading || isAboutInfoLoading}
+          icons={origamiInfoIcons}
+          buttonText={t("news_read_more")}
+          onSeeMore={() => setIsConsultationModalOpen(true)}
+        />
 
         <RenderSection
           title={renderSectionTitle}

@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { TranslationKey } from "../../i18n";
 import type { NewsCard } from "../../types";
 import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
@@ -12,12 +12,63 @@ type NewsSectionProps = {
 
 export function NewsSection({ items, t, navigateTo }: NewsSectionProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
+  const [activeIndex, setActiveIndex] = useState(1);
+
+  const carouselItems = items.length <= 3 ? [...items, ...items] : items;
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) {
+      return;
+    }
+
+    const updateActiveIndex = () => {
+      const cards = track.querySelectorAll<HTMLElement>(".news-card");
+      if (!cards.length) {
+        return;
+      }
+
+      const trackRect = track.getBoundingClientRect();
+      const trackCenter = trackRect.left + trackRect.width / 2;
+
+      let closestIndex = 0;
+      let minDistance = Infinity;
+
+      cards.forEach((card, index) => {
+        const cardRect = card.getBoundingClientRect();
+        const cardCenter = cardRect.left + cardRect.width / 2;
+        const distance = Math.abs(trackCenter - cardCenter);
+
+        if (distance < minDistance) {
+          minDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      setActiveIndex(closestIndex);
+    };
+
+    updateActiveIndex();
+
+    let animationFrameId: number;
+    const handleScroll = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(updateActiveIndex);
+    };
+
+    track.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll);
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      track.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+    };
+  }, [carouselItems.length]);
 
   if (!items.length) {
     return null;
   }
-
-  const carouselItems = items.length <= 3 ? [...items, ...items] : items;
 
   const scrollNews = (direction: "left" | "right") => {
     const track = trackRef.current;
@@ -73,7 +124,7 @@ export function NewsSection({ items, t, navigateTo }: NewsSectionProps) {
 
         <div className="news-grid reveal-scroll" ref={trackRef}>
           {carouselItems.map((item, index) => (
-            <article className="news-card" key={`${item.id}-${index}`}>
+            <article className={`news-card${index === activeIndex ? " is-featured" : ""}`} key={`${item.id}-${index}`}>
               <div className="news-card-media">
                 <span className="news-card-badge">{item.category}</span>
                 <img
