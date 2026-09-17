@@ -85,6 +85,8 @@ import {
   type CurrencyRates,
   type SupportedCurrency
 } from "./unitCatalog";
+import { getExplorerRoute, type ExplorerRoute } from "./propertyExplorer";
+
 const origamiInfoIcons = [
   <PriceTagIcon />,
   <CalendarIcon />,
@@ -1951,7 +1953,7 @@ function App() {
           loading={isAboutLoading || isAboutInfoLoading}
           icons={origamiInfoIcons}
           buttonText={t("news_read_more")}
-          onSeeMore={() => setIsConsultationModalOpen(true)}
+          onSeeMore={openModal}
         />
 
         <RenderSection
