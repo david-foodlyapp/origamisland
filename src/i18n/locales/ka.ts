@@ -191,6 +191,13 @@ export const ka: Record<TranslationKey, string> = {
   form_area: "სასურველი უბანი",
   form_area_label: "სასურველი დასახლება",
   form_send: "დაჯავშნე კონსულტაცია",
+  form_preferred_language: "საკომუნიკაციო ენა",
+  form_preferred_channel: "საკომუნიკაციო არხი",
+  channel_phone: "სატელეფონო ზარი",
+  channel_whatsapp: "WhatsApp",
+  channel_telegram: "Telegram",
+  channel_viber: "Viber",
+  channel_email: "ელ.ფოსტა",
   form_success_title: "გმადლობთ",
   form_success_desc:
     "თქვენი მოთხოვნა წარმატებით დარეგისტრირდა. ჩვენი მრჩეველი 2 საათის განმავლობაში დაგიკავშირდებათ.",

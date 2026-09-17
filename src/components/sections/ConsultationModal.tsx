@@ -20,6 +20,8 @@ type ConsultationModalProps = {
   formEmail: string;
   formCountryCode: string;
   formPhone: string;
+  formPreferredLanguage: string;
+  formPreferredChannel: string;
   countryCodeOptions: PhoneCountryCodeOption[];
   language: Language;
   closeModal: () => void;
@@ -30,6 +32,8 @@ type ConsultationModalProps = {
   setFormEmail: (value: string) => void;
   setFormCountryCode: (value: string) => void;
   setFormPhone: (value: string) => void;
+  setFormPreferredLanguage: (value: string) => void;
+  setFormPreferredChannel: (value: string) => void;
   t: (key: TranslationKey) => string;
 };
 
@@ -44,6 +48,8 @@ export function ConsultationModal({
   formEmail,
   formCountryCode,
   formPhone,
+  formPreferredLanguage,
+  formPreferredChannel,
   countryCodeOptions,
   language,
   closeModal,
@@ -54,6 +60,8 @@ export function ConsultationModal({
   setFormEmail,
   setFormCountryCode,
   setFormPhone,
+  setFormPreferredLanguage,
+  setFormPreferredChannel,
   t
 }: ConsultationModalProps) {
   const descriptionText = selectedChooseItem?.description || modalDescription;
@@ -146,7 +154,48 @@ export function ConsultationModal({
               </div>
             </div>
 
-            <button type="submit" className="gold-button" style={{ width: "100%", marginTop: "1.5rem" }} disabled={isSubmitting}>
+            <div className="form-row">
+              <div className="form-group select-group">
+                <select
+                  id="form-preferred-language"
+                  value={formPreferredLanguage}
+                  onChange={(event) => setFormPreferredLanguage(event.target.value)}
+                  required
+                >
+                  <option value="ka">ქართული</option>
+                  <option value="en">English</option>
+                  <option value="ru">Русский</option>
+                  <option value="zh">中文</option>
+                  <option value="he">עברית</option>
+                  <option value="it">Italiano</option>
+                  <option value="de">Deutsch</option>
+                  <option value="ar">العربية</option>
+                </select>
+                <label htmlFor="form-preferred-language">
+                  {t("form_preferred_language")}
+                </label>
+              </div>
+
+              <div className="form-group select-group">
+                <select
+                  id="form-preferred-channel"
+                  value={formPreferredChannel}
+                  onChange={(event) => setFormPreferredChannel(event.target.value)}
+                  required
+                >
+                  <option value="Phone Call">{t("channel_phone")}</option>
+                  <option value="WhatsApp">{t("channel_whatsapp")}</option>
+                  <option value="Telegram">{t("channel_telegram")}</option>
+                  <option value="Viber">{t("channel_viber")}</option>
+                  <option value="Email">{t("channel_email")}</option>
+                </select>
+                <label htmlFor="form-preferred-channel">
+                  {t("form_preferred_channel")}
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" className="gold-button" style={{ width: "100%", marginTop: "0.5rem" }} disabled={isSubmitting}>
               {isSubmitting ? (language === "en" ? "Securing Access..." : "áƒ¬áƒ•áƒ“áƒáƒ›áƒ áƒ›áƒ£áƒ¨áƒáƒ•áƒ“áƒ”áƒ‘áƒ...") : t("form_send")}
             </button>
             {submitError ? (

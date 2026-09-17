@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 import { Theme } from "../../types";
 import { Language, TranslationKey } from "../../i18n";
-import { CloseIcon, GlobeOutlineIcon, MoonIcon, SunIcon } from "../Icons";
+import { ChatIcon, CloseIcon, GlobeOutlineIcon, MoonIcon, SunIcon } from "../Icons";
 
 type HeaderProps = {
   headerShrunk: boolean;
@@ -86,6 +86,7 @@ export function Header({
                 <a
                   key={item.href}
                   href={item.isModalAction ? "#" : item.href}
+                  className={item.isModalAction ? "nav-link-call-request" : undefined}
                   onClick={(event) => {
                     if (item.isModalAction) {
                       event.preventDefault();
@@ -93,7 +94,8 @@ export function Header({
                     handleNavItemClick(item);
                   }}
                 >
-                  {item.label}
+                  {item.isModalAction ? <ChatIcon /> : null}
+                  <span>{item.label}</span>
                 </a>
               ))}
               <div className="mobile-nav-language-switcher" aria-label={t("language_modal_title")}>

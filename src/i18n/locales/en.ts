@@ -191,6 +191,13 @@ export const en: Record<TranslationKey, string> = {
   form_area: "Preferred Area",
   form_area_label: "Preferred Neighborhood",
   form_send: "Request Private Access",
+  form_preferred_language: "Preferred Communication Language",
+  form_preferred_channel: "Preferred Communication Channel",
+  channel_phone: "Phone Call",
+  channel_whatsapp: "WhatsApp",
+  channel_telegram: "Telegram",
+  channel_viber: "Viber",
+  channel_email: "Email",
   form_success_title: "Thank You",
   form_success_desc:
     "Your request has been registered. An elite advisor will contact you within 2 hours.",

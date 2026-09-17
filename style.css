@@ -657,6 +657,66 @@ nav a {
   opacity: 0.88;
 }
 
+/* Animated "Request a Call" / "ზარის მოთხოვნა" header button */
+.nav-link-call-request {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1.05rem !important;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, rgba(47, 58, 68, 0.65) 0%, rgba(197, 168, 128, 0.3) 100%) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(197, 168, 128, 0.6);
+  color: #ffffff !important;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  opacity: 1 !important;
+  animation: pulse-call-btn 2.2s infinite ease-in-out;
+  transition: all 0.3s ease;
+}
+
+.nav-link-call-request svg {
+  width: 16px;
+  height: 16px;
+  stroke: #ffffff;
+  color: #ffffff;
+  flex-shrink: 0;
+  animation: pulse-call-icon 1.6s infinite alternate ease-in-out;
+}
+
+.nav-link-call-request:hover {
+  background: linear-gradient(135deg, rgba(47, 58, 68, 0.85) 0%, rgba(197, 168, 128, 0.5) 100%) !important;
+  border-color: var(--primary-gold) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 20px rgba(197, 168, 128, 0.75) !important;
+  transform: translateY(-1px);
+}
+
+@keyframes pulse-call-btn {
+  0%, 100% {
+    border-color: rgba(197, 168, 128, 0.5);
+    box-shadow: 0 0 4px rgba(197, 168, 128, 0.25), inset 0 0 6px rgba(197, 168, 128, 0.15);
+  }
+  50% {
+    border-color: rgba(230, 205, 155, 0.95);
+    box-shadow: 0 0 18px 2px rgba(197, 168, 128, 0.7), inset 0 0 12px rgba(197, 168, 128, 0.35);
+  }
+}
+
+@keyframes pulse-call-icon {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+  }
+}
+
 .nav-cta-btn,
 .nav-language-btn {
   border: none;
@@ -4677,7 +4737,7 @@ html[data-theme="light"] .news-detail-state {
 .luxury-form {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.25rem;
 }
 
 .form-row {
@@ -4715,8 +4775,9 @@ html[data-theme="light"] .news-detail-state {
 }
 
 .form-group select option {
-  background: var(--bg-card);
-  color: var(--text-white);
+  background: #1c1c1e;
+  color: #ffffff;
+  padding: 0.75rem 1rem;
 }
 
 .form-group input:focus, .form-group select:focus {
@@ -4736,27 +4797,52 @@ html[data-theme="light"] .news-detail-state {
 }
 
 .form-group.select-group select {
-  padding-top: 1.7rem;
-  padding-bottom: 0.7rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 1.6rem 2.2rem 0.5rem 1.2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23c5a880' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 12px;
+  cursor: pointer;
+  height: 3.6rem;
 }
 
-.form-group.select-group label {
-  top: 0.7rem;
-  left: 1.2rem;
-  font-size: 0.75rem;
-  color: var(--primary-gold);
+.form-group.select-group label,
+.form-group.select-group select:focus ~ label,
+.form-group.select-group select:valid ~ label {
+  top: 0.45rem !important;
+  left: 1.2rem !important;
+  font-size: 0.68rem !important;
+  font-weight: 600;
+  color: var(--primary-gold) !important;
   font-family: var(--font-serif);
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: calc(100% - 2.5rem);
 }
 
 .country-code-group {
-  flex: 0 0 140px;
+  flex: 0 0 135px;
 }
 
 .country-code-group select {
   height: 100%;
-  padding-right: 2.75rem;
+  padding-right: 2rem;
+  padding-left: 0.9rem;
+  font-size: 0.88rem;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23c5a880' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 10px;
 }
 
 .phone-number-group {
@@ -4765,9 +4851,7 @@ html[data-theme="light"] .news-detail-state {
 
 /* Floating Label Logic */
 .form-group input:focus ~ label,
-.form-group input:not(:placeholder-shown) ~ label,
-.form-group select:focus ~ label,
-.form-group select:valid ~ label {
+.form-group input:not(:placeholder-shown) ~ label {
   top: -1.4rem;
   left: 0;
   font-size: 0.75rem;

@@ -317,6 +317,8 @@ function App() {
   const [countryCodeOptions, setCountryCodeOptions] = useState<PhoneCountryCodeOption[]>(phoneCountryCodeFallbackOptions);
   const [formCountryCode, setFormCountryCode] = useState(defaultPhoneCountryCode);
   const [formPhone, setFormPhone] = useState("");
+  const [formPreferredLanguage, setFormPreferredLanguage] = useState<string>("ka");
+  const [formPreferredChannel, setFormPreferredChannel] = useState<string>("Phone Call");
   const [galleryPageCount, setGalleryPageCount] = useState(1);
   const [galleryCurrentPage, setGalleryCurrentPage] = useState(0);
   const galleryTrackRef = useRef<HTMLDivElement | null>(null);
@@ -1646,8 +1648,10 @@ function App() {
           name: formName.trim(),
           email: formEmail.trim(),
           phone: fullPhoneNumber,
+          preferred_language: formPreferredLanguage,
+          preferred_channel: formPreferredChannel,
           subject: selectedChooseItem?.title || "consultation",
-          message: selectedChooseItem?.description || "Origami Island consultation request",
+          message: `${selectedChooseItem?.description || "Origami Island consultation request"}\nPreferred Language: ${formPreferredLanguage}\nPreferred Channel: ${formPreferredChannel}`,
           source_page: window.location.pathname
         })
       });
@@ -1661,6 +1665,8 @@ function App() {
       setFormEmail("");
       setFormCountryCode(defaultPhoneCountryCode);
       setFormPhone("");
+      setFormPreferredLanguage("ka");
+      setFormPreferredChannel("Phone Call");
     } catch (error) {
       console.error("Consultation submission error:", error);
       setSubmitError(getSubmitErrorMessage());
@@ -1759,6 +1765,8 @@ function App() {
           formEmail={formEmail}
           formCountryCode={formCountryCode}
           formPhone={formPhone}
+          formPreferredLanguage={formPreferredLanguage}
+          formPreferredChannel={formPreferredChannel}
           countryCodeOptions={countryCodeOptions}
           language={language}
           closeModal={closeModal}
@@ -1769,6 +1777,8 @@ function App() {
           setFormEmail={setFormEmail}
           setFormCountryCode={setFormCountryCode}
           setFormPhone={setFormPhone}
+          setFormPreferredLanguage={setFormPreferredLanguage}
+          setFormPreferredChannel={setFormPreferredChannel}
           t={t}
         />
       </>
@@ -1803,6 +1813,8 @@ function App() {
           formEmail={formEmail}
           formCountryCode={formCountryCode}
           formPhone={formPhone}
+          formPreferredLanguage={formPreferredLanguage}
+          formPreferredChannel={formPreferredChannel}
           countryCodeOptions={countryCodeOptions}
           language={language}
           closeModal={closeModal}
@@ -1813,6 +1825,8 @@ function App() {
           setFormEmail={setFormEmail}
           setFormCountryCode={setFormCountryCode}
           setFormPhone={setFormPhone}
+          setFormPreferredLanguage={setFormPreferredLanguage}
+          setFormPreferredChannel={setFormPreferredChannel}
           t={t}
         />
         <UnitsPreferencesModal
@@ -1877,6 +1891,8 @@ function App() {
           formEmail={formEmail}
           formCountryCode={formCountryCode}
           formPhone={formPhone}
+          formPreferredLanguage={formPreferredLanguage}
+          formPreferredChannel={formPreferredChannel}
           countryCodeOptions={countryCodeOptions}
           language={language}
           closeModal={closeModal}
@@ -1887,6 +1903,8 @@ function App() {
           setFormEmail={setFormEmail}
           setFormCountryCode={setFormCountryCode}
           setFormPhone={setFormPhone}
+          setFormPreferredLanguage={setFormPreferredLanguage}
+          setFormPreferredChannel={setFormPreferredChannel}
           t={t}
         />
       </>
@@ -2128,6 +2146,8 @@ function App() {
           formEmail={formEmail}
           formCountryCode={formCountryCode}
           formPhone={formPhone}
+          formPreferredLanguage={formPreferredLanguage}
+          formPreferredChannel={formPreferredChannel}
           countryCodeOptions={countryCodeOptions}
           language={language}
           closeModal={closeModal}
@@ -2138,6 +2158,8 @@ function App() {
           setFormEmail={setFormEmail}
           setFormCountryCode={setFormCountryCode}
           setFormPhone={setFormPhone}
+          setFormPreferredLanguage={setFormPreferredLanguage}
+          setFormPreferredChannel={setFormPreferredChannel}
           t={t}
         />
         <LanguageModal
