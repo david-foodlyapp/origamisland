@@ -21,6 +21,7 @@ import { CompanyProjectsSection } from "./components/sections/CompanyProjectsSec
 import { NewsSection } from "./components/sections/NewsSection";
 import { Footer } from "./components/sections/Footer";
 import { ConsultationModal } from "./components/sections/ConsultationModal";
+import { RequestCallModal } from "./components/sections/RequestCallModal";
 import { LanguageModal } from "./components/sections/LanguageModal";
 import { UnitsPreferencesModal } from "./components/sections/UnitsPreferencesModal";
 import {
@@ -311,13 +312,15 @@ function App() {
   const [showSuccessState, setShowSuccessState] = useState(false);
 
   const [submitError, setSubmitError] = useState("");
+  const [modalStyle, setModalStyle] = useState<"consultation" | "request_call">("request_call");
   const [formName, setFormName] = useState("");
   const [formEmail, setFormEmail] = useState("");
   const [countryCodeOptions, setCountryCodeOptions] = useState<PhoneCountryCodeOption[]>(phoneCountryCodeFallbackOptions);
   const [formCountryCode, setFormCountryCode] = useState(defaultPhoneCountryCode);
   const [formPhone, setFormPhone] = useState("");
-  const [formPreferredLanguage, setFormPreferredLanguage] = useState<string>("ka");
-  const [formPreferredChannel, setFormPreferredChannel] = useState<string>("Phone Call");
+  const [formCountry, setFormCountry] = useState(defaultPhoneCountryCode);
+  const [formPreferredLanguage, setFormPreferredLanguage] = useState<string>("");
+  const [formPreferredChannel, setFormPreferredChannel] = useState<string>("");
   const [, setGalleryPageCount] = useState(1);
   const [, setGalleryCurrentPage] = useState(0);
   const galleryTrackRef = useRef<HTMLDivElement | null>(null);
@@ -1472,27 +1475,8 @@ function App() {
   const footerContactEmail = apiContactSettings?.email?.trim() || "";
   const footerContactPhone = apiContactSettings?.phone?.trim() || "";
   const footerContactSecondaryPhone = apiContactSettings?.secondary_phone;
-  const formatTelHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
-
-  const getPlanningUnitsRoute = (types: string[] = []) =>
-    `/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
-      page: 1,
-      perPage: 9,
-      floors: [],
-      types,
-      statuses: [],
-      roomTypes: [],
-      rooms: [],
-      bedrooms: [],
-      bathrooms: [],
-      areaMin: "",
-      areaMax: "",
-      condition: "",
-      sort: "rank",
-      view: "grid"
-    }, language)}`;
-
-  const openModal = () => {
+  const openModal = (style: "consultation" | "request_call" = "request_call") => {
+    setModalStyle(style);
     setSelectedChooseItem(null);
     setShowSuccessState(false);
     setSubmitError("");
@@ -1500,6 +1484,7 @@ function App() {
   };
 
   const openChooseModal = async (item: ChooseApiItem) => {
+    setModalStyle("consultation");
     setSelectedChooseItem(item);
     setShowSuccessState(false);
     setSubmitError("");
@@ -1533,6 +1518,71 @@ function App() {
     setIsSubmitting(false);
   };
 
+  const renderActiveModal = () => {
+    if (modalStyle === "request_call") {
+      return (
+        <RequestCallModal
+          active={isModalOpen}
+          modalDescription={modalDescription}
+          showSuccessState={showSuccessState}
+          isSubmitting={isSubmitting}
+          submitError={submitError}
+          formName={formName}
+          formEmail={formEmail}
+          formPhone={formPhone}
+          formPreferredLanguage={formPreferredLanguage}
+          formPreferredChannel={formPreferredChannel}
+          formCountry={formCountry}
+          countryCodeOptions={countryCodeOptions}
+          language={language}
+          closeModal={closeModal}
+          handleSubmit={handleSubmit}
+          handleFieldInvalid={handleFieldInvalid}
+          clearFieldValidity={clearFieldValidity}
+          setFormName={setFormName}
+          setFormEmail={setFormEmail}
+          setFormPhone={setFormPhone}
+          setFormPreferredLanguage={setFormPreferredLanguage}
+          setFormPreferredChannel={setFormPreferredChannel}
+          setFormCountry={setFormCountry}
+          onSwitchModalStyle={(style) => setModalStyle(style)}
+          t={t}
+        />
+      );
+    }
+
+    return (
+      <ConsultationModal
+        active={isModalOpen}
+        selectedChooseItem={selectedChooseItem}
+        modalDescription={modalDescription}
+        showSuccessState={showSuccessState}
+        isSubmitting={isSubmitting}
+        submitError={submitError}
+        formName={formName}
+        formEmail={formEmail}
+        formCountryCode={formCountryCode}
+        formPhone={formPhone}
+        formPreferredLanguage={formPreferredLanguage}
+        formPreferredChannel={formPreferredChannel}
+        countryCodeOptions={countryCodeOptions}
+        language={language}
+        closeModal={closeModal}
+        handleSubmit={handleSubmit}
+        handleFieldInvalid={handleFieldInvalid}
+        clearFieldValidity={clearFieldValidity}
+        setFormName={setFormName}
+        setFormEmail={setFormEmail}
+        setFormCountryCode={setFormCountryCode}
+        setFormPhone={setFormPhone}
+        setFormPreferredLanguage={setFormPreferredLanguage}
+        setFormPreferredChannel={setFormPreferredChannel}
+        onSwitchModalStyle={(style) => setModalStyle(style)}
+        t={t}
+      />
+    );
+  };
+
   const closeLanguageModal = () => {
     setIsLanguageModalOpen(false);
   };
@@ -1548,12 +1598,36 @@ function App() {
 
   const handleUnitsLanguageSelect = (nextLanguage: Language) => {
     setLanguage(nextLanguage);
+    setIsLanguageModalOpen(false);
   };
 
   const handleCurrencySelect = (nextCurrency: SupportedCurrency) => {
     setCurrency(nextCurrency);
     setIsCurrencyModalOpen(false);
   };
+
+  const formatTelHref = (rawPhone: string) => {
+    const cleaned = rawPhone.replace(/[^\d+]/g, "");
+    return cleaned ? `tel:${cleaned}` : "#";
+  };
+
+  const getPlanningUnitsRoute = (types: string[] = []) =>
+    `/properties/${DEFAULT_BUILDING_SLUG}/units?${buildUnitCatalogSearch({
+      page: 1,
+      perPage: 9,
+      floors: [],
+      types,
+      statuses: [],
+      roomTypes: [],
+      rooms: [],
+      bedrooms: [],
+      bathrooms: [],
+      areaMin: "",
+      areaMax: "",
+      condition: "",
+      sort: "rank",
+      view: "grid"
+    }, language)}`;
 
   const handleSearch = () => {
     setMobileFilterOpen(false);
@@ -1634,7 +1708,8 @@ function App() {
 
     setIsSubmitting(true);
     setSubmitError("");
-    const fullPhoneNumber = `${formCountryCode} ${formPhone}`.trim();
+    const activeCountryCode = modalStyle === "request_call" ? (formCountry || defaultPhoneCountryCode) : formCountryCode;
+    const fullPhoneNumber = `${activeCountryCode} ${formPhone}`.trim();
 
     try {
       const response = await fetch(`${API_BASE_URL}/contact-messages`, {
@@ -1645,12 +1720,14 @@ function App() {
         },
         body: JSON.stringify({
           name: formName.trim(),
-          email: formEmail.trim(),
+          email: formEmail.trim() || undefined,
           phone: fullPhoneNumber,
           preferred_language: formPreferredLanguage,
           preferred_channel: formPreferredChannel,
-          subject: selectedChooseItem?.title || "consultation",
-          message: `${selectedChooseItem?.description || "Origami Island consultation request"}\nPreferred Language: ${formPreferredLanguage}\nPreferred Channel: ${formPreferredChannel}`,
+          subject: selectedChooseItem?.title || (modalStyle === "request_call" ? "Request a Call" : "Consultation"),
+          message: modalStyle === "request_call"
+            ? `Request a Call Submission:\nName: ${formName.trim()}\nPhone: ${fullPhoneNumber}\nPreferred Language: ${formPreferredLanguage}\nCountry: ${formCountry}`
+            : `${selectedChooseItem?.description || "Origami Island consultation request"}\nPreferred Language: ${formPreferredLanguage}\nPreferred Channel: ${formPreferredChannel}`,
           source_page: window.location.pathname
         })
       });
@@ -1664,8 +1741,8 @@ function App() {
       setFormEmail("");
       setFormCountryCode(defaultPhoneCountryCode);
       setFormPhone("");
-      setFormPreferredLanguage("ka");
-      setFormPreferredChannel("Phone Call");
+      setFormPreferredLanguage("");
+      setFormPreferredChannel("");
     } catch (error) {
       console.error("Consultation submission error:", error);
       setSubmitError(getSubmitErrorMessage());
@@ -1753,33 +1830,7 @@ function App() {
             )}
           </article>
         </main>
-        <ConsultationModal
-          active={isModalOpen}
-          selectedChooseItem={selectedChooseItem}
-          modalDescription={modalDescription}
-          showSuccessState={showSuccessState}
-          isSubmitting={isSubmitting}
-          submitError={submitError}
-          formName={formName}
-          formEmail={formEmail}
-          formCountryCode={formCountryCode}
-          formPhone={formPhone}
-          formPreferredLanguage={formPreferredLanguage}
-          formPreferredChannel={formPreferredChannel}
-          countryCodeOptions={countryCodeOptions}
-          language={language}
-          closeModal={closeModal}
-          handleSubmit={handleSubmit}
-          handleFieldInvalid={handleFieldInvalid}
-          clearFieldValidity={clearFieldValidity}
-          setFormName={setFormName}
-          setFormEmail={setFormEmail}
-          setFormCountryCode={setFormCountryCode}
-          setFormPhone={setFormPhone}
-          setFormPreferredLanguage={setFormPreferredLanguage}
-          setFormPreferredChannel={setFormPreferredChannel}
-          t={t}
-        />
+        {renderActiveModal()}
       </>
     );
   }
@@ -1801,33 +1852,7 @@ function App() {
           currency={currency}
           currencyRates={currencyRates}
         />
-        <ConsultationModal
-          active={isModalOpen}
-          selectedChooseItem={selectedChooseItem}
-          modalDescription={modalDescription}
-          showSuccessState={showSuccessState}
-          isSubmitting={isSubmitting}
-          submitError={submitError}
-          formName={formName}
-          formEmail={formEmail}
-          formCountryCode={formCountryCode}
-          formPhone={formPhone}
-          formPreferredLanguage={formPreferredLanguage}
-          formPreferredChannel={formPreferredChannel}
-          countryCodeOptions={countryCodeOptions}
-          language={language}
-          closeModal={closeModal}
-          handleSubmit={handleSubmit}
-          handleFieldInvalid={handleFieldInvalid}
-          clearFieldValidity={clearFieldValidity}
-          setFormName={setFormName}
-          setFormEmail={setFormEmail}
-          setFormCountryCode={setFormCountryCode}
-          setFormPhone={setFormPhone}
-          setFormPreferredLanguage={setFormPreferredLanguage}
-          setFormPreferredChannel={setFormPreferredChannel}
-          t={t}
-        />
+        {renderActiveModal()}
         <UnitsPreferencesModal
           active={isLanguageModalOpen || isCurrencyModalOpen}
           language={language}
@@ -1879,33 +1904,7 @@ function App() {
           handleCurrencySelect={handleCurrencySelect}
           t={t}
         />
-        <ConsultationModal
-          active={isModalOpen}
-          selectedChooseItem={selectedChooseItem}
-          modalDescription={modalDescription}
-          showSuccessState={showSuccessState}
-          isSubmitting={isSubmitting}
-          submitError={submitError}
-          formName={formName}
-          formEmail={formEmail}
-          formCountryCode={formCountryCode}
-          formPhone={formPhone}
-          formPreferredLanguage={formPreferredLanguage}
-          formPreferredChannel={formPreferredChannel}
-          countryCodeOptions={countryCodeOptions}
-          language={language}
-          closeModal={closeModal}
-          handleSubmit={handleSubmit}
-          handleFieldInvalid={handleFieldInvalid}
-          clearFieldValidity={clearFieldValidity}
-          setFormName={setFormName}
-          setFormEmail={setFormEmail}
-          setFormCountryCode={setFormCountryCode}
-          setFormPhone={setFormPhone}
-          setFormPreferredLanguage={setFormPreferredLanguage}
-          setFormPreferredChannel={setFormPreferredChannel}
-          t={t}
-        />
+        {renderActiveModal()}
       </>
     );
   }
@@ -2128,33 +2127,7 @@ function App() {
         formatTelHref={formatTelHref}
         t={t}
       />
-      <ConsultationModal
-          active={isModalOpen}
-          selectedChooseItem={selectedChooseItem}
-          modalDescription={modalDescription}
-          showSuccessState={showSuccessState}
-          isSubmitting={isSubmitting}
-          submitError={submitError}
-          formName={formName}
-          formEmail={formEmail}
-          formCountryCode={formCountryCode}
-          formPhone={formPhone}
-          formPreferredLanguage={formPreferredLanguage}
-          formPreferredChannel={formPreferredChannel}
-          countryCodeOptions={countryCodeOptions}
-          language={language}
-          closeModal={closeModal}
-          handleSubmit={handleSubmit}
-          handleFieldInvalid={handleFieldInvalid}
-          clearFieldValidity={clearFieldValidity}
-          setFormName={setFormName}
-          setFormEmail={setFormEmail}
-          setFormCountryCode={setFormCountryCode}
-          setFormPhone={setFormPhone}
-          setFormPreferredLanguage={setFormPreferredLanguage}
-          setFormPreferredChannel={setFormPreferredChannel}
-          t={t}
-        />
+      {renderActiveModal()}
         <LanguageModal
         active={isLanguageModalOpen}
         language={language}

@@ -214,5 +214,16 @@ export const en: Record<TranslationKey, string> = {
   footer_terms: "Terms & Conditions",
   footer_cookies: "Cookies Policy",
   footer_copyright: "© 2026 ORIGAMI. All rights reserved.",
-  footer_author_label: "Author"
+  footer_author_label: "Author",
+  request_call_title: "Request a call",
+  request_call_desc: "Leave your number and our personal advisor will contact you",
+  request_call_purpose_label: "Call purpose",
+  request_call_purpose_opt_buy: "Apartment Purchase",
+  request_call_purpose_opt_invest: "Investment",
+  request_call_purpose_opt_commercial: "Commercial Space",
+  request_call_purpose_opt_consult: "General Consultation",
+  request_call_country_label: "Country",
+  request_call_button: "Request a call",
+  request_call_recaptcha: "This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply."
 };
+

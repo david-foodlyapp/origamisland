@@ -204,4 +204,15 @@ export type TranslationKey =
   | "footer_terms"
   | "footer_cookies"
   | "footer_copyright"
-  | "footer_author_label";
+  | "footer_author_label"
+  | "request_call_title"
+  | "request_call_desc"
+  | "request_call_purpose_label"
+  | "request_call_purpose_opt_buy"
+  | "request_call_purpose_opt_invest"
+  | "request_call_purpose_opt_commercial"
+  | "request_call_purpose_opt_consult"
+  | "request_call_country_label"
+  | "request_call_button"
+  | "request_call_recaptcha";
+

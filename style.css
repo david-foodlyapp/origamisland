@@ -4795,6 +4795,293 @@ html[data-theme="light"] .news-detail-state {
   border-color: rgba(255, 255, 255, 0.25);
 }
 
+/* --- Request Call Modal Form (Style 2 - Screenshot 2) --- */
+.request-call-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 1.25rem;
+  box-sizing: border-box;
+}
+
+.request-call-modal.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.request-call-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 14, 12, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.request-call-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 760px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(163, 133, 88, 0.2);
+  transform: scale(0.95) translateY(16px);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  background: #FAF8F5;
+  color: #1A1918;
+  box-sizing: border-box;
+}
+
+.request-call-modal.active .request-call-content {
+  transform: scale(1) translateY(0);
+}
+
+.request-call-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #A38558;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.request-call-close:hover {
+  background: rgba(163, 133, 88, 0.1);
+  color: #83673B;
+  transform: rotate(90deg);
+}
+
+.request-call-close svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.request-call-header {
+  background-color: #FAF8F5;
+  padding: 2.75rem 3rem 1.75rem 3rem;
+  text-align: center;
+}
+
+.request-call-title {
+  font-family: var(--font-serif, serif);
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: #1A1918;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.request-call-desc {
+  font-size: 0.95rem;
+  color: #6E6A64;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.request-call-body {
+  background-color: #F3EDE5;
+  padding: 2.25rem 3rem 2.5rem 3rem;
+  border-top: 1px solid rgba(220, 211, 200, 0.6);
+}
+
+.request-call-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.request-call-grid-top {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.request-call-grid-bottom {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.request-call-field {
+  position: relative;
+  width: 100%;
+}
+
+.request-call-input,
+.request-call-select {
+  width: 100%;
+  height: 52px;
+  background-color: #FAF9F6;
+  border: 1px solid #D8CFC4;
+  border-radius: 6px;
+  padding: 0 1.1rem;
+  font-size: 0.95rem;
+  color: #2A2724;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.request-call-input::placeholder {
+  color: #928C84;
+}
+
+.request-call-select.is-placeholder {
+  color: #928C84;
+}
+
+.request-call-select option {
+  color: #2A2724;
+}
+
+.request-call-select option[disabled] {
+  color: #928C84;
+}
+
+.request-call-input:focus,
+.request-call-select:focus {
+  border-color: #A38558;
+  background-color: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(163, 133, 88, 0.15);
+}
+
+.request-call-select-wrapper {
+  position: relative;
+}
+
+.request-call-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  padding-right: 2.5rem;
+}
+
+.request-call-select-arrow {
+  position: absolute;
+  right: 1.1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.request-call-submit-btn {
+  height: 52px;
+  width: 100%;
+  background: #A38253;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.98rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  letter-spacing: 0.01em;
+}
+
+.request-call-submit-btn:hover {
+  background: #8E6D3E;
+  box-shadow: 0 4px 14px rgba(163, 130, 83, 0.35);
+  transform: translateY(-1px);
+}
+
+.request-call-submit-btn:active {
+  transform: translateY(0);
+}
+
+.request-call-submit-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.request-call-submit-btn:hover svg {
+  transform: translateX(4px);
+}
+
+.request-call-recaptcha {
+  font-size: 0.75rem;
+  color: #7C7770;
+  text-align: center;
+  margin: 1.25rem 0 0 0;
+  line-height: 1.45;
+}
+
+/* Modal Form Switcher Tab */
+.modal-form-switcher {
+  display: inline-flex;
+  background: rgba(163, 133, 88, 0.12);
+  padding: 3px;
+  border-radius: 20px;
+  border: 1px solid rgba(163, 133, 88, 0.25);
+}
+
+.modal-form-switcher button {
+  border: none;
+  background: transparent;
+  padding: 5px 14px;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #8C8479;
+  transition: all 0.2s ease;
+}
+
+.modal-form-switcher button.active {
+  background: #A38558;
+  color: #FFFFFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 640px) {
+  .request-call-header {
+    padding: 2.25rem 1.25rem 1.25rem 1.25rem;
+  }
+  .request-call-title {
+    font-size: 1.75rem;
+  }
+  .request-call-body {
+    padding: 1.5rem 1.25rem 1.75rem 1.25rem;
+  }
+  .request-call-grid-top {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+  .request-call-grid-bottom {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+}
+
 /* --- VIP Modal Form --- */
 .modal {
   position: fixed;

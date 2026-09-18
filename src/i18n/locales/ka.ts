@@ -214,5 +214,16 @@ export const ka: Record<TranslationKey, string> = {
   footer_terms: "წესები და პირობები",
   footer_cookies: "ქუქიების პოლიტიკა",
   footer_copyright: "© 2026 ORIGAMI. ყველა უფლება დაცულია.",
-  footer_author_label: "ავტორი"
+  footer_author_label: "ავტორი",
+  request_call_title: "ზარის მოთხოვნა",
+  request_call_desc: "დატოვეთ თქვენი ნომერი და ჩვენი პერსონალური კონსულტანტი დაგიკავშირდებათ",
+  request_call_purpose_label: "ზარის მიზანი",
+  request_call_purpose_opt_buy: "ბინის შეძენა",
+  request_call_purpose_opt_invest: "ინვესტიცია",
+  request_call_purpose_opt_commercial: "კომერციული ფართი",
+  request_call_purpose_opt_consult: "ზოგადი კონსულტაცია",
+  request_call_country_label: "ქვეყანა",
+  request_call_button: "ზარის მოთხოვნა",
+  request_call_recaptcha: "ეს საიტი დაცულია reCAPTCHA-თი და მოქმედებს Google-ის Privacy Policy და Terms of Service."
 };
+

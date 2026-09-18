@@ -34,6 +34,7 @@ type ConsultationModalProps = {
   setFormPhone: (value: string) => void;
   setFormPreferredLanguage: (value: string) => void;
   setFormPreferredChannel: (value: string) => void;
+  onSwitchModalStyle?: (style: "consultation" | "request_call") => void;
   t: (key: TranslationKey) => string;
 };
 
@@ -62,6 +63,7 @@ export function ConsultationModal({
   setFormPhone,
   setFormPreferredLanguage,
   setFormPreferredChannel,
+  onSwitchModalStyle,
   t
 }: ConsultationModalProps) {
   const descriptionText = selectedChooseItem?.description || modalDescription;
@@ -75,7 +77,30 @@ export function ConsultationModal({
           <CloseIcon />
         </button>
 
+        {onSwitchModalStyle && (
+          <div style={{ textAlign: "center", marginBottom: "0.5rem" }}>
+            <div className="modal-form-switcher">
+              <button
+                type="button"
+                className="active"
+                onClick={() => onSwitchModalStyle("consultation")}
+                title="Form 1 (VIP Consultation)"
+              >
+                Form 1 (VIP)
+              </button>
+              <button
+                type="button"
+                onClick={() => onSwitchModalStyle("request_call")}
+                title="Switch to Form 2 (Request Call)"
+              >
+                Form 2 (Request Call)
+              </button>
+            </div>
+          </div>
+        )}
+
         <h3 className="modal-title">{selectedChooseItem?.title || t("modal_title")}</h3>
+
 
         {!showSuccessState ? (
           <>
