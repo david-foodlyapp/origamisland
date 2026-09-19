@@ -193,10 +193,7 @@ export function RequestCallModal({
                       <option value="ka">🇬🇪 ქართული</option>
                       <option value="en">🇺🇸 English</option>
                       <option value="ru">🇷🇺 Русский</option>
-                      <option value="zh">🇨🇳 中文</option>
-                      <option value="he">🇮🇱 עברית</option>
-                      <option value="it">🇮🇹 Italiano</option>
-                      <option value="de">🇩🇪 Deutsch</option>
+                      <option value="pl">🇵🇱 Polski</option>
                       <option value="ar">🇸🇦 العربية</option>
                     </select>
                     <div className="request-call-select-arrow">
@@ -220,7 +217,6 @@ export function RequestCallModal({
                       <option value="WhatsApp">{t("channel_whatsapp")}</option>
                       <option value="Telegram">{t("channel_telegram")}</option>
                       <option value="Viber">{t("channel_viber")}</option>
-                      <option value="Email">{t("channel_email")}</option>
                     </select>
                     <div className="request-call-select-arrow">
                       <svg width="12" height="7" viewBox="0 0 12 7" fill="none" xmlns="http://www.w3.org/2000/svg">
