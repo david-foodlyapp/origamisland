@@ -60,7 +60,6 @@ export function RequestCallModal({
   setFormPreferredLanguage,
   setFormPreferredChannel,
   setFormCountry,
-  onSwitchModalStyle,
   t
 }: RequestCallModalProps) {
   return (
@@ -80,25 +79,6 @@ export function RequestCallModal({
         {!showSuccessState ? (
           <>
             <div className="request-call-header">
-              {onSwitchModalStyle && (
-                <div className="modal-form-switcher" style={{ marginBottom: "0.75rem" }}>
-                  <button
-                    type="button"
-                    onClick={() => onSwitchModalStyle("consultation")}
-                    title="Switch to Form 1 (VIP Consultation)"
-                  >
-                    Form 1 (VIP)
-                  </button>
-                  <button
-                    type="button"
-                    className="active"
-                    onClick={() => onSwitchModalStyle("request_call")}
-                    title="Form 2 (Request Call)"
-                  >
-                    Form 2 (Request Call)
-                  </button>
-                </div>
-              )}
               <h3 className="request-call-title">{t("request_call_title")}</h3>
               <p className="request-call-desc">
                 {modalDescription || t("request_call_desc")}
