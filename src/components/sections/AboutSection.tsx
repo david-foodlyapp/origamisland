@@ -21,8 +21,8 @@ export function AboutSection({ data, infoItems, image, hasContent, loading, icon
   return (
     <section id="about-us" className="concept-section">
       <div className="container">
-        <div className="about-grid-container">
-          {/* Left Column: Image Card */}
+        <div className="concept-card about-grid-container">
+          {/* Left Column: Image */}
           <div className="about-grid-left">
             {loading ? (
               <div className="about-image-card concept-render-skeleton">
@@ -43,37 +43,33 @@ export function AboutSection({ data, infoItems, image, hasContent, loading, icon
             ) : null}
           </div>
 
-          {/* Right Column: Text Card (Top) + Stats Grid (Bottom) */}
+          {/* Right Column: Text (Top) + Stats Grid (Bottom) */}
           <div className="about-grid-right">
             {loading ? (
-              <div className="concept-card about-text-card concept-card-skeleton" aria-hidden="true">
-                <div className="concept-content concept-content-skeleton">
-                  <div className="concept-title-skeleton" />
-                  <div className="concept-line-skeleton wide" />
-                  <div className="concept-line-skeleton" />
-                  <div className="concept-line-skeleton medium" />
-                </div>
+              <div className="concept-content concept-content-skeleton">
+                <div className="concept-title-skeleton" />
+                <div className="concept-line-skeleton wide" />
+                <div className="concept-line-skeleton" />
+                <div className="concept-line-skeleton medium" />
               </div>
             ) : hasContent ? (
-              <div className="concept-card about-text-card">
-                <div className="concept-content">
-                  {data?.title ? <h2 className="concept-title">{data.title}</h2> : null}
-                  {data?.body ? (
-                    <div className="concept-desc" dangerouslySetInnerHTML={{ __html: data.body }} />
-                  ) : null}
-                  <div className="about-text-action">
-                    <button
-                      type="button"
-                      className="about-see-more-btn"
-                      onClick={onSeeMore}
-                    >
-                      <span>{buttonText || "ვრცლად"}</span>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M5 12h14" />
-                        <path d="M12 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
+              <div className="concept-content">
+                {data?.title ? <h2 className="concept-title">{data.title}</h2> : null}
+                {data?.body ? (
+                  <div className="concept-desc" dangerouslySetInnerHTML={{ __html: data.body }} />
+                ) : null}
+                <div className="about-text-action">
+                  <button
+                    type="button"
+                    className="about-see-more-btn"
+                    onClick={onSeeMore}
+                  >
+                    <span>{buttonText || "ვრცლად"}</span>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14" />
+                      <path d="M12 5l7 7-7 7" />
+                    </svg>
+                  </button>
                 </div>
               </div>
             ) : null}
