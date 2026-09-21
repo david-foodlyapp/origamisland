@@ -1865,13 +1865,9 @@ function App() {
 
         <AboutUsPage
           data={apiAboutData}
-          infoItems={apiAboutInfoItems}
-          loading={isAboutLoading || isAboutInfoLoading}
-          icons={origamiInfoIcons}
+          loading={isAboutLoading}
           language={language}
-          openModal={openModal}
           navigateTo={navigateTo}
-          t={t}
         />
 
         <Footer
