@@ -235,9 +235,6 @@ export function RequestCallModal({
                   </p>
                 ) : null}
 
-                <p className="request-call-recaptcha">
-                  {t("request_call_recaptcha")}
-                </p>
               </form>
             </div>
           </>
