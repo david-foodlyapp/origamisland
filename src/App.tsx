@@ -11,6 +11,7 @@ import { HeroSection } from "./components/sections/HeroSection";
 import { PropertiesPage } from "./components/sections/PropertiesPage";
 import { UnitCatalogPage } from "./components/sections/UnitCatalogPage";
 import { AboutSection } from "./components/sections/AboutSection";
+import { AboutUsPage } from "./components/sections/AboutUsPage";
 import { RenderSection } from "./components/sections/RenderSection";
 import { ChooseSection } from "./components/sections/ChooseSection";
 import { BiohackingSection } from "./components/sections/BiohackingSection";
@@ -153,7 +154,8 @@ const phoneCountryCodeFallbackOptions: PhoneCountryCodeOption[] = [
 const defaultPhoneCountryCode = phoneCountryCodeFallbackOptions[0].dialCode;
 
 type NewsDetailRoute = { name: "newsDetail"; slug: string };
-type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute | NewsDetailRoute;
+type AboutUsRoute = { name: "aboutUs" };
+type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute | NewsDetailRoute | AboutUsRoute;
 type FeaturedUnitsFilter = "all" | "hotel_room" | "apartment";
 const SHOW_FEATURED_UNITS_SECTION = false;
 
@@ -239,6 +241,10 @@ function getAppRoute(): AppRouteState {
 
   if (normalized === "/coming-soon") {
     window.history.replaceState(null, "", "/");
+  }
+
+  if (normalized === "/about-us") {
+    return { name: "aboutUs" };
   }
 
   const unitRoute = getUnitCatalogRoute();
@@ -1329,9 +1335,9 @@ function App() {
         }
 
         const payload: AboutUsResponse = await response.json();
-        const aboutItem = payload.data
-          .filter((item) => item.status && item.platform_identifier === "origamisland")
-          .sort((a, b) => a.rank - b.rank)[0] || null;
+        const aboutItem = (Array.isArray(payload.data) ? payload.data : [])
+          .filter((item) => item.status && (item.platform_identifier?.toLowerCase() === "origamisland" || !item.platform_identifier))
+          .sort((a, b) => a.rank - b.rank)[0] || (Array.isArray(payload.data) && payload.data.length > 0 ? payload.data[0] : null);
 
         setApiAboutData(aboutItem);
       } catch (error) {
@@ -1835,6 +1841,77 @@ function App() {
     );
   }
 
+  if (routeState.name === "aboutUs") {
+    return (
+      <>
+        <Header
+          headerShrunk={headerShrunk}
+          variant="surface"
+          darkThemeLogoSrc={darkThemeLogoSrc}
+          lightThemeLogoSrc={lightThemeLogoSrc}
+          mobileMenuOpen={mobileMenuOpen}
+          setMobileMenuOpen={setMobileMenuOpen}
+          primaryNavItems={primaryNavItems}
+          t={t}
+          openModal={openModal}
+          isLanguageModalOpen={isLanguageModalOpen}
+          setIsLanguageModalOpen={setIsLanguageModalOpen}
+          language={language}
+          languageOptions={languageOptions}
+          handleLanguageSelect={handleLanguageSelect}
+          theme={theme}
+          handleThemeToggle={handleThemeToggle}
+        />
+
+        <AboutUsPage
+          data={apiAboutData}
+          infoItems={apiAboutInfoItems}
+          loading={isAboutLoading || isAboutInfoLoading}
+          icons={origamiInfoIcons}
+          language={language}
+          openModal={openModal}
+          navigateTo={navigateTo}
+          t={t}
+        />
+
+        <Footer
+          darkThemeLogoSrc={darkThemeLogoSrc}
+          lightThemeLogoSrc={lightThemeLogoSrc}
+          socialNetworks={apiSocialNetworks}
+          footerDescription={apiFooterDescription || t("footer_desc")}
+          primaryNavItems={primaryNavItems}
+          companyProjectsData={apiCompanyProjectsData}
+          legalItems={apiFooterLegalItems}
+          contact={{
+            address: footerContactAddress,
+            email: footerContactEmail,
+            phone: footerContactPhone,
+            secondaryPhone: footerContactSecondaryPhone,
+            mapLink: apiContactSettings?.map_link
+          }}
+          openFooterSection={openFooterSection}
+          toggleFooterSection={toggleFooterSection}
+          openModal={openModal}
+          formatTelHref={formatTelHref}
+          t={t}
+        />
+        {renderActiveModal()}
+        <LanguageModal
+          active={isLanguageModalOpen}
+          language={language}
+          languageOptions={languageOptions}
+          currency={currency}
+          currencyRates={currencyRates}
+          closeModal={closeLanguageModal}
+          handleLanguageSelect={handleLanguageSelect}
+          handleCurrencySelect={handleCurrencySelect}
+          t={t}
+        />
+        <Analytics />
+      </>
+    );
+  }
+
   if (isUnitsRoute) {
     return (
       <>
@@ -1952,7 +2029,7 @@ function App() {
           loading={isAboutLoading || isAboutInfoLoading}
           icons={origamiInfoIcons}
           buttonText={t("news_read_more")}
-          onSeeMore={openModal}
+          onSeeMore={() => navigateTo("/about-us")}
         />
 
         <RenderSection
