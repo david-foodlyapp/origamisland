@@ -2105,6 +2105,8 @@ function App() {
         <FinanceSection
           data={apiFinanceData}
           hasContent={hasFinanceContent}
+          t={t}
+          openModal={openModal}
         />
 
         <OrigamiHoldingSection
