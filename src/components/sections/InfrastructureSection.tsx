@@ -84,7 +84,7 @@ export function InfrastructureSection({ items, hasContent, sectionRef, t }: Infr
   return (
     <section id="infrastructure" className="infrastructure-section" ref={sectionRef}>
       <div className="container infrastructure-container">
-        <header className="infrastructure-header-modern">
+        <div className="infrastructure-header-modern">
           <div className="infrastructure-header-left">
             <div className="infrastructure-eyebrow">
               <span className="infrastructure-eyebrow-line" aria-hidden="true" />
@@ -96,7 +96,7 @@ export function InfrastructureSection({ items, hasContent, sectionRef, t }: Infr
           <div className="infrastructure-header-right">
             <p className="infrastructure-tagline">{t("infra_tagline")}</p>
           </div>
-        </header>
+        </div>
 
         <div className="infrastructure-carousel-wrapper">
           <button
@@ -156,7 +156,7 @@ export function InfrastructureSection({ items, hasContent, sectionRef, t }: Infr
           </button>
         </div>
 
-        <footer className="infrastructure-footer">
+        <div className="infrastructure-footer">
           <div className="infrastructure-progress-track" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100}>
             <div
               className="infrastructure-progress-bar"
@@ -171,7 +171,7 @@ export function InfrastructureSection({ items, hasContent, sectionRef, t }: Infr
             <span className="sep"> / </span>
             <span className="total">{totalCountFormatted}</span>
           </div>
-        </footer>
+        </div>
       </div>
     </section>
   );
