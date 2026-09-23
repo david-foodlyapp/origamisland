@@ -12,7 +12,6 @@ import { PropertiesPage } from "./components/sections/PropertiesPage";
 import { UnitCatalogPage } from "./components/sections/UnitCatalogPage";
 import { AboutSection } from "./components/sections/AboutSection";
 import { AboutUsPage } from "./components/sections/AboutUsPage";
-import { RenderSection } from "./components/sections/RenderSection";
 import { ChooseSection } from "./components/sections/ChooseSection";
 import { BiohackingSection } from "./components/sections/BiohackingSection";
 import { InfrastructureSection } from "./components/sections/InfrastructureSection";
@@ -1978,22 +1977,20 @@ function App() {
           onSeeMore={() => navigateTo("/about-us")}
         />
 
-        <RenderSection
-          title={renderSectionTitle}
-          image={renderSectionImage}
-          imageAlt={renderSectionImageAlt}
+        <ChooseSection
+          chooseData={apiChooseData}
+          openChooseModal={openChooseModal}
+          renderTitle={renderSectionTitle}
+          renderImage={renderSectionImage}
+          renderImageAlt={renderSectionImageAlt}
           floors={buildingVisualFloors}
-          loading={isBuildingVisualLoading}
+          loadingFloors={isBuildingVisualLoading}
           getFloorPolygonPoints={getFloorPolygonPoints}
           getFloorLabel={getBuildingFloorLabel}
           getFloorTooltip={getBuildingFloorTooltip}
           getFloorUnitsRoute={getBuildingFloorUnitsRoute}
           navigateTo={navigateTo}
-        />
-
-        <ChooseSection
-          data={apiChooseData}
-          openChooseModal={openChooseModal}
+          t={t}
         />
 
         {SHOW_FEATURED_UNITS_SECTION && (
