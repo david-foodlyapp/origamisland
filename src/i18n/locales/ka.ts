@@ -77,6 +77,8 @@ export const ka: Record<TranslationKey, string> = {
   dir_status: "სტატუსი",
   dir_types: "ბინის ტიპები",
   infra_title: "ინფრასტრუქტურა",
+  infra_eyebrow: "კომფორტი",
+  infra_tagline: "ყოველდღიური კომფორტი უმაღლესი სტანდარტით",
   infra_lifestyle: "Lifestyle",
   infra_lifestyle_desc: "შეიგრძენით გამორჩეული ცხოვრების სტილი, შექმნილი მათთვის, ვინც აფასებს ექსკლუზიურობას.",
   infra_wellness: "Wellness",

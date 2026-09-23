@@ -77,6 +77,8 @@ export const en: Record<TranslationKey, string> = {
   dir_status: "Status",
   dir_types: "Apartment Types",
   infra_title: "Infrastructure",
+  infra_eyebrow: "AMENITIES",
+  infra_tagline: "EVERYDAY ESSENTIALS FOR A HIGHER STANDARD",
   infra_lifestyle: "Lifestyle",
   infra_lifestyle_desc: "Experience a curated lifestyle designed for those who appreciate the extraordinary.",
   infra_wellness: "Wellness",

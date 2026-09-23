@@ -710,56 +710,6 @@ function App() {
   }, [resolvedGalleryItems.length]);
 
   useEffect(() => {
-    const section = infrastructureSectionRef.current;
-    if (!section || typeof window === "undefined") {
-      return;
-    }
-
-    const reduceMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (reduceMotionQuery.matches) {
-      section.querySelectorAll<HTMLElement>(".infrastructure-card").forEach((card) => {
-        card.style.setProperty("--infra-parallax", "0px");
-      });
-      return;
-    }
-
-    let frameId = 0;
-
-    const updateInfrastructureParallax = () => {
-      frameId = 0;
-      const cards = section.querySelectorAll<HTMLElement>(".infrastructure-card");
-      const viewportHeight = window.innerHeight || 1;
-
-      cards.forEach((card) => {
-        const speed = Number(card.dataset.speed || "0");
-        const rect = card.getBoundingClientRect();
-        const cardCenter = rect.top + rect.height / 2;
-        const distanceFromViewportCenter = (cardCenter - viewportHeight / 2) / viewportHeight;
-        const offset = Math.max(-120, Math.min(120, distanceFromViewportCenter * speed * -128));
-        card.style.setProperty("--infra-parallax", `${offset.toFixed(2)}px`);
-      });
-    };
-
-    const requestUpdate = () => {
-      if (!frameId) {
-        frameId = window.requestAnimationFrame(updateInfrastructureParallax);
-      }
-    };
-
-    updateInfrastructureParallax();
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-
-    return () => {
-      if (frameId) {
-        window.cancelAnimationFrame(frameId);
-      }
-      window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
-    };
-  }, [apiInfrastructureItems.length]);
-
-  useEffect(() => {
     const controller = new AbortController();
 
     const loadFooterContent = async () => {

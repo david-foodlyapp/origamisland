@@ -77,6 +77,8 @@ export type TranslationKey =
   | "dir_status"
   | "dir_types"
   | "infra_title"
+  | "infra_eyebrow"
+  | "infra_tagline"
   | "infra_lifestyle"
   | "infra_lifestyle_desc"
   | "infra_wellness"
