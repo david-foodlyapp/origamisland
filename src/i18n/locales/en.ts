@@ -136,6 +136,11 @@ export const en: Record<TranslationKey, string> = {
   about_holding_title: "OUR RESULTS",
   about_holding_desc:
     "The story of Origami began in Batumi in 2008 under the name BWC. Through 18 years of continuous work and growth, we have evolved into one of the region's most substantial multidisciplinary holdings. The company brings together three core directions — development, architecture, and hospitality — while real estate development remains our main strategic line. We believe the strongest story about a company is told by facts: we have fulfilled every promise. We created one of Batumi's largest landmark projects, White Sails, we are currently building the premium residential complex Well Home, and we are beginning the boldest idea in the company's history — Origami Island.",
+  holding_eyebrow: "ORIGAMI DEVELOPMENT",
+  holding_explore_all: "EXPLORE ALL",
+  projects_eyebrow: "OUR PROJECTS",
+  projects_title: "Explore Projects",
+  projects_view_all: "VIEW ALL PROJECTS",
   about_stat1_value: "Since 2008",
   about_stat1_label: "continuous growth",
   about_stat2_value: "Up to 600 professionals",

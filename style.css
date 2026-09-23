@@ -10469,3 +10469,392 @@ html[data-theme="light"] .cs-page {
     -webkit-backdrop-filter: blur(12px);
   }
 }
+
+/* ==========================================================================
+   ORIGAMI HOLDING & PROJECTS COMBINED SECTION (REFERENCE DESIGN)
+   ========================================================================== */
+.origami-holding-combined-section {
+  position: relative;
+  padding: clamp(3.5rem, 6vw, 6rem) 0;
+  width: 100%;
+}
+
+.holding-combined-container {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(3rem, 5vw, 4.5rem);
+}
+
+/* --- Top & Bottom Block Headers --- */
+.holding-block-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.holding-block-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.holding-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.76rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #9c8a76;
+  font-weight: 600;
+}
+
+.holding-eyebrow-line {
+  display: inline-block;
+  width: 1.25rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.holding-main-title {
+  font-family: var(--font-serif), var(--font-georgian), serif;
+  font-size: clamp(1.85rem, 3.2vw, 2.85rem);
+  font-weight: 400;
+  color: #18181b;
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+html[data-theme="dark"] .holding-main-title {
+  color: #f4efe6;
+}
+
+.holding-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #8c7e72;
+  font-family: var(--font-sans), var(--font-georgian), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  padding: 0.4rem 0;
+  transition: color 0.25s ease, transform 0.25s ease;
+  white-space: nowrap;
+}
+
+.holding-header-link .holding-link-arrow {
+  font-size: 1rem;
+  transition: transform 0.25s ease;
+}
+
+.holding-header-link:hover {
+  color: #18181b;
+}
+
+html[data-theme="dark"] .holding-header-link:hover {
+  color: #d4af37;
+}
+
+.holding-header-link:hover .holding-link-arrow {
+  transform: translateX(4px);
+}
+
+/* --- Top Block: 4 Stats Cards Grid --- */
+.holding-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(0.75rem, 1.5vw, 1.35rem);
+}
+
+.holding-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.4rem;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(197, 168, 128, 0.45);
+  border-radius: 4px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+html[data-theme="dark"] .holding-stat-card {
+  background: rgba(24, 24, 27, 0.65);
+  border-color: rgba(197, 168, 128, 0.25);
+}
+
+.holding-stat-card:hover {
+  border-color: rgba(197, 168, 128, 0.9);
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+html[data-theme="dark"] .holding-stat-card:hover {
+  background: rgba(32, 32, 36, 0.85);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.holding-stat-icon-wrapper {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(197, 168, 128, 0.35);
+  background: rgba(197, 168, 128, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9c8a76;
+  transition: all 0.3s ease;
+}
+
+.holding-stat-card:hover .holding-stat-icon-wrapper {
+  border-color: #9c8a76;
+  background: rgba(197, 168, 128, 0.16);
+  color: #18181b;
+}
+
+html[data-theme="dark"] .holding-stat-card:hover .holding-stat-icon-wrapper {
+  color: #d4af37;
+}
+
+.holding-stat-icon-wrapper svg {
+  width: 22px;
+  height: 22px;
+}
+
+.holding-stat-img-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.holding-stat-text-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.holding-stat-value {
+  font-family: var(--font-sans), var(--font-georgian), sans-serif;
+  font-size: clamp(1.1rem, 1.4vw, 1.35rem);
+  font-weight: 700;
+  color: #18181b;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html[data-theme="dark"] .holding-stat-value {
+  color: #ffffff;
+}
+
+.holding-stat-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #71717a;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+html[data-theme="dark"] .holding-stat-label {
+  color: #a1a1aa;
+}
+
+/* --- Bottom Block: 3 Project Cards Grid --- */
+.holding-projects-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.holding-project-card {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  min-height: 280px;
+  aspect-ratio: 16 / 10;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease, border-color 0.4s ease;
+  background: #18181b;
+}
+
+html[data-theme="dark"] .holding-project-card {
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.holding-project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.2);
+  border-color: rgba(197, 168, 128, 0.4);
+}
+
+.holding-project-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.holding-project-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.holding-project-card:hover .holding-project-media img {
+  transform: scale(1.06);
+}
+
+.holding-project-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0.2) 40%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+.holding-project-content {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: clamp(1rem, 2vw, 1.5rem);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.holding-project-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.holding-project-title {
+  font-family: var(--font-serif), var(--font-georgian), serif;
+  font-size: clamp(1.1rem, 1.6vw, 1.45rem);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.holding-project-subtitle {
+  font-family: var(--font-sans), var(--font-georgian), sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.78);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.holding-project-circle-btn {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.holding-project-circle-btn svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.25s ease;
+}
+
+.holding-project-card:hover .holding-project-circle-btn {
+  background: #ffffff;
+  color: #18181b;
+  border-color: #ffffff;
+}
+
+.holding-project-card:hover .holding-project-circle-btn svg {
+  transform: translateX(2px);
+}
+
+.holding-project-skeleton {
+  background: linear-gradient(90deg, rgba(220, 220, 220, 0.2) 25%, rgba(240, 240, 240, 0.4) 50%, rgba(220, 220, 220, 0.2) 75%);
+  background-size: 200% 100%;
+  animation: holdingSkeletonShimmer 1.5s infinite;
+}
+
+@keyframes holdingSkeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* --- Responsive Layout for Origami Holding Combined Section --- */
+@media (max-width: 1100px) {
+  .holding-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 860px) {
+  .holding-projects-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .holding-project-card {
+    aspect-ratio: 16 / 9;
+    min-height: 240px;
+  }
+}
+
+@media (max-width: 640px) {
+  .holding-block-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .holding-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .holding-stat-card {
+    padding: 1rem 1.15rem;
+  }
+}

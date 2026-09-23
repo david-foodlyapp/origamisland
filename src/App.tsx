@@ -17,7 +17,6 @@ import { BiohackingSection } from "./components/sections/BiohackingSection";
 import { InfrastructureSection } from "./components/sections/InfrastructureSection";
 import { FinanceSection } from "./components/sections/FinanceSection";
 import { OrigamiHoldingSection } from "./components/sections/OrigamiHoldingSection";
-import { CompanyProjectsSection } from "./components/sections/CompanyProjectsSection";
 import { NewsSection } from "./components/sections/NewsSection";
 import { Footer } from "./components/sections/Footer";
 import { ConsultationModal } from "./components/sections/ConsultationModal";
@@ -2107,16 +2106,15 @@ function App() {
         />
 
         <OrigamiHoldingSection
-          data={apiOrigamiHoldingData}
+          holdingData={apiOrigamiHoldingData}
+          projectsData={apiCompanyProjectsData}
+          loadingProjects={isCompanyProjectsLoading}
           hasContent={hasOrigamiHoldingContent}
           getIcon={getOrigamiHoldingIcon}
           getOrder={getOrigamiHoldingOrder}
-        />
-
-        <CompanyProjectsSection
-          data={apiCompanyProjectsData}
-          loading={isCompanyProjectsLoading}
           openModal={openModal}
+          navigateTo={navigateTo}
+          t={t}
         />
 
         <NewsSection
