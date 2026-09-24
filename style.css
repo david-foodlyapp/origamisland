@@ -1498,21 +1498,28 @@ section {
   min-height: calc(100vh - 80px);
   display: flex;
   align-items: center;
+  background: transparent;
 }
 
-#about-us .container {
-  max-width: 100%;
-  padding: 0 3rem;
-  width: 100%;
+#about-us .concept-card,
+#about-us .about-grid-container {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+}
+
+html[data-theme="light"] #about-us .concept-card,
+html[data-theme="light"] #about-us .about-grid-container {
+  background: transparent;
+  box-shadow: none;
+  border: none;
 }
 
 @media (max-width: 900px) {
   #about-us.concept-section {
     min-height: auto;
     padding: 3rem 0;
-  }
-  #about-us .container {
-    padding: 0 1.25rem;
   }
 }
 
@@ -1522,7 +1529,6 @@ section {
   gap: 1.5rem;
   align-items: stretch;
   width: 100%;
-  padding: 1.25rem;
   border-radius: var(--radius-xl);
 }
 
@@ -4692,18 +4698,6 @@ html[data-theme="dark"] .gallery-title {
 .news-section {
   padding: 2rem 0 5rem;
   width: 100%;
-}
-
-.news-section .container {
-  max-width: 100%;
-  width: 100%;
-  padding: 0 3rem;
-}
-
-@media (max-width: 900px) {
-  .news-section .container {
-    padding: 0 1.25rem;
-  }
 }
 
 .news-header {
@@ -10570,20 +10564,23 @@ html[data-theme="dark"] .holding-header-link:hover {
 /* --- Top Block: 4 Stats Cards Grid --- */
 .holding-stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: clamp(0.75rem, 1.5vw, 1.35rem);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.5rem, 1vw, 1.25rem);
+  width: 100%;
 }
 
 .holding-stat-card {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1.25rem 1.4rem;
+  gap: 0.75rem;
+  padding: 0.95rem 1.1rem;
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid rgba(197, 168, 128, 0.45);
   border-radius: 4px;
   text-decoration: none;
   color: inherit;
+  min-width: 0;
+  overflow: hidden;
   transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -10608,8 +10605,8 @@ html[data-theme="dark"] .holding-stat-card:hover {
 
 .holding-stat-icon-wrapper {
   flex-shrink: 0;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: 1px solid rgba(197, 168, 128, 0.35);
   background: rgba(197, 168, 128, 0.08);
@@ -10631,32 +10628,32 @@ html[data-theme="dark"] .holding-stat-card:hover .holding-stat-icon-wrapper {
 }
 
 .holding-stat-icon-wrapper svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .holding-stat-img-icon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
 }
 
 .holding-stat-text-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0.15rem;
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .holding-stat-value {
   font-family: var(--font-sans), var(--font-georgian), sans-serif;
-  font-size: clamp(1.1rem, 1.4vw, 1.35rem);
+  font-size: clamp(0.92rem, 1.1vw, 1.2rem);
   font-weight: 700;
   color: #18181b;
-  line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
+  word-break: break-word;
 }
 
 html[data-theme="dark"] .holding-stat-value {
@@ -10664,14 +10661,12 @@ html[data-theme="dark"] .holding-stat-value {
 }
 
 .holding-stat-label {
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: #71717a;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.25;
+  word-break: break-word;
 }
 
 html[data-theme="dark"] .holding-stat-label {
@@ -10681,8 +10676,9 @@ html[data-theme="dark"] .holding-stat-label {
 /* --- Bottom Block: 3 Project Cards Grid --- */
 .holding-projects-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(1rem, 2vw, 1.5rem);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  width: 100%;
 }
 
 .holding-project-card {
@@ -10824,9 +10820,10 @@ html[data-theme="dark"] .holding-project-card {
 }
 
 /* --- Responsive Layout for Origami Holding Combined Section --- */
-@media (max-width: 1100px) {
+@media (max-width: 1024px) {
   .holding-stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
   }
 }
 
@@ -10851,10 +10848,10 @@ html[data-theme="dark"] .holding-project-card {
 
   .holding-stats-grid {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .holding-stat-card {
-    padding: 1rem 1.15rem;
+    padding: 0.85rem 1rem;
   }
 }

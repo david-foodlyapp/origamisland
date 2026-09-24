@@ -11,7 +11,7 @@ type OrigamiHoldingProjectsSectionProps = {
   getIcon: (slug: string) => ReactNode;
   getOrder: (item: { slug?: string; title?: string; description?: string }) => number;
   openModal: (style?: "consultation" | "request_call") => void;
-  navigateTo: (path: string) => void;
+  navigateTo?: (path: string) => void;
   t: (key: TranslationKey) => string;
 };
 
@@ -57,7 +57,6 @@ export function OrigamiHoldingSection({
   getIcon,
   getOrder,
   openModal,
-  navigateTo,
   t
 }: OrigamiHoldingProjectsSectionProps) {
   if (!hasContent && !projectsData?.items.length) {
@@ -128,7 +127,6 @@ export function OrigamiHoldingSection({
 
   const holdingEyebrow = t("holding_eyebrow");
   const holdingTitle = holdingData?.title || "THE ISLAND";
-  const holdingExplore = t("holding_explore_all");
 
   const projectsEyebrow = t("projects_eyebrow");
   const projectsTitle = projectsData?.title || t("projects_title");
@@ -146,17 +144,6 @@ export function OrigamiHoldingSection({
                 <span className="holding-eyebrow-text">{holdingEyebrow}</span>
               </div>
               <h2 className="holding-main-title">{holdingTitle}</h2>
-            </div>
-
-            <div className="holding-block-header-right">
-              <button
-                type="button"
-                className="holding-header-link"
-                onClick={() => navigateTo("/about-us")}
-              >
-                <span>{holdingExplore}</span>
-                <span className="holding-link-arrow" aria-hidden="true">→</span>
-              </button>
             </div>
           </div>
 
