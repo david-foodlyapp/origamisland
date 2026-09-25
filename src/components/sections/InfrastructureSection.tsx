@@ -86,15 +86,7 @@ export function InfrastructureSection({ items, hasContent, sectionRef, t }: Infr
       <div className="container infrastructure-container">
         <div className="infrastructure-header-modern">
           <div className="infrastructure-header-left">
-            <div className="infrastructure-eyebrow">
-              <span className="infrastructure-eyebrow-line" aria-hidden="true" />
-              <span className="infrastructure-eyebrow-text">{t("infra_eyebrow")}</span>
-            </div>
             <h2 className="infrastructure-main-title">{t("infra_title")}</h2>
-          </div>
-
-          <div className="infrastructure-header-right">
-            <p className="infrastructure-tagline">{t("infra_tagline")}</p>
           </div>
         </div>
 

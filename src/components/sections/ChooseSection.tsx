@@ -1,7 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import type { TranslationKey } from "../../i18n";
 import type { BuildingVisualFloor, ChooseApiItem } from "../../types";
-import { DEFAULT_BUILDING_SLUG } from "../../unitCatalog";
 import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/media";
 
 type UnifiedPropertiesSectionProps = {
@@ -38,9 +37,7 @@ export function ChooseSection({
     .filter((item) => item.status !== false)
     .sort((a, b) => a.rank - b.rank);
 
-  const eyebrow = t("available_properties_eyebrow");
   const sectionTitle = t("available_properties_title");
-  const tagline = t("available_properties_tagline");
   const exploreText = t("available_properties_explore");
 
   return (
@@ -49,15 +46,7 @@ export function ChooseSection({
         {/* Section Header */}
         <div className="available-properties-header">
           <div className="available-properties-header-left">
-            <div className="available-properties-eyebrow">
-              <span className="available-properties-eyebrow-line" aria-hidden="true" />
-              <span className="available-properties-eyebrow-text">{eyebrow}</span>
-            </div>
             <h2 className="available-properties-main-title">{sectionTitle}</h2>
-          </div>
-
-          <div className="available-properties-header-right">
-            <p className="available-properties-tagline">{tagline}</p>
           </div>
         </div>
 
@@ -133,21 +122,9 @@ export function ChooseSection({
             {/* Top Bar on Building Card */}
             <div className="available-building-topbar">
               <div className="available-building-explore-tag">
-                <span className="available-building-explore-text">{exploreText}</span>
                 <span className="available-building-explore-line" aria-hidden="true" />
+                <span className="available-building-explore-text">{exploreText}</span>
               </div>
-
-              <button
-                type="button"
-                className="available-building-nav-btn"
-                onClick={() => navigateTo(`/properties/${DEFAULT_BUILDING_SLUG}/units`)}
-                aria-label="Explore all units"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="5" y1="12" x2="19" y2="12" />
-                  <polyline points="12 5 19 12 12 19" />
-                </svg>
-              </button>
             </div>
 
             {/* Interactive Visual Map with SVG Hotspots & Floor Labels */}
