@@ -6,7 +6,6 @@ import { getOptimizedImageUrl, getResponsiveImageSrcSet } from "../../utils/medi
 
 type UnifiedPropertiesSectionProps = {
   chooseData: { title: string; items: ChooseApiItem[] } | null;
-  openChooseModal: (item: ChooseApiItem) => void;
   renderTitle?: string;
   renderImage: string;
   renderImageAlt: string;
@@ -22,7 +21,6 @@ type UnifiedPropertiesSectionProps = {
 
 export function ChooseSection({
   chooseData,
-  openChooseModal,
   renderImage,
   renderImageAlt,
   floors,
@@ -36,43 +34,9 @@ export function ChooseSection({
 }: UnifiedPropertiesSectionProps) {
   const [activeFloorId, setActiveFloorId] = useState<number | null>(null);
 
-  const defaultOptionItems: ChooseApiItem[] = [
-    {
-      id: 1,
-      slug: "hotel-rooms",
-      title: "Hotel-style Residences",
-      subtitle: "Hotel Service",
-      description: "Turnkey living with hotel services",
-      image: "/assets/property_lagoons.png",
-      logo: "",
-      link: "",
-      badge: "Hotel",
-      rank: 1,
-      status: true
-    },
-    {
-      id: 2,
-      slug: "branded-residences",
-      title: "Residential Residences",
-      subtitle: "Private Living",
-      description: "A home for your next chapter",
-      image: "/assets/property_cavalli.png",
-      logo: "",
-      link: "",
-      badge: "Residential",
-      rank: 2,
-      status: true
-    }
-  ];
-
-  const optionItems =
-    chooseData?.items && chooseData.items.length > 0
-      ? chooseData.items.map((item, idx) => ({
-          ...item,
-          description: item.description || defaultOptionItems[idx % defaultOptionItems.length].description,
-          image: item.image || item.image_preview || defaultOptionItems[idx % defaultOptionItems.length].image
-        }))
-      : defaultOptionItems;
+  const optionItems = (chooseData?.items || [])
+    .filter((item) => item.status !== false)
+    .sort((a, b) => a.rank - b.rank);
 
   const eyebrow = t("available_properties_eyebrow");
   const sectionTitle = t("available_properties_title");
@@ -108,42 +72,54 @@ export function ChooseSection({
                 <article
                   key={item.id}
                   className="available-option-card"
-                  onClick={() => openChooseModal(item)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      openChooseModal(item);
-                    }
-                  }}
                 >
-                  <div className="available-option-media">
-                    <img
-                      src={getOptimizedImageUrl(imageSrc, { width: 780, height: 960, crop: "fill", gravity: "auto" })}
-                      srcSet={getResponsiveImageSrcSet(imageSrc, [380, 560, 780, 960], { crop: "limit" })}
-                      sizes="(max-width: 768px) 92vw, (max-width: 1200px) 45vw, 24vw"
-                      alt={item.title}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <div className="available-option-overlay" />
-                  </div>
+                  <div className="available-option-card-inner">
+                    {/* Front Face */}
+                    <div className="available-option-card-front">
+                      <div className="available-option-media">
+                        <img
+                          src={getOptimizedImageUrl(imageSrc, { width: 780, height: 960, crop: "fill", gravity: "auto" })}
+                          srcSet={getResponsiveImageSrcSet(imageSrc, [380, 560, 780, 960], { crop: "limit" })}
+                          sizes="(max-width: 768px) 92vw, (max-width: 1200px) 45vw, 24vw"
+                          alt={item.title}
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <div className="available-option-overlay" />
+                      </div>
 
-                  <div className="available-option-content">
-                    <div className="available-option-text">
-                      <h3 className="available-option-title">{item.title}</h3>
-                      {item.description ? (
-                        <p className="available-option-desc">{item.description}</p>
-                      ) : null}
+                      <div className="available-option-content">
+                        <div className="available-option-text">
+                          <h3 className="available-option-title">{item.title}</h3>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="available-option-action" aria-hidden="true">
-                      <div className="available-option-circle-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="5" y1="12" x2="19" y2="12" />
-                          <polyline points="12 5 19 12 12 19" />
-                        </svg>
+                    {/* Back Face (Appears on Flip / Mouse Hover) */}
+                    <div className="available-option-card-back">
+                      <div className="available-option-back-bg">
+                        <img
+                          src={getOptimizedImageUrl(imageSrc, { width: 780, height: 960, crop: "fill", gravity: "auto" })}
+                          alt=""
+                          aria-hidden="true"
+                          className="available-option-back-img"
+                        />
+                        <div className="available-option-back-overlay" />
+                      </div>
+
+                      <div className="available-option-back-content">
+                        <div className="available-option-back-header">
+                          <div className="available-option-back-badge">
+                            {item.title}
+                          </div>
+                          <span className="available-option-back-line" aria-hidden="true" />
+                        </div>
+
+                        <div className="available-option-back-body">
+                          {item.description ? (
+                            <p className="available-option-back-desc">{item.description}</p>
+                          ) : null}
+                        </div>
                       </div>
                     </div>
                   </div>
