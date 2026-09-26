@@ -39,26 +39,12 @@ import {
   type GallerySectionResponse,
   type NewsApiItem,
   type NewsCard,
-  type InfrastructureApiItem,
-  type BiohackingApiItem,
-  type BiohackingSectionResponse,
-  type OrigamiHoldingApiItem,
-  type OrigamiHoldingSectionResponse,
   type ChooseApiItem,
-  type ChooseSectionResponse,
-  type FinanceApiItem,
-  type FinanceSectionResponse,
-  type InfrastructureSectionResponse,
   type FooterMenuApiItem,
   type FooterMenuSectionResponse,
   type ContactSettings,
   type ContactSettingsResponse,
   type SectionGridCardItem,
-  type AboutSectionResponse,
-  type CompanyProjectApiItem,
-  type CompanyProjectsSectionResponse,
-  type AboutUsApiItem,
-  type AboutUsResponse,
   type BuildingVisual,
   type BuildingVisualFloor,
   type BuildingVisualResponse,
@@ -86,6 +72,7 @@ import {
   type SupportedCurrency
 } from "./unitCatalog";
 import { getExplorerRoute, type ExplorerRoute } from "./propertyExplorer";
+import { useHomepageContent } from "./hooks/useHomepageContent";
 
 const origamiInfoIcons = [
   <PriceTagIcon />,
@@ -292,12 +279,6 @@ function App() {
   const [isBuildingVisualLoading, setIsBuildingVisualLoading] = useState(true);
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [, setIsGalleryLoading] = useState(true);
-  const [apiInfrastructureItems, setApiInfrastructureItems] = useState<InfrastructureApiItem[]>([]);
-  const [apiBiohackingData, setApiBiohackingData] = useState<{ description: string; background_image: string; items: BiohackingApiItem[] } | null>(null);
-  const [apiOrigamiHoldingData, setApiOrigamiHoldingData] = useState<{ title: string; background_image: string; items: OrigamiHoldingApiItem[] } | null>(null);
-  const [apiChooseData, setApiChooseData] = useState<{ title: string; items: ChooseApiItem[] } | null>(null);
-  const [apiFinanceData, setApiFinanceData] = useState<{ title: string; description: string; items: FinanceApiItem[] } | null>(null);
-  const [apiCompanyProjectsData, setApiCompanyProjectsData] = useState<{ title: string; items: CompanyProjectApiItem[] } | null>(null);
   const [apiSection3Data, setApiSection3Data] = useState<{ title: string; background_image: string } | null>(null);
   const [apiFooterDescription, setApiFooterDescription] = useState("");
   const [apiFooterMenuItems, setApiFooterMenuItems] = useState<FooterMenuApiItem[]>([]);
@@ -306,11 +287,6 @@ function App() {
   const [apiContactSettings, setApiContactSettings] = useState<ContactSettings | null>(null);
   const [apiSocialNetworks, setApiSocialNetworks] = useState<SocialNetworkItem[]>([]);
   const [branding, setBranding] = useState<BrandingSettings | null>(null);
-  const [isCompanyProjectsLoading, setIsCompanyProjectsLoading] = useState(true);
-  const [apiAboutData, setApiAboutData] = useState<AboutUsApiItem | null>(null);
-  const [apiAboutInfoItems, setApiAboutInfoItems] = useState<SectionGridCardItem[]>([]);
-  const [isAboutLoading, setIsAboutLoading] = useState(true);
-  const [isAboutInfoLoading, setIsAboutInfoLoading] = useState(true);
   const [selectedChooseItem, setSelectedChooseItem] = useState<ChooseApiItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessState, setShowSuccessState] = useState(false);
@@ -330,6 +306,19 @@ function App() {
   const galleryTrackRef = useRef<HTMLDivElement | null>(null);
   const infrastructureSectionRef = useRef<HTMLElement | null>(null);
   const t = (key: TranslationKey) => translations[language][key];
+  const {
+    infrastructureItems: apiInfrastructureItems,
+    biohackingData: apiBiohackingData,
+    origamiHoldingData: apiOrigamiHoldingData,
+    chooseData: apiChooseData,
+    financeData: apiFinanceData,
+    companyProjectsData: apiCompanyProjectsData,
+    aboutData: apiAboutData,
+    aboutInfoItems: apiAboutInfoItems,
+    isCompanyProjectsLoading,
+    isAboutLoading,
+    isAboutInfoLoading
+  } = useHomepageContent(language);
   const featuredUnitsCopy = language === "ka"
     ? {
       cta: "დეტალები",
@@ -1084,267 +1073,6 @@ function App() {
     loadNewsDetail();
     return () => controller.abort();
   }, [routeState, language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadInfrastructure = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/infrastructure?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Infrastructure request failed: ${response.status}`);
-        }
-
-        const payload: InfrastructureSectionResponse = await response.json();
-        setApiInfrastructureItems(
-          payload.data.items
-            .filter((item) => item.status)
-            .sort((a, b) => a.rank - b.rank)
-        );
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load infrastructure data:", error);
-        setApiInfrastructureItems([]);
-      }
-    };
-
-    loadInfrastructure();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadBiohacking = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/biohacking?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Biohacking request failed: ${response.status}`);
-        }
-
-        const payload: BiohackingSectionResponse = await response.json();
-        setApiBiohackingData({
-          description: payload.data.description,
-          background_image: payload.data.background_image,
-          items: payload.data.items
-            .filter((item) => item.status)
-            .sort((a, b) => a.rank - b.rank)
-        });
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load biohacking data:", error);
-        setApiBiohackingData(null);
-      }
-    };
-
-    loadBiohacking();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadOrigamiHolding = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/origami-holding?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Origami Holding request failed: ${response.status}`);
-        }
-
-        const payload: OrigamiHoldingSectionResponse = await response.json();
-        setApiOrigamiHoldingData({
-          title: payload.data.title,
-          background_image: payload.data.background_image,
-          items: payload.data.items
-            .filter((item) => item.status)
-            .sort((a, b) => a.rank - b.rank)
-        });
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load origami holding data:", error);
-        setApiOrigamiHoldingData(null);
-      }
-    };
-
-    loadOrigamiHolding();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadChoose = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/choose?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Choose request failed: ${response.status}`);
-        }
-
-        const payload: ChooseSectionResponse = await response.json();
-        setApiChooseData({
-          title: payload.data.title,
-          items: (payload.data.items || [])
-            .filter((item) => item.status !== false)
-            .sort((a, b) => a.rank - b.rank)
-        });
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load choose data:", error);
-        setApiChooseData(null);
-      }
-    };
-
-    loadChoose();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadFinance = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/finances?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Finance request failed: ${response.status}`);
-        }
-
-        const payload: FinanceSectionResponse = await response.json();
-        setApiFinanceData({
-          title: payload.data.title,
-          description: payload.data.description,
-          items: payload.data.items
-            .filter((item) => item.status)
-            .sort((a, b) => a.rank - b.rank)
-        });
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load finance data:", error);
-        setApiFinanceData(null);
-      }
-    };
-
-    loadFinance();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadCompanyProjects = async () => {
-      setIsCompanyProjectsLoading(true);
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/projects?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Company projects request failed: ${response.status}`);
-        }
-
-        const payload: CompanyProjectsSectionResponse = await response.json();
-        setApiCompanyProjectsData({
-          title: payload.data.title,
-          items: payload.data.items
-            .filter((item) => item.status && item.image)
-            .sort((a, b) => a.rank - b.rank)
-        });
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load company projects data:", error);
-        setApiCompanyProjectsData(null);
-      } finally {
-        setIsCompanyProjectsLoading(false);
-      }
-    };
-
-    loadCompanyProjects();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadAboutUs = async () => {
-      setIsAboutLoading(true);
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/about-us?locale=${locale}&platform=origamisland`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`About us request failed: ${response.status}`);
-        }
-
-        const payload: AboutUsResponse = await response.json();
-        const aboutItem = (Array.isArray(payload.data) ? payload.data : [])
-          .filter((item) => item.status && (item.platform_identifier?.toLowerCase() === "origamisland" || !item.platform_identifier))
-          .sort((a, b) => a.rank - b.rank)[0] || (Array.isArray(payload.data) && payload.data.length > 0 ? payload.data[0] : null);
-
-        setApiAboutData(aboutItem);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load about us data:", error);
-        setApiAboutData(null);
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsAboutLoading(false);
-        }
-      }
-    };
-
-    loadAboutUs();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadAboutInfoItems = async () => {
-      setIsAboutInfoLoading(true);
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/about?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`About section request failed: ${response.status}`);
-        }
-
-        const payload: AboutSectionResponse = await response.json();
-        setApiAboutInfoItems(
-          payload.data.items
-            .filter((item) => item.status)
-            .sort((a, b) => a.rank - b.rank)
-        );
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load about section cards:", error);
-        setApiAboutInfoItems([]);
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsAboutInfoLoading(false);
-        }
-      }
-    };
-
-    loadAboutInfoItems();
-    return () => controller.abort();
-  }, [language]);
 
   const getBiohackingIcon = (slug: string) => {
     if (slug.includes("wellness")) return <WellnessIcon />;

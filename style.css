@@ -10867,15 +10867,83 @@ html[data-theme="dark"] .holding-stat-label {
   color: #a1a1aa;
 }
 
-/* --- Bottom Block: 3 Project Cards Grid --- */
-.holding-projects-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+/* --- Bottom Block: Project Cards Carousel & Scroll --- */
+.holding-projects-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.holding-projects-nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #ffffff;
+  color: #18181b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  transition: transform 0.25s ease, background 0.25s ease, border-color 0.25s ease, color 0.25s ease, opacity 0.25s ease;
+}
+
+html[data-theme="dark"] .holding-projects-nav-btn {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: #18181b;
+  color: #f4efe6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.holding-projects-nav-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.holding-projects-nav-btn:hover:not(:disabled) {
+  transform: scale(1.08);
+  border-color: var(--primary-gold);
+  color: var(--primary-gold);
+}
+
+.holding-projects-nav-btn:disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.holding-projects-carousel-wrapper {
+  position: relative;
   width: 100%;
 }
 
+.holding-projects-track {
+  display: flex;
+  gap: clamp(0.75rem, 1.5vw, 1.5rem);
+  width: 100%;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.25rem 0 0.75rem;
+  cursor: grab;
+  user-select: none;
+}
+
+.holding-projects-track:active {
+  cursor: grabbing;
+}
+
+.holding-projects-track::-webkit-scrollbar {
+  display: none;
+}
+
 .holding-project-card {
+  flex: 0 0 calc((100% - 2 * clamp(0.75rem, 1.5vw, 1.5rem)) / 3);
+  min-width: 300px;
+  scroll-snap-align: start;
   position: relative;
   border-radius: 8px;
   overflow: hidden;
@@ -11019,14 +11087,14 @@ html[data-theme="dark"] .holding-project-card {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.75rem;
   }
+
+  .holding-project-card {
+    flex: 0 0 calc(50% - 0.5rem);
+    min-width: 280px;
+  }
 }
 
 @media (max-width: 860px) {
-  .holding-projects-grid {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-
   .holding-project-card {
     aspect-ratio: 16 / 9;
     min-height: 240px;
@@ -11035,9 +11103,15 @@ html[data-theme="dark"] .holding-project-card {
 
 @media (max-width: 640px) {
   .holding-block-header {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     gap: 0.75rem;
+  }
+
+  .holding-project-card {
+    flex: 0 0 85%;
+    min-width: 260px;
   }
 
   .holding-stats-grid {
