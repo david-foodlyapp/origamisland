@@ -20,7 +20,7 @@ type FinanceSectionProps = {
   openModal?: (style?: "consultation" | "request_call") => void;
 };
 
-export function FinanceSection({ data, hasContent, t, openModal }: FinanceSectionProps) {
+export function FinanceSection({ data, hasContent, t }: FinanceSectionProps) {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -240,31 +240,8 @@ export function FinanceSection({ data, hasContent, t, openModal }: FinanceSectio
                     <span className="finance-card-badge">{slide.badge}</span>
                   </div>
 
-                  {/* Card Title & Subtitle */}
-                  <div className="finance-card-headline">
-                    <h3 className="finance-card-title">{slide.title}</h3>
-                    {slide.subtitle && slide.subtitle.trim().toLowerCase() !== slide.title.trim().toLowerCase() ? (
-                      <p className="finance-card-subtitle">{slide.subtitle}</p>
-                    ) : null}
-                  </div>
-
                   {/* Description */}
                   <p className="finance-card-description">{slide.description}</p>
-
-                  {/* Bottom Action CTA */}
-                  <div className="finance-card-action">
-                    <button
-                      type="button"
-                      className="finance-card-btn"
-                      onClick={() => openModal?.("consultation")}
-                    >
-                      <span>{slide.ctaText || (t ? t("finance_explore_cta") : "EXPLORE BATUMI'S POTENTIAL")}</span>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12" />
-                        <polyline points="12 5 19 12 12 19" />
-                      </svg>
-                    </button>
-                  </div>
                 </article>
               ))}
             </div>
