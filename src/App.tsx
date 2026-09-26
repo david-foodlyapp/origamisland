@@ -1037,6 +1037,7 @@ function App() {
         if (error instanceof DOMException && error.name === "AbortError") {
           return;
         }
+        setNewsItems([]);
       }
     };
 
@@ -1106,6 +1107,7 @@ function App() {
           return;
         }
         console.error("Failed to load infrastructure data:", error);
+        setApiInfrastructureItems([]);
       }
     };
 
@@ -1137,6 +1139,7 @@ function App() {
           return;
         }
         console.error("Failed to load biohacking data:", error);
+        setApiBiohackingData(null);
       }
     };
 
@@ -1168,6 +1171,7 @@ function App() {
           return;
         }
         console.error("Failed to load origami holding data:", error);
+        setApiOrigamiHoldingData(null);
       }
     };
 
@@ -1230,6 +1234,7 @@ function App() {
           return;
         }
         console.error("Failed to load finance data:", error);
+        setApiFinanceData(null);
       }
     };
 
@@ -1261,6 +1266,7 @@ function App() {
           return;
         }
         console.error("Failed to load company projects data:", error);
+        setApiCompanyProjectsData(null);
       } finally {
         setIsCompanyProjectsLoading(false);
       }
@@ -1420,10 +1426,10 @@ function App() {
   const renderSectionImageAlt = apiBuildingVisual?.title || apiSection3Data?.title || "";
   const conceptImage = apiAboutData?.image || "";
   const hasAboutContent = Boolean(apiAboutData?.title || apiAboutData?.body || conceptImage || apiAboutInfoItems.length);
-  const hasBiohackingContent = Boolean(apiBiohackingData?.description || apiBiohackingData?.background_image || apiBiohackingData?.items.length);
+  const hasBiohackingContent = Boolean(apiBiohackingData?.items.length);
   const hasInfrastructureContent = apiInfrastructureItems.length > 0;
-  const hasFinanceContent = Boolean(apiFinanceData?.title || apiFinanceData?.description || apiFinanceData?.items.length);
-  const hasOrigamiHoldingContent = Boolean(apiOrigamiHoldingData?.title || apiOrigamiHoldingData?.background_image || apiOrigamiHoldingData?.items.length);
+  const hasFinanceContent = Boolean(apiFinanceData?.items.length);
+  const hasOrigamiHoldingContent = Boolean(apiOrigamiHoldingData?.items.length);
 
   const footerContactAddress = apiContactSettings?.address?.trim() || "";
   const footerContactEmail = apiContactSettings?.email?.trim() || "";

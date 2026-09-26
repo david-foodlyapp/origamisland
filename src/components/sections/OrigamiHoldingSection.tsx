@@ -59,80 +59,25 @@ export function OrigamiHoldingSection({
   openModal,
   t
 }: OrigamiHoldingProjectsSectionProps) {
-  if (!hasContent && !projectsData?.items.length) {
+  const holdingItems = hasContent
+    ? [...(holdingData?.items || [])].sort((a, b) => getOrder(a) - getOrder(b)).slice(0, 4)
+    : [];
+  const projectsList = (projectsData?.items || []).slice(0, 3);
+  const hasHoldingItems = holdingItems.length > 0;
+  const hasProjectItems = projectsList.length > 0;
+
+  if (!hasHoldingItems && !hasProjectItems && !loadingProjects) {
     return null;
   }
 
-  // Fallback default holding stats matching reference
-  const defaultHoldingStats = [
-    { value: "28 ha", label: "TOTAL ISLAND AREA" },
-    { value: "600+", label: "RESIDENCES & HOTEL KEYS" },
-    { value: "1,000,000+", label: "ANNUAL VISITORS (EST.)" },
-    { value: "1,400,000 m²", label: "TOTAL DEVELOPMENT" }
-  ];
-
-  // Holding stats list
-  const holdingItems =
-    holdingData?.items && holdingData.items.length > 0
-      ? [...holdingData.items].sort((a, b) => getOrder(a) - getOrder(b)).slice(0, 4)
-      : null;
-
-  // Fallback default company projects matching reference
-  const defaultProjects: CompanyProjectApiItem[] = [
-    {
-      id: 1,
-      slug: "origami-island",
-      title: "ORIGAMI ISLAND",
-      subtitle: "BEYOND THE HORIZON",
-      description: "Beyond the horizon",
-      image: "/assets/hero_bg_2.png",
-      logo: "",
-      link: "",
-      badge: "Flagship",
-      rank: 1,
-      status: true
-    },
-    {
-      id: 2,
-      slug: "wellhome",
-      title: "WELLHOME",
-      subtitle: "A BETTER WAY TO LIVE",
-      description: "A better way to live",
-      image: "/assets/property_cavalli.png",
-      logo: "",
-      link: "",
-      badge: "Residential",
-      rank: 2,
-      status: true
-    },
-    {
-      id: 3,
-      slug: "white-sails",
-      title: "TOWN",
-      subtitle: "CONNECTED TO A CALMER LIFE",
-      description: "Connected to a calmer life",
-      image: "/assets/property_lagoons.png",
-      logo: "",
-      link: "",
-      badge: "Completed",
-      rank: 3,
-      status: true
-    }
-  ];
-
-  const projectsList =
-    projectsData?.items && projectsData.items.length > 0
-      ? projectsData.items.slice(0, 3)
-      : defaultProjects;
-
-  const holdingTitle = holdingData?.title || "THE ISLAND";
+  const holdingTitle = holdingData?.title || "";
   const projectsTitle = projectsData?.title || t("projects_title");
 
   return (
     <section id="holding" className="origami-holding-combined-section">
       <div className="container holding-combined-container">
         {/* ================= TOP BLOCK: THE ISLAND / STATS ================= */}
-        <div className="holding-top-block">
+        {hasHoldingItems ? <div className="holding-top-block">
           <div className="holding-block-header">
             <div className="holding-block-header-left">
               <h2 className="holding-main-title">{holdingTitle}</h2>
@@ -141,8 +86,7 @@ export function OrigamiHoldingSection({
 
           {/* 4 Outline Metric Boxes Row */}
           <div className="holding-stats-grid">
-            {holdingItems && holdingItems.length > 0
-              ? holdingItems.map((item, idx) => {
+            {holdingItems.map((item, idx) => {
                   const link = item.link?.trim();
                   const iconElement = item.logo ? (
                     <img src={item.logo} alt={item.title} className="holding-stat-img-icon" />
@@ -181,23 +125,12 @@ export function OrigamiHoldingSection({
                       {content}
                     </div>
                   );
-                })
-              : defaultHoldingStats.map((st, idx) => (
-                  <div key={idx} className="holding-stat-card">
-                    <div className="holding-stat-icon-wrapper" aria-hidden="true">
-                      <StatIconFallback index={idx} />
-                    </div>
-                    <div className="holding-stat-text-wrapper">
-                      <span className="holding-stat-value">{st.value}</span>
-                      <span className="holding-stat-label">{st.label}</span>
-                    </div>
-                  </div>
-                ))}
+                })}
           </div>
-        </div>
+        </div> : null}
 
         {/* ================= BOTTOM BLOCK: OUR PROJECTS ================= */}
-        <div className="holding-bottom-block">
+        {loadingProjects || hasProjectItems ? <div className="holding-bottom-block">
           <div className="holding-block-header">
             <div className="holding-block-header-left">
               <h2 className="holding-main-title">{projectsTitle}</h2>
@@ -257,7 +190,7 @@ export function OrigamiHoldingSection({
                   );
                 })}
           </div>
-        </div>
+        </div> : null}
       </div>
     </section>
   );

@@ -40,6 +40,10 @@ export function ChooseSection({
   const sectionTitle = t("available_properties_title");
   const exploreText = t("available_properties_explore");
 
+  if (!loadingFloors && optionItems.length === 0 && !renderImage) {
+    return null;
+  }
+
   return (
     <section id="properties" className="available-properties-section">
       <div className="container available-properties-container">

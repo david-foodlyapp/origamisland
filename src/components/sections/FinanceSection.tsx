@@ -26,76 +26,19 @@ export function FinanceSection({ data, hasContent, t }: FinanceSectionProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  const fallbackSlides: SlideItem[] = useMemo(() => [
-    {
-      id: "batumi-potential",
-      title: "Why Batumi?",
-      subtitle: "A DYNAMIC MARKET ON THE RISE",
-      description:
-        "Batumi combines a strategic location, a growing economy and a year-round tourism industry, creating a strong foundation for real estate investment. Increasing international demand and ongoing infrastructure development continue to drive long-term value.",
-      badge: "INVEST IN POTENTIAL",
-      image: "/assets/hero_bg_2.png",
-      ctaText: "EXPLORE BATUMI'S POTENTIAL"
-    },
-    {
-      id: "capital-growth",
-      title: "High Capital Growth",
-      subtitle: "ACCELERATING ASSET VALUATION",
-      description:
-        "Prime waterfront real estate in Batumi yields consistent annual capital appreciation. Origami Island offers an extraordinary early-stage entry point for investors seeking premium international property appreciation.",
-      badge: "CAPITAL APPRECIATION",
-      image: "/assets/hero_bg.png",
-      ctaText: "VIEW CAPITAL PROJECTIONS"
-    },
-    {
-      id: "rental-yield",
-      title: "Attractive Rental Yield",
-      subtitle: "YEAR-ROUND HOSPITALITY DEMAND",
-      description:
-        "With fully managed five-star hospitality services, owners enjoy effortless passive rental yields driven by rising four-season tourism and booming international business travel.",
-      badge: "PASSIVE INCOME",
-      image: "/assets/hero_bg_2.png",
-      ctaText: "EXPLORE RENTAL MODEL"
-    },
-    {
-      id: "business-climate",
-      title: "Business & Tax Ease",
-      subtitle: "FAVORABLE GLOBAL HUB",
-      description:
-        "Georgia is recognized globally for its business-friendly regulations, fast ownership registration, visa-free access for over 90 countries, and zero property purchase tax.",
-      badge: "GLOBAL JURISDICTION",
-      image: "/assets/hero_bg.png",
-      ctaText: "LEARN ABOUT RESIDENCY"
-    },
-    {
-      id: "origami-island",
-      title: "Origami Island Landmark",
-      subtitle: "ICONIC ARCHITECTURAL DESTINATION",
-      description:
-        "A private island luxury retreat combining cutting-edge biohacking, branded residences, world-class dining, and unmatched lifestyle amenities right on the Black Sea coast.",
-      badge: "ISLAND INVESTMENT",
-      image: "/assets/hero_bg_2.png",
-      ctaText: "DISCOVER THE ISLAND"
-    }
-  ], []);
-
   const slides: SlideItem[] = useMemo(() => {
-    if (data?.items && data.items.length > 0) {
-      return data.items.map((item, idx) => {
-        const fallback = fallbackSlides[idx % fallbackSlides.length];
-        return {
-          id: item.id || `finance-item-${idx}`,
-          title: item.title || fallback.title,
-          subtitle: item.subtitle || fallback.subtitle,
-          description: item.description || fallback.description,
-          badge: item.badge || fallback.badge,
-          image: item.image ? normalizeApiImageUrl(item.image) : fallback.image,
-          ctaText: item.link ? undefined : fallback.ctaText
-        };
-      });
-    }
-    return fallbackSlides;
-  }, [data?.items, fallbackSlides]);
+    return (data?.items || [])
+      .filter((item) => Boolean(item.title?.trim() && item.image?.trim()))
+      .map((item, idx) => ({
+        id: item.id || `finance-item-${idx}`,
+        title: item.title.trim(),
+        subtitle: item.subtitle?.trim() || "",
+        description: item.description?.trim() || "",
+        badge: item.badge?.trim() || "",
+        image: normalizeApiImageUrl(item.image),
+        ctaText: undefined
+      }));
+  }, [data?.items]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -136,7 +79,7 @@ export function FinanceSection({ data, hasContent, t }: FinanceSectionProps) {
     };
   }, [slides.length]);
 
-  if (!hasContent && slides.length === 0) {
+  if (!hasContent || slides.length === 0) {
     return null;
   }
 
@@ -155,7 +98,7 @@ export function FinanceSection({ data, hasContent, t }: FinanceSectionProps) {
   };
 
   const currentSlide = slides[activeIndex] || slides[0];
-  const bgImage = currentSlide?.image || "/assets/hero_bg_2.png";
+  const bgImage = currentSlide.image;
   const totalCountFormatted = String(slides.length).padStart(2, "0");
   const currentIndexFormatted = String(Math.min(slides.length, activeIndex + 1)).padStart(2, "0");
 
