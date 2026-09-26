@@ -30,14 +30,11 @@ import {
   AudienceOutlineIcon, PriceTagIcon, InstallmentIcon, ResidenceIcon, HotelSuiteIcon, PenthouseIcon
 } from "./components/Icons";
 import {
-  type Theme,
   type BrandingSettings,
   type FooterSection,
   type GalleryItem,
   type GalleryApiItem,
   type GallerySectionResponse,
-  type NewsApiItem,
-  type NewsCard,
   type ChooseApiItem,
   type BuildingVisual,
   type BuildingVisualFloor,
@@ -56,16 +53,18 @@ import {
   formatArea,
   formatPrice,
   getUnitDisplayTitle,
-  getUnitCatalogRoute,
   mapUnitStatusLabel,
   mapUnitTypeLabel,
   navigateTo,
   type CurrencyRates,
   type SupportedCurrency
 } from "./unitCatalog";
-import { getExplorerRoute, type ExplorerRoute } from "./propertyExplorer";
 import { useHomepageContent } from "./hooks/useHomepageContent";
 import { useSiteChrome } from "./hooks/useSiteChrome";
+import { useAppRoute } from "./hooks/useAppRoute";
+import { usePreferences } from "./hooks/usePreferences";
+import { useNews } from "./hooks/useNews";
+import { formatNewsDate, formatNewsFallbackTitle } from "./api/news";
 
 const origamiInfoIcons = [
   <PriceTagIcon />,
@@ -131,59 +130,13 @@ const phoneCountryCodeFallbackOptions: PhoneCountryCodeOption[] = [
 
 const defaultPhoneCountryCode = phoneCountryCodeFallbackOptions[0].dialCode;
 
-type NewsDetailRoute = { name: "newsDetail"; slug: string };
-type AboutUsRoute = { name: "aboutUs" };
-type AppRouteState = ReturnType<typeof getUnitCatalogRoute> | ExplorerRoute | NewsDetailRoute | AboutUsRoute;
 type FeaturedUnitsFilter = "all" | "hotel_room" | "apartment";
 const SHOW_FEATURED_UNITS_SECTION = false;
-
-function getInitialTheme(): Theme {
-  const savedTheme = localStorage.getItem("origami_theme");
-  if (savedTheme === "light" || savedTheme === "dark") {
-    return savedTheme;
-  }
-
-  return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
-}
-
-function getInitialLanguage(): Language {
-  const savedLanguage = localStorage.getItem("origami_language");
-  return languageOptions.some((option) => option.code === savedLanguage) ? (savedLanguage as Language) : "ka";
-}
-
-function getInitialCurrency(): SupportedCurrency {
-  const savedCurrency = localStorage.getItem("origami_currency");
-  return savedCurrency === "GEL" || savedCurrency === "USD" || savedCurrency === "EUR" ? savedCurrency : "USD";
-}
 
 function getNewsLocale(language: Language) {
   return language;
 }
 
-function formatNewsDate(dateString: string, language: Language) {
-  const dateLocales: Record<Language, string> = {
-    en: "en-US",
-    ka: "ka-GE",
-    ru: "ru-RU",
-    zh: "zh-CN",
-    he: "he-IL",
-    it: "it-IT",
-    de: "de-DE",
-    ar: "ar-SA"
-  };
-  const formatted = new Intl.DateTimeFormat(dateLocales[language], {
-    month: "long",
-    day: "numeric",
-    year: "numeric"
-  }).format(new Date(dateString));
-
-  return language === "ka" ? formatted : formatted.toUpperCase();
-}
-
-function formatNewsFallbackTitle(slug: string) {
-  const normalized = slug.replace(/[-_]+/g, " ").trim();
-  return normalized.charAt(0).toUpperCase() + normalized.slice(1);
-}
 
 function stripHtmlContent(html: string) {
   return html
@@ -213,41 +166,9 @@ function resolveBrandingLogo(
   return localizedDark || localizedDefault || branding?.logo_dark_url || branding?.logo_url || brandingLogoFallbacks[language === "ka" ? "logo_dark_ka_url" : "logo_dark_en_url"];
 }
 
-function getAppRoute(): AppRouteState {
-  const path = window.location.pathname;
-  const normalized = path.endsWith("/") && path !== "/" ? path.slice(0, -1) : path;
-
-  if (normalized === "/coming-soon") {
-    window.history.replaceState(null, "", "/");
-  }
-
-  if (normalized === "/about-us") {
-    return { name: "aboutUs" };
-  }
-
-  const unitRoute = getUnitCatalogRoute();
-
-  if (unitRoute.name === "home" || unitRoute.name === "unitList" || unitRoute.name === "unitDetail") {
-    return unitRoute;
-  }
-
-  const newsMatch = normalized.match(/^\/news\/([^/]+)$/);
-  if (newsMatch) {
-    return { name: "newsDetail", slug: decodeURIComponent(newsMatch[1]) };
-  }
-
-  const explorerRoute = getExplorerRoute();
-  if (explorerRoute.name !== "unknown" && explorerRoute.name !== "home") {
-    return explorerRoute;
-  }
-
-  return unitRoute;
-}
-
 function App() {
-  const [routeState, setRouteState] = useState<AppRouteState>(getAppRoute);
-  const [language, setLanguage] = useState<Language>(getInitialLanguage);
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const routeState = useAppRoute();
+  const { language, setLanguage, theme, setTheme, currency, setCurrency } = usePreferences();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
   const [openFooterSection, setOpenFooterSection] = useState<FooterSection | null>(null);
@@ -259,12 +180,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false);
   const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
-  const [currency, setCurrency] = useState<SupportedCurrency>(getInitialCurrency);
   const [currencyRates, setCurrencyRates] = useState<CurrencyRates | null>(null);
-  const [newsItems, setNewsItems] = useState<NewsCard[]>([]);
-  const [newsDetail, setNewsDetail] = useState<NewsApiItem | null>(null);
-  const [isNewsDetailLoading, setIsNewsDetailLoading] = useState(false);
-  const [newsDetailError, setNewsDetailError] = useState("");
   const [featuredUnits, setFeaturedUnits] = useState<ExplorerUnit[]>([]);
   const [isFeaturedUnitsLoading, setIsFeaturedUnitsLoading] = useState(true);
   const [featuredUnitsFilter, setFeaturedUnitsFilter] = useState<FeaturedUnitsFilter>("all");
@@ -292,6 +208,12 @@ function App() {
   const galleryTrackRef = useRef<HTMLDivElement | null>(null);
   const infrastructureSectionRef = useRef<HTMLElement | null>(null);
   const t = (key: TranslationKey) => translations[language][key];
+  const {
+    items: newsItems,
+    detail: newsDetail,
+    isDetailLoading: isNewsDetailLoading,
+    detailError: newsDetailError
+  } = useNews(language, routeState.name === "newsDetail" ? routeState.slug : null, t("news_category"));
   const {
     infrastructureItems: apiInfrastructureItems,
     biohackingData: apiBiohackingData,
@@ -387,36 +309,6 @@ function App() {
   useEffect(() => {
     GA4React.initialize("G-QYSDYT7YGN");
   }, []);
-
-  useEffect(() => {
-    const handleRouteChange = () => {
-      setRouteState(getAppRoute());
-    };
-
-    window.addEventListener("popstate", handleRouteChange);
-
-    return () => window.removeEventListener("popstate", handleRouteChange);
-  }, []);
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-    localStorage.setItem("origami_theme", theme);
-
-    const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
-    if (metaColorScheme) {
-      metaColorScheme.setAttribute("content", theme);
-    }
-  }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem("origami_language", language);
-    document.documentElement.lang = language;
-    document.documentElement.dir = language === "ar" || language === "he" ? "rtl" : "ltr";
-  }, [language]);
-
-  useEffect(() => {
-    localStorage.setItem("origami_currency", currency);
-  }, [currency]);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -543,18 +435,6 @@ function App() {
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: light)");
-    const handleThemePreference = (event: MediaQueryListEvent) => {
-      if (!localStorage.getItem("origami_theme")) {
-        setTheme(event.matches ? "light" : "dark");
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleThemePreference);
-    return () => mediaQuery.removeEventListener("change", handleThemePreference);
   }, []);
 
   useEffect(() => {
@@ -795,84 +675,6 @@ function App() {
     revealElements.forEach((element) => observer.observe(element));
     return () => observer.disconnect();
   }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadNews = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/news?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`News request failed: ${response.status}`);
-        }
-
-        const payload: { data: NewsApiItem[] } = await response.json();
-        const nextNews = payload.data
-          .filter((item) => item.image_url && item.status !== "inactive")
-          .sort((a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime())
-          .map((item) => ({
-            id: item.id,
-            slug: item.slug,
-            title: item.title?.trim() || formatNewsFallbackTitle(item.slug),
-            excerpt: item.excerpt?.trim() || "",
-            image: item.image_url,
-            date: formatNewsDate(item.published_at, language),
-            category: item.category?.name || t("news_category")
-          }));
-
-        setNewsItems(nextNews);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        setNewsItems([]);
-      }
-    };
-
-    loadNews();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    if (routeState.name !== "newsDetail") {
-      setNewsDetail(null);
-      setNewsDetailError("");
-      return;
-    }
-
-    const controller = new AbortController();
-
-    const loadNewsDetail = async () => {
-      setIsNewsDetailLoading(true);
-      setNewsDetailError("");
-
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/news/${routeState.slug}?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`News detail request failed: ${response.status}`);
-        }
-
-        const payload: { data: NewsApiItem } = await response.json();
-        setNewsDetail(payload.data);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load news detail:", error);
-        setNewsDetail(null);
-        setNewsDetailError(language === "ka" ? "სიახლე ვერ მოიძებნა" : "News article was not found");
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsNewsDetailLoading(false);
-        }
-      }
-    };
-
-    loadNewsDetail();
-    return () => controller.abort();
-  }, [routeState, language]);
 
   const getBiohackingIcon = (slug: string) => {
     if (slug.includes("wellness")) return <WellnessIcon />;
