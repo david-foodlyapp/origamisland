@@ -159,14 +159,7 @@ export function FinanceSection({ data, hasContent, t }: FinanceSectionProps) {
   const totalCountFormatted = String(slides.length).padStart(2, "0");
   const currentIndexFormatted = String(Math.min(slides.length, activeIndex + 1)).padStart(2, "0");
 
-  const eyebrowText = t ? t("finance_eyebrow") : "INVESTMENT";
   const mainTitle = currentSlide?.title || data?.title || (t ? t("finance_title") : "INVESTMENT");
-  const mainSubtitle =
-    currentSlide?.subtitle && currentSlide.subtitle.toLowerCase() !== mainTitle.toLowerCase()
-      ? currentSlide.subtitle
-      : data?.description && data.description !== mainTitle
-      ? data.description
-      : "";
 
   return (
     <section id="finances" className="finance-investment-section">
@@ -187,14 +180,7 @@ export function FinanceSection({ data, hasContent, t }: FinanceSectionProps) {
           {/* Left Hero / Brand Content */}
           <div className="finance-left-content">
             <div className="finance-left-top">
-              <div className="finance-hero-eyebrow">
-                <span className="finance-eyebrow-line" aria-hidden="true" />
-                <span className="finance-eyebrow-text">{eyebrowText}</span>
-              </div>
-
               <h2 className="finance-hero-heading">{mainTitle}</h2>
-
-              {mainSubtitle ? <p className="finance-hero-subheading">{mainSubtitle}</p> : null}
             </div>
           </div>
 
