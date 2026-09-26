@@ -125,12 +125,8 @@ export function OrigamiHoldingSection({
       ? projectsData.items.slice(0, 3)
       : defaultProjects;
 
-  const holdingEyebrow = t("holding_eyebrow");
   const holdingTitle = holdingData?.title || "THE ISLAND";
-
-  const projectsEyebrow = t("projects_eyebrow");
   const projectsTitle = projectsData?.title || t("projects_title");
-  const projectsViewAll = t("projects_view_all");
 
   return (
     <section id="holding" className="origami-holding-combined-section">
@@ -139,10 +135,6 @@ export function OrigamiHoldingSection({
         <div className="holding-top-block">
           <div className="holding-block-header">
             <div className="holding-block-header-left">
-              <div className="holding-eyebrow">
-                <span className="holding-eyebrow-line" aria-hidden="true" />
-                <span className="holding-eyebrow-text">{holdingEyebrow}</span>
-              </div>
               <h2 className="holding-main-title">{holdingTitle}</h2>
             </div>
           </div>
@@ -208,22 +200,7 @@ export function OrigamiHoldingSection({
         <div className="holding-bottom-block">
           <div className="holding-block-header">
             <div className="holding-block-header-left">
-              <div className="holding-eyebrow">
-                <span className="holding-eyebrow-line" aria-hidden="true" />
-                <span className="holding-eyebrow-text">{projectsEyebrow}</span>
-              </div>
               <h2 className="holding-main-title">{projectsTitle}</h2>
-            </div>
-
-            <div className="holding-block-header-right">
-              <button
-                type="button"
-                className="holding-header-link"
-                onClick={() => openModal("consultation")}
-              >
-                <span>{projectsViewAll}</span>
-                <span className="holding-link-arrow" aria-hidden="true">→</span>
-              </button>
             </div>
           </div>
 
