@@ -32,7 +32,6 @@ import {
 import {
   type Theme,
   type BrandingSettings,
-  type BrandingSettingsResponse,
   type FooterSection,
   type GalleryItem,
   type GalleryApiItem,
@@ -40,18 +39,11 @@ import {
   type NewsApiItem,
   type NewsCard,
   type ChooseApiItem,
-  type FooterMenuApiItem,
-  type FooterMenuSectionResponse,
-  type ContactSettings,
-  type ContactSettingsResponse,
-  type SectionGridCardItem,
   type BuildingVisual,
   type BuildingVisualFloor,
   type BuildingVisualResponse,
   type ExplorerUnit,
   type UnitFilterOptions,
-  type SocialNetworkItem,
-  type SocialNetworksResponse,
   type WebsiteSectionResponse
 } from "./types";
 import {
@@ -73,6 +65,7 @@ import {
 } from "./unitCatalog";
 import { getExplorerRoute, type ExplorerRoute } from "./propertyExplorer";
 import { useHomepageContent } from "./hooks/useHomepageContent";
+import { useSiteChrome } from "./hooks/useSiteChrome";
 
 const origamiInfoIcons = [
   <PriceTagIcon />,
@@ -280,13 +273,6 @@ function App() {
   const [apiGalleryItems, setApiGalleryItems] = useState<GalleryApiItem[]>([]);
   const [, setIsGalleryLoading] = useState(true);
   const [apiSection3Data, setApiSection3Data] = useState<{ title: string; background_image: string } | null>(null);
-  const [apiFooterDescription, setApiFooterDescription] = useState("");
-  const [apiFooterMenuItems, setApiFooterMenuItems] = useState<FooterMenuApiItem[]>([]);
-  const [requestCallDescription, setRequestCallDescription] = useState("");
-  const [apiFooterLegalItems, setApiFooterLegalItems] = useState<SectionGridCardItem[]>([]);
-  const [apiContactSettings, setApiContactSettings] = useState<ContactSettings | null>(null);
-  const [apiSocialNetworks, setApiSocialNetworks] = useState<SocialNetworkItem[]>([]);
-  const [branding, setBranding] = useState<BrandingSettings | null>(null);
   const [selectedChooseItem, setSelectedChooseItem] = useState<ChooseApiItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessState, setShowSuccessState] = useState(false);
@@ -319,6 +305,15 @@ function App() {
     isAboutLoading,
     isAboutInfoLoading
   } = useHomepageContent(language);
+  const {
+    branding,
+    contactSettings: apiContactSettings,
+    socialNetworks: apiSocialNetworks,
+    footerDescription: apiFooterDescription,
+    footerMenuItems: apiFooterMenuItems,
+    requestCallDescription,
+    footerLegalItems: apiFooterLegalItems
+  } = useSiteChrome(language);
   const featuredUnitsCopy = language === "ka"
     ? {
       cta: "დეტალები",
@@ -572,27 +567,6 @@ function App() {
   useEffect(() => {
     const controller = new AbortController();
 
-    const loadBranding = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/settings/branding`, {
-          signal: controller.signal
-        });
-
-        if (!response.ok) {
-          throw new Error(`Branding request failed with status ${response.status}`);
-        }
-
-        const result = (await response.json()) as BrandingSettingsResponse;
-        if (result?.data) {
-          setBranding(result.data);
-        }
-      } catch (error) {
-        if ((error as Error).name !== "AbortError") {
-          console.error("Failed to load branding settings:", error);
-        }
-      }
-    };
-
     const loadCountryCodes = async () => {
       try {
         const response = await fetch("https://api.foodlyapp.ge/api/settings/country_codes", {
@@ -645,7 +619,6 @@ function App() {
       }
     };
 
-    void loadBranding();
     void loadCountryCodes();
 
     return () => controller.abort();
@@ -695,179 +668,6 @@ function App() {
       window.removeEventListener("resize", syncGalleryPagination);
     };
   }, [resolvedGalleryItems.length]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadFooterContent = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/footer?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Footer content request failed: ${response.status}`);
-        }
-
-        const payload: WebsiteSectionResponse = await response.json();
-        const footerItem = payload.data.items
-          .filter((item) => item.status)
-          .sort((a, b) => a.rank - b.rank)[0];
-        const title = footerItem?.title?.trim() || "";
-        const subtitle = footerItem?.subtitle?.trim() || "";
-        const description = title && subtitle && title !== subtitle ? `${title}- ${subtitle}` : title || subtitle;
-        setApiFooterDescription(description);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load footer content:", error);
-        setApiFooterDescription("");
-      }
-    };
-
-    loadFooterContent();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadFooterMenu = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/menu?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Footer menu request failed: ${response.status}`);
-        }
-
-        const payload: FooterMenuSectionResponse = await response.json();
-        setApiFooterMenuItems(
-          payload.data.items
-            .filter((item) => item.status)
-            .sort((a, b) => a.rank - b.rank)
-        );
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load footer menu data:", error);
-        setApiFooterMenuItems([]);
-      }
-    };
-
-    loadFooterMenu();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadRequestCallItem = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/menu/item/request-a-call?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Request a call menu item request failed: ${response.status}`);
-        }
-
-        const payload: { data: { description?: string } } = await response.json();
-        if (payload?.data?.description) {
-          setRequestCallDescription(payload.data.description);
-        }
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load request-a-call menu item data:", error);
-      }
-    };
-
-    loadRequestCallItem();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadFooterLegalMenu = async () => {
-      try {
-        const locale = getNewsLocale(language);
-        const response = await fetch(`${API_BASE_URL}/sections/footer-menu?locale=${locale}`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Footer legal menu request failed: ${response.status}`);
-        }
-
-        const payload: WebsiteSectionResponse = await response.json();
-        setApiFooterLegalItems(
-          payload.data.items
-            .filter((item) => item.status)
-            .sort((a, b) => a.rank - b.rank)
-        );
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load footer legal menu:", error);
-        setApiFooterLegalItems([]);
-      }
-    };
-
-    loadFooterLegalMenu();
-    return () => controller.abort();
-  }, [language]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadContactSettings = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/settings/contact`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Contact settings request failed: ${response.status}`);
-        }
-
-        const payload: ContactSettingsResponse = await response.json();
-        setApiContactSettings(payload.data);
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load contact settings:", error);
-        setApiContactSettings(null);
-      }
-    };
-
-    loadContactSettings();
-    return () => controller.abort();
-  }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-
-    const loadSocialNetworks = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/social-networks`, { signal: controller.signal });
-        if (!response.ok) {
-          throw new Error(`Social networks request failed: ${response.status}`);
-        }
-
-        const payload: SocialNetworksResponse = await response.json();
-        setApiSocialNetworks(
-          payload.data
-            .filter((item) => item.status)
-            .sort((a, b) => a.rank - b.rank)
-        );
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        console.error("Failed to load social networks data:", error);
-        setApiSocialNetworks([]);
-      }
-    };
-
-    loadSocialNetworks();
-    return () => controller.abort();
-  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
