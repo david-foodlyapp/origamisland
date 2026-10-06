@@ -131,7 +131,7 @@ Private repository. All rights reserved by **Origami Holding**.
 
 ---
 
-## 👤 Author
+## 👤 Author 
 
-**Davit Gakhokia**
+**Davit Gakhokia **
 
