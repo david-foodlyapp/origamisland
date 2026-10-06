@@ -1,5 +1,5 @@
 import { useState, useEffect, FormEvent } from "react";
-import { API_BASE_URL } from "../../config";
+import { API_BASE_URL, PLATFORM_SLUG } from "../../config";
 
 type CountdownValue = {
   hours: number;
@@ -108,7 +108,8 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
           phone: fullPhoneNumber,
           subject: "consultation",
           message: "Origami Island consultation request",
-          source_page: window.location.pathname,
+          platform_slug: PLATFORM_SLUG,
+          source_page: window.location.href,
         }),
       });
 

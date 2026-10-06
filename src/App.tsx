@@ -3,7 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import GA4React from "react-ga4";
 import "react-medium-image-zoom/dist/styles.css";
 import { translations, type Language, type TranslationKey } from "./i18n";
-import { API_BASE_URL } from "./config";
+import { API_BASE_URL, PLATFORM_SLUG } from "./config";
 import { normalizeApiImageUrl } from "./utils/media";
 
 import { Header } from "./components/sections/Header";
@@ -985,7 +985,8 @@ function App() {
           message: modalStyle === "request_call"
             ? `Request a Call Submission:\nName: ${formName.trim()}\nPhone: ${fullPhoneNumber}\nPreferred Language: ${formPreferredLanguage}\nCountry: ${formCountry}`
             : `${selectedChooseItem?.description || "Origami Island consultation request"}\nPreferred Language: ${formPreferredLanguage}\nPreferred Channel: ${formPreferredChannel}`,
-          source_page: window.location.pathname
+          platform_slug: PLATFORM_SLUG,
+          source_page: window.location.href
         })
       });
 
