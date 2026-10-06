@@ -220,7 +220,7 @@ export const ka: Record<TranslationKey, string> = {
   channel_email: "ელ.ფოსტა",
   form_success_title: "გმადლობთ",
   form_success_desc:
-    "თქვენი მოთხოვნა წარმატებით დარეგისტრირდა. ჩვენი მრჩეველი 2 საათის განმავლობაში დაგიკავშირდებათ.",
+    "თქვენი მოთხოვნა წარმატებით გაიგზავნა, ჩვენი წარმომადგენელი მალე დაგიკავშირდებათ.",
   form_success_close: "დახურვა",
   footer_desc: "Origami Island- The Art of Living.",
   footer_col_links: "გვერდები",
