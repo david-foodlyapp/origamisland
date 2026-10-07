@@ -1,5 +1,6 @@
 import { useState, useEffect, FormEvent } from "react";
 import { API_BASE_URL, PLATFORM_SLUG } from "../../config";
+import { getUtmParams } from "../../utils/utm";
 
 type CountdownValue = {
   hours: number;
@@ -96,6 +97,7 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
     const fullPhoneNumber = `${countryCode} ${phone}`.trim();
 
     try {
+      const utmParams = getUtmParams();
       const response = await fetch(`${API_BASE_URL}/contact-messages`, {
         method: "POST",
         headers: {
@@ -110,6 +112,7 @@ export function ComingSoonPage({ darkThemeLogoSrc, lightThemeLogoSrc, language, 
           message: "Origami Island consultation request",
           platform_slug: PLATFORM_SLUG,
           source_page: window.location.href,
+          ...utmParams,
         }),
       });
 

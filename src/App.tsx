@@ -5,6 +5,7 @@ import "react-medium-image-zoom/dist/styles.css";
 import { translations, type Language, type TranslationKey } from "./i18n";
 import { API_BASE_URL, PLATFORM_SLUG } from "./config";
 import { normalizeApiImageUrl } from "./utils/media";
+import { getUtmParams } from "./utils/utm";
 
 import { Header } from "./components/sections/Header";
 import { HeroSection } from "./components/sections/HeroSection";
@@ -325,6 +326,7 @@ function App() {
 
   useEffect(() => {
     GA4React.initialize("G-QYSDYT7YGN");
+    getUtmParams();
   }, []);
 
   useEffect(() => {
@@ -969,6 +971,7 @@ function App() {
     const fullPhoneNumber = `${activeCountryCode} ${formPhone}`.trim();
 
     try {
+      const utmParams = getUtmParams();
       const response = await fetch(`${API_BASE_URL}/contact-messages`, {
         method: "POST",
         headers: {
@@ -986,7 +989,8 @@ function App() {
             ? `Request a Call Submission:\nName: ${formName.trim()}\nPhone: ${fullPhoneNumber}\nPreferred Language: ${formPreferredLanguage}\nCountry: ${formCountry}`
             : `${selectedChooseItem?.description || "Origami Island consultation request"}\nPreferred Language: ${formPreferredLanguage}\nPreferred Channel: ${formPreferredChannel}`,
           platform_slug: PLATFORM_SLUG,
-          source_page: window.location.href
+          source_page: window.location.href,
+          ...utmParams
         })
       });
 
